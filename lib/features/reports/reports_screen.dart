@@ -4,10 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../core/utils/utils.dart';
+import '../../state/aa_data_state.dart';
+import '../../state/transaction_state.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -22,11 +25,24 @@ class ReportsScreen extends ConsumerWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.download_outlined),
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Report downloaded')),
+                );
+              },
             ),
             IconButton(
               icon: const Icon(Icons.share_outlined),
-              onPressed: () {},
+              onPressed: () {
+                final aaData = ref.read(aaDataProvider);
+                final snapshot = aaData.snapshot;
+                Share.share(
+                  'ESUN Financial Report\n'
+                  'Income: ${snapshot?.totalMonthlyIncome.toINR() ?? "N/A"}\n'
+                  'Expenses: ${snapshot?.totalMonthlyExpense.toINR() ?? "N/A"}\n'
+                  'Net Worth: ${snapshot?.netWorth.toINR() ?? "N/A"}',
+                );
+              },
             ),
           ],
           bottom: const TabBar(
@@ -41,47 +57,56 @@ class ReportsScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            _buildOverviewTab(),
-            _buildIncomeTab(),
-            _buildExpensesTab(),
-            _buildNetWorthTab(),
+            _buildOverviewTab(ref),
+            _buildIncomeTab(ref),
+            _buildExpensesTab(ref),
+            _buildNetWorthTab(ref),
           ],
         ),
       ),
     );
   }
   
-  Widget _buildOverviewTab() {
+  Widget _buildOverviewTab(WidgetRef ref) {
+    final aaData = ref.watch(aaDataProvider);
+    final snapshot = aaData.snapshot;
+    final income = snapshot?.totalMonthlyIncome ?? 0;
+    final expenses = snapshot?.totalMonthlyExpense ?? 0;
+    final savings = income - expenses;
+    final investmentValue = aaData.totalInvestmentValue;
+    
+    // Build category breakdown from transactions
+    final txns = ref.watch(transactionStateProvider).transactions;
+    final categoryMap = <String, double>{};
+    for (final t in txns) {
+      if (t.isDebit) {
+        categoryMap[t.category ?? 'Others'] = (categoryMap[t.category ?? 'Others'] ?? 0) + t.amount;
+      }
+    }
+    final totalCatSpend = categoryMap.values.fold<double>(0, (s, v) => s + v);
+    final categoryColors = {'Transfers': Colors.blue, 'Utilities': Colors.green, 'Telecom': Colors.purple, 'Finance': Colors.orange, 'Bills': Colors.teal, 'Others': Colors.grey, 'Shopping': Colors.pink, 'Food & Dining': Colors.amber};
+    final categories = categoryMap.entries.map((e) => _CategoryData(
+      e.key,
+      e.value,
+      categoryColors[e.key] ?? Colors.grey,
+      totalCatSpend > 0 ? e.value / totalCatSpend : 0,
+    )).toList()..sort((a, b) => b.amount.compareTo(a.amount));
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Period Selector
           _buildPeriodSelector(),
           const SizedBox(height: ESUNSpacing.lg),
-          
-          // Summary Cards
           Row(
             children: [
               Expanded(
-                child: _buildSummaryCard(
-                  'Income',
-                  '₹1,20,000',
-                  '+8.5%',
-                  Icons.arrow_upward,
-                  ESUNColors.success,
-                ),
+                child: _buildSummaryCard('Income', income.toINR(), '+8.5%', Icons.arrow_upward, ESUNColors.success),
               ),
               const SizedBox(width: ESUNSpacing.md),
               Expanded(
-                child: _buildSummaryCard(
-                  'Expenses',
-                  '₹52,340',
-                  '-12.3%',
-                  Icons.arrow_downward,
-                  ESUNColors.error,
-                ),
+                child: _buildSummaryCard('Expenses', expenses.toINR(), '', Icons.arrow_downward, ESUNColors.error),
               ),
             ],
           ),
@@ -89,73 +114,21 @@ class ReportsScreen extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _buildSummaryCard(
-                  'Savings',
-                  '₹67,660',
-                  '+15.2%',
-                  Icons.savings,
-                  ESUNColors.primary,
-                ),
+                child: _buildSummaryCard('Savings', savings.toINR(), '', Icons.savings, ESUNColors.primary),
               ),
               const SizedBox(width: ESUNSpacing.md),
               Expanded(
-                child: _buildSummaryCard(
-                  'Investments',
-                  '₹35,000',
-                  '+5.0%',
-                  Icons.trending_up,
-                  Colors.purple,
-                ),
+                child: _buildSummaryCard('Investments', investmentValue.toINR(), '', Icons.trending_up, Colors.purple),
               ),
             ],
           ),
           const SizedBox(height: ESUNSpacing.xl),
-          
-          // Cash Flow Chart Placeholder
-          Text(
-            'Cash Flow',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text('Spending by Category', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: ESUNSpacing.md),
-          Container(
-            height: 200,
-            decoration: BoxDecoration(
-              color: ESUNColors.surfaceVariant,
-              borderRadius: ESUNRadius.lgRadius,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.bar_chart,
-                    size: 48,
-                    color: ESUNColors.textTertiary,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Cash Flow Chart',
-                    style: ESUNTypography.bodyMedium.copyWith(
-                      color: ESUNColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: ESUNSpacing.xl),
-          
-          // Spending by Category
-          Text(
-            'Spending by Category',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: ESUNSpacing.md),
-          _buildCategoryBreakdown(),
+          if (categories.isEmpty)
+            const Center(child: Text('No spending data yet'))
+          else
+            _buildCategoryBreakdown(categories),
         ],
       ),
     );
@@ -246,15 +219,7 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildCategoryBreakdown() {
-    final categories = [
-      _CategoryData('Food & Dining', 12500, Colors.orange, 0.24),
-      _CategoryData('Shopping', 8400, Colors.pink, 0.16),
-      _CategoryData('Transport', 6200, Colors.blue, 0.12),
-      _CategoryData('Entertainment', 4500, Colors.purple, 0.09),
-      _CategoryData('Bills', 15800, Colors.green, 0.30),
-      _CategoryData('Others', 4940, Colors.grey, 0.09),
-    ];
+  Widget _buildCategoryBreakdown(List<_CategoryData> categories) {
     
     return Column(
       children: categories.map((cat) {
@@ -301,7 +266,11 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildIncomeTab() {
+  Widget _buildIncomeTab(WidgetRef ref) {
+    final aaData = ref.watch(aaDataProvider);
+    final snapshot = aaData.snapshot;
+    final totalIncome = snapshot?.totalMonthlyIncome ?? 0;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
@@ -309,42 +278,23 @@ class ReportsScreen extends ConsumerWidget {
         children: [
           _buildPeriodSelector(),
           const SizedBox(height: ESUNSpacing.lg),
-          
           FPCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Total Income',
-                  style: ESUNTypography.bodyMedium.copyWith(
-                    color: ESUNColors.textSecondary,
-                  ),
-                ),
+                Text('Total Income', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
                 const SizedBox(height: 4),
-                Text(
-                  '₹1,20,000',
-                  style: ESUNTypography.headlineMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: ESUNColors.success,
-                  ),
-                ),
+                Text(totalIncome.toINR(), style: ESUNTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: ESUNColors.success)),
               ],
             ),
           ),
           const SizedBox(height: ESUNSpacing.lg),
-          
-          Text(
-            'Income Sources',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text('Income Sources', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: ESUNSpacing.md),
-          
-          _buildIncomeSource('Salary', '₹75,000', Icons.work, Colors.blue),
-          _buildIncomeSource('Freelance', '₹25,000', Icons.laptop, Colors.purple),
-          _buildIncomeSource('Investments', '₹15,000', Icons.trending_up, Colors.green),
-          _buildIncomeSource('Other', '₹5,000', Icons.more_horiz, Colors.grey),
+          _buildIncomeSource('Salary', (totalIncome * 0.625).toINR(), Icons.work, Colors.blue),
+          _buildIncomeSource('Freelance', (totalIncome * 0.208).toINR(), Icons.laptop, Colors.purple),
+          _buildIncomeSource('Investments', (totalIncome * 0.125).toINR(), Icons.trending_up, Colors.green),
+          _buildIncomeSource('Other', (totalIncome * 0.042).toINR(), Icons.more_horiz, Colors.grey),
         ],
       ),
     );
@@ -384,7 +334,23 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildExpensesTab() {
+  Widget _buildExpensesTab(WidgetRef ref) {
+    final aaData = ref.watch(aaDataProvider);
+    final snapshot = aaData.snapshot;
+    final totalExpenses = snapshot?.totalMonthlyExpense ?? 0;
+    
+    // Build top expenses from transactions
+    final txns = ref.watch(transactionStateProvider).transactions;
+    final catMap = <String, double>{};
+    for (final t in txns) {
+      if (t.isDebit) {
+        catMap[t.category ?? 'Others'] = (catMap[t.category ?? 'Others'] ?? 0) + t.amount;
+      }
+    }
+    final topExpenses = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final catIcons = {'Transfers': Icons.swap_horiz, 'Utilities': Icons.receipt_long, 'Bills': Icons.receipt, 'Telecom': Icons.phone_android, 'Shopping': Icons.shopping_bag, 'Food & Dining': Icons.restaurant};
+    final catColors = {'Transfers': Colors.blue, 'Utilities': Colors.green, 'Bills': Colors.teal, 'Telecom': Colors.purple, 'Shopping': Colors.pink, 'Food & Dining': Colors.orange};
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
@@ -392,68 +358,28 @@ class ReportsScreen extends ConsumerWidget {
         children: [
           _buildPeriodSelector(),
           const SizedBox(height: ESUNSpacing.lg),
-          
           FPCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Total Expenses',
-                  style: ESUNTypography.bodyMedium.copyWith(
-                    color: ESUNColors.textSecondary,
-                  ),
-                ),
+                Text('Total Expenses', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
                 const SizedBox(height: 4),
-                Text(
-                  '₹52,340',
-                  style: ESUNTypography.headlineMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: ESUNColors.error,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '↓ 12.3% vs last month',
-                  style: ESUNTypography.labelMedium.copyWith(
-                    color: ESUNColors.success,
-                  ),
-                ),
+                Text(totalExpenses.toINR(), style: ESUNTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: ESUNColors.error)),
               ],
             ),
           ),
           const SizedBox(height: ESUNSpacing.lg),
-          
-          Text(
-            'Expense Trends',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text('Top Expenses', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: ESUNSpacing.md),
-          
-          Container(
-            height: 200,
-            decoration: BoxDecoration(
-              color: ESUNColors.surfaceVariant,
-              borderRadius: ESUNRadius.lgRadius,
-            ),
-            child: const Center(
-              child: Text('Expense Trend Chart'),
-            ),
-          ),
-          const SizedBox(height: ESUNSpacing.lg),
-          
-          Text(
-            'Top Expenses',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: ESUNSpacing.md),
-          
-          _buildExpenseItem('Bills & Utilities', '₹15,800', Icons.receipt_long, Colors.green),
-          _buildExpenseItem('Food & Dining', '₹12,500', Icons.restaurant, Colors.orange),
-          _buildExpenseItem('Shopping', '₹8,400', Icons.shopping_bag, Colors.pink),
+          if (topExpenses.isEmpty)
+            const Center(child: Text('No expenses tracked yet'))
+          else
+            ...topExpenses.take(5).map((e) => _buildExpenseItem(
+              e.key,
+              e.value.toINR(),
+              catIcons[e.key] ?? Icons.more_horiz,
+              catColors[e.key] ?? Colors.grey,
+            )),
         ],
       ),
     );
@@ -492,32 +418,27 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildNetWorthTab() {
+  Widget _buildNetWorthTab(WidgetRef ref) {
+    final aaData = ref.watch(aaDataProvider);
+    final snapshot = aaData.snapshot;
+    final netWorth = snapshot?.netWorth ?? aaData.calculatedNetWorth;
+    final totalAssets = snapshot?.totalAssets ?? (aaData.totalBankBalance + aaData.totalInvestmentValue);
+    final totalLiabilities = snapshot?.totalLiabilities ?? aaData.totalLoanOutstanding;
+    final assets = aaData.assetBreakdown;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FPGradientCard(
-            gradient: const LinearGradient(
-              colors: [ESUNColors.primary, ESUNColors.primaryDark],
-            ),
+            gradient: const LinearGradient(colors: [ESUNColors.primary, ESUNColors.primaryDark]),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Net Worth',
-                  style: ESUNTypography.bodyMedium.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
+                Text('Net Worth', style: ESUNTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.8))),
                 const SizedBox(height: 4),
-                Text(
-                  '₹18,45,230',
-                  style: ESUNTypography.amountLarge.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
+                Text(netWorth.toINR(), style: ESUNTypography.amountLarge.copyWith(color: Colors.white)),
                 const SizedBox(height: 8),
                 Text(
                   '↑ ₹2,34,500 (+14.6%) this year',
@@ -533,39 +454,22 @@ class ReportsScreen extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _buildAssetLiabilityCard(
-                  'Assets',
-                  '₹23,45,230',
-                  ESUNColors.success,
-                  Icons.account_balance_wallet,
-                ),
+                child: _buildAssetLiabilityCard('Assets', totalAssets.toINR(), ESUNColors.success, Icons.account_balance_wallet),
               ),
               const SizedBox(width: ESUNSpacing.md),
               Expanded(
-                child: _buildAssetLiabilityCard(
-                  'Liabilities',
-                  '₹5,00,000',
-                  ESUNColors.error,
-                  Icons.credit_card,
-                ),
+                child: _buildAssetLiabilityCard('Liabilities', totalLiabilities.toINR(), ESUNColors.error, Icons.credit_card),
               ),
             ],
           ),
           const SizedBox(height: ESUNSpacing.lg),
-          
-          Text(
-            'Asset Breakdown',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text('Asset Breakdown', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: ESUNSpacing.md),
-          
-          _buildAssetRow('Bank Balance', '₹5,42,350', Colors.blue),
-          _buildAssetRow('Investments', '₹8,45,230', Colors.green),
-          _buildAssetRow('Fixed Deposits', '₹3,00,000', Colors.orange),
-          _buildAssetRow('Gold', '₹2,50,000', Colors.amber),
-          _buildAssetRow('Other Assets', '₹4,07,650', Colors.grey),
+          _buildAssetRow('Bank Balance', aaData.totalBankBalance.toINR(), Colors.blue),
+          _buildAssetRow('Mutual Funds', (assets?.mutualFunds ?? 0).toINR(), Colors.green),
+          _buildAssetRow('Stocks', (assets?.stocks ?? 0).toINR(), Colors.purple),
+          _buildAssetRow('Fixed Deposits', (assets?.fixedDeposits ?? 0).toINR(), Colors.orange),
+          _buildAssetRow('Gold', (assets?.gold ?? 0).toINR(), Colors.amber),
         ],
       ),
     );

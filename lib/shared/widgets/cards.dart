@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';
+import 'smart_network_image.dart';
 
 /// Base Card
 class FPCard extends StatelessWidget {
@@ -11,6 +12,7 @@ class FPCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final FPCardVariant variant;
   final BorderRadiusGeometry? borderRadius;
   final Color? backgroundColor;
@@ -22,6 +24,7 @@ class FPCard extends StatelessWidget {
     this.padding,
     this.margin,
     this.onTap,
+    this.onLongPress,
     this.variant = FPCardVariant.outlined,
     this.borderRadius,
     this.backgroundColor,
@@ -34,6 +37,7 @@ class FPCard extends StatelessWidget {
     this.padding,
     this.margin,
     this.onTap,
+    this.onLongPress,
     this.borderRadius,
     this.backgroundColor,
     this.shadow,
@@ -45,6 +49,7 @@ class FPCard extends StatelessWidget {
     this.padding,
     this.margin,
     this.onTap,
+    this.onLongPress,
     this.borderRadius,
     this.backgroundColor,
     this.shadow,
@@ -96,11 +101,12 @@ class FPCard extends StatelessWidget {
       ),
     );
     
-    if (onTap != null) {
+    if (onTap != null || onLongPress != null) {
       card = Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
+          onLongPress: onLongPress,
           borderRadius: effectiveBorderRadius as BorderRadius,
           child: card,
         ),
@@ -502,46 +508,46 @@ class FPTransactionCard extends StatelessWidget {
   
   static final Map<String, String> _merchantLogos = {
     // Food & Dining
-    'swiggy': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/200px-Swiggy_logo.svg.png',
-    'zomato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Zomato_logo.png/200px-Zomato_logo.png',
-    'dominos': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/200px-Domino%27s_pizza_logo.svg.png',
-    'mcdonalds': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/200px-McDonald%27s_Golden_Arches.svg.png',
-    'starbucks': 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/200px-Starbucks_Corporation_Logo_2011.svg.png',
+    'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+    'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    'dominos': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dominos.co.in&size=128',
+    'mcdonalds': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mcdonalds.com&size=128',
+    'starbucks': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://starbucks.in&size=128',
     
     // Transport
-    'ola': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Ola_Cabs_logo.svg/200px-Ola_Cabs_logo.svg.png',
-    'uber': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/200px-Uber_logo_2018.svg.png',
-    'rapido': 'https://play-lh.googleusercontent.com/P0Ofljgq8j7bkb3BOwpg6JT7Xv4K4XKkVxwk5B4fWYQDp5hRD7nh1hTyQMG6oD7aeJBY',
+    'ola': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://uber.com&size=128',
+    'uber': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://uber.com&size=128',
+    'rapido': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://rapido.bike&size=128',
     
     // Shopping
-    'amazon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png',
-    'flipkart': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Flipkart_logo.svg/200px-Flipkart_logo.svg.png',
-    'myntra': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Myntra_logo.png/200px-Myntra_logo.png',
-    'boat': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/BoAt_Logo.svg',
-    'nykaa': 'https://companieslogo.com/img/orig/NYKAA.NS-4e6d3f9c.png',
+    'amazon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.in&size=128',
+    'flipkart': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://flipkart.com&size=128',
+    'myntra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://myntra.com&size=128',
+    'boat': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://boat-lifestyle.com&size=128',
+    'nykaa': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://nykaa.com&size=128',
     
     // Entertainment
-    'netflix': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/200px-Netflix_2015_logo.svg.png',
-    'prime': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/200px-Amazon_Prime_Video_logo.svg.png',
-    'hotstar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Disney%2B_Hotstar_2024_Logo.svg/200px-Disney%2B_Hotstar_2024_Logo.svg.png',
-    'spotify': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/200px-Spotify_logo_without_text.svg.png',
+    'netflix': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://netflix.com&size=128',
+    'prime': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://primevideo.com&size=128',
+    'hotstar': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hotstar.com&size=128',
+    'spotify': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://spotify.com&size=128',
     
     // Utilities & Payments
-    'paytm': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Paytm_logo.png/200px-Paytm_logo.png',
-    'phonepe': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/200px-PhonePe_Logo.svg.png',
-    'gpay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/200px-Google_Pay_Logo.svg.png',
-    'google pay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/200px-Google_Pay_Logo.svg.png',
+    'paytm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128',
+    'phonepe': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://phonepe.com&size=128',
+    'gpay': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pay.google.com&size=128',
+    'google pay': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pay.google.com&size=128',
     
     // Grocery
-    'bigbasket': 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/BigBasket_Logo.svg/200px-BigBasket_Logo.svg.png',
-    'blinkit': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Blinkit-yellow-logo.svg/200px-Blinkit-yellow-logo.svg.png',
-    'zepto': 'https://zepto.co.in/images/zepto-logo.png',
-    'instamart': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/200px-Swiggy_logo.svg.png',
+    'bigbasket': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bigbasket.com&size=128',
+    'blinkit': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://blinkit.com&size=128',
+    'zepto': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zeptonow.com&size=128',
+    'instamart': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
     
     // Fuel
-    'hp petrol': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7d/Hindustan_Petroleum_Logo.svg/200px-Hindustan_Petroleum_Logo.svg.png',
-    'indian oil': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/62/Indian_Oil_Logo.svg/200px-Indian_Oil_Logo.svg.png',
-    'bharat petroleum': 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/BPCL_logo.svg/200px-BPCL_logo.svg.png',
+    'hp petrol': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hindustanpetroleum.com&size=128',
+    'indian oil': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iocl.com&size=128',
+    'bharat petroleum': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bharatpetroleum.in&size=128',
   };
   
   @override
@@ -571,24 +577,18 @@ class FPTransactionCard extends StatelessWidget {
             child: effectiveLogoUrl != null
                 ? ClipRRect(
                     borderRadius: ESUNRadius.smRadius,
-                    child: Image.network(
-                      effectiveLogoUrl,
+                    child: SmartNetworkImage(
+                      imageUrl: effectiveLogoUrl,
                       width: 44,
                       height: 44,
                       fit: BoxFit.contain,
+                      placeholderIcon: effectiveIcon,
+                      placeholderColor: effectiveIconColor,
                       errorBuilder: (_, __, ___) => Icon(
                         effectiveIcon,
                         color: effectiveIconColor,
                         size: ESUNIconSize.sm,
                       ),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Icon(
-                          effectiveIcon,
-                          color: effectiveIconColor.withOpacity(0.5),
-                          size: ESUNIconSize.sm,
-                        );
-                      },
                     ),
                   )
                 : Icon(

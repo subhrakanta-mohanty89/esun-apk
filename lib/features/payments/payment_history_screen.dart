@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../theme/theme.dart';
@@ -772,7 +771,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     // Details Card
                     Container(
                       width: double.infinity,
@@ -796,7 +795,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     // Action Buttons
                     Row(
                       children: [
@@ -903,7 +902,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Download Statement', style: ESUNTypography.titleLarge),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             _buildDownloadOption('Last 30 Days', Icons.calendar_today),
             _buildDownloadOption('Last 3 Months', Icons.date_range),
             _buildDownloadOption('Last 6 Months', Icons.calendar_month),
@@ -939,7 +938,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Filter Transactions', style: ESUNTypography.titleLarge),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             ListTile(
               leading: const Icon(Icons.calendar_today),
               title: const Text('Date Range'),

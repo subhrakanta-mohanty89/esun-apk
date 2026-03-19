@@ -77,7 +77,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
             // Customer Testimonials
             _buildTestimonials(context),
             
-            const SizedBox(height: ESUNSpacing.xxl),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -1243,6 +1243,12 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
   }
   
   Widget _buildCreditScore(BuildContext context) {
+    final aaData = ref.watch(aaDataProvider);
+    final score = aaData.creditScore;
+    final label = aaData.creditLabel;
+    final percentage = score / 900;
+    final percentText = '${(percentage * 100).round()}%';
+
     return Padding(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: FPGradientCard(
@@ -1271,7 +1277,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   ),
                   const SizedBox(height: ESUNSpacing.sm),
                   Text(
-                    '752',
+                    '$score',
                     style: ESUNTypography.displaySmall.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -1285,7 +1291,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                       borderRadius: ESUNRadius.fullRadius,
                     ),
                     child: Text(
-                      'Excellent',
+                      label,
                       style: ESUNTypography.labelSmall.copyWith(
                         color: Colors.white,
                       ),
@@ -1301,13 +1307,13 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                 alignment: Alignment.center,
                 children: [
                   CircularProgressIndicator(
-                    value: 0.84,
+                    value: percentage,
                     strokeWidth: 8,
                     backgroundColor: Colors.white.withOpacity(0.2),
                     valueColor: const AlwaysStoppedAnimation(Colors.white),
                   ),
                   Text(
-                    '84%',
+                    percentText,
                     style: ESUNTypography.titleMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -1402,7 +1408,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
   
   Widget _buildActiveLoans(BuildContext context) {
     final aaData = ref.watch(aaDataProvider);
-    final loans = aaData.loans ?? LoanData.mockList;
+    final loans = aaData.loans;
     
     if (loans.isEmpty) {
       return Padding(

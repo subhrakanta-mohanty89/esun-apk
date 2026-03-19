@@ -86,10 +86,6 @@ class _PermissionsScreenState extends ConsumerState<PermissionsScreen> {
     ),
   ];
 
-  bool get _allRequiredGranted {
-    return _permissions.where((p) => p.isRequired).every((p) => p.isGranted);
-  }
-
   Future<void> _requestAllPermissions() async {
     setState(() => _isProcessing = true);
 

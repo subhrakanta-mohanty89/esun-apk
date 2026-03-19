@@ -116,7 +116,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           
           // Bottom controls
           Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + ESUNSpacing.xl,
+            bottom: MediaQuery.of(context).padding.bottom + ESUNSpacing.md,
             left: ESUNSpacing.xl,
             right: ESUNSpacing.xl,
             child: Column(

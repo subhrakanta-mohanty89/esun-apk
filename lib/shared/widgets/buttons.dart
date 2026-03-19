@@ -336,13 +336,14 @@ class FPQuickActionButton extends StatelessWidget {
         onTap: onPressed,
         borderRadius: ESUNRadius.mdRadius,
         child: Padding(
-          padding: const EdgeInsets.all(ESUNSpacing.sm),
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
                   gradient: gradient ?? LinearGradient(
                     begin: Alignment.topLeft,
@@ -371,10 +372,10 @@ class FPQuickActionButton extends StatelessWidget {
                   color: iconColor ?? colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: ESUNSpacing.sm),
+              const SizedBox(height: 4),
               Text(
                 label,
-                style: ESUNTypography.labelMedium.copyWith(
+                style: ESUNTypography.labelSmall.copyWith(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),

@@ -78,7 +78,7 @@ class AuthState {
     this.userId,
     this.userName,
     this.isBiometricEnabled = false,
-    this.isLoading = false,
+    this.isLoading = true,  // Start as loading until auth check completes
     this.error,
     this.isOnboarded = true,  // Default true to avoid popup on initial load
     this.aaConnected = false,
@@ -499,6 +499,8 @@ class AppSettings {
   final bool biometricPromptEnabled;
   final bool aiConsentGiven;
   final bool hasCompletedOnboarding;
+  final bool transactionAlertsEnabled;
+  final bool billRemindersEnabled;
   
   const AppSettings({
     this.locale = 'en',
@@ -507,6 +509,8 @@ class AppSettings {
     this.biometricPromptEnabled = true,
     this.aiConsentGiven = false,
     this.hasCompletedOnboarding = false,
+    this.transactionAlertsEnabled = true,
+    this.billRemindersEnabled = true,
   });
   
   // Alias for compatibility
@@ -519,6 +523,8 @@ class AppSettings {
     bool? biometricPromptEnabled,
     bool? aiConsentGiven,
     bool? hasCompletedOnboarding,
+    bool? transactionAlertsEnabled,
+    bool? billRemindersEnabled,
   }) {
     return AppSettings(
       locale: locale ?? this.locale,
@@ -527,6 +533,8 @@ class AppSettings {
       biometricPromptEnabled: biometricPromptEnabled ?? this.biometricPromptEnabled,
       aiConsentGiven: aiConsentGiven ?? this.aiConsentGiven,
       hasCompletedOnboarding: hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+      transactionAlertsEnabled: transactionAlertsEnabled ?? this.transactionAlertsEnabled,
+      billRemindersEnabled: billRemindersEnabled ?? this.billRemindersEnabled,
     );
   }
 }
@@ -602,6 +610,14 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
   
   Future<void> toggleNotifications() async {
     await setNotificationsEnabled(!state.notificationsEnabled);
+  }
+  
+  Future<void> toggleTransactionAlerts() async {
+    state = state.copyWith(transactionAlertsEnabled: !state.transactionAlertsEnabled);
+  }
+  
+  Future<void> toggleBillReminders() async {
+    state = state.copyWith(billRemindersEnabled: !state.billRemindersEnabled);
   }
 }
 

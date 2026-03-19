@@ -14,8 +14,13 @@ import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../shared/widgets/qr_sheet.dart';
 import '../../routes/app_routes.dart';
-import 'upi_payment_demo_screen.dart';
+import '../../state/aa_data_state.dart';
+import '../../core/utils/utils.dart';
 import 'payment_history_screen.dart';
+import 'bill_payment_screen.dart';
+import 'send_money_screen.dart';
+import '../profile/profile_screen.dart';
+import '../../state/transaction_state.dart';
 
 class PaymentsScreen extends ConsumerStatefulWidget {
   const PaymentsScreen({super.key});
@@ -25,11 +30,28 @@ class PaymentsScreen extends ConsumerStatefulWidget {
 }
 
 class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTickerProviderStateMixin {
-  static const String _upiId = 'john.doe@ESUN';
-  static const String _name = 'John Doe';
-  static const String _bankLabel = 'HDFC • 1234';
+  String get _name {
+    final profile = ref.watch(userProfileProvider).valueOrNull;
+    return profile?['full_name'] ?? 'User';
+  }
+  
+  String get _upiId {
+    final name = _name.toLowerCase().replaceAll(' ', '.');
+    return '$name@ESUN';
+  }
+  
+  String get _bankLabel {
+    final banks = ref.watch(aaDataProvider).bankAccounts;
+    if (banks.isNotEmpty) {
+      final b = banks.first;
+      final last4 = b.accountNumber.length >= 4
+          ? b.accountNumber.substring(b.accountNumber.length - 4)
+          : b.accountNumber;
+      return '${b.bankName} • $last4';
+    }
+    return 'Link Bank';
+  }
 
-  bool _isLoadingContacts = false;
   bool _contactsGranted = false;
   List<_PaymentContact> _contacts = [];
   bool _permissionAsked = false;
@@ -37,16 +59,30 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   late AnimationController _scanPulseController;
   
   final TextEditingController _searchController = TextEditingController();
-  bool _isSearchFocused = false;
   
-  // Recent transactions for quick repeat
-  final List<_RecentPerson> _recentPeople = [
-    _RecentPerson('Rahul S', 'RS', '₹5,000', Colors.blue),
-    _RecentPerson('Priya M', 'PM', '₹2,500', Colors.purple),
-    _RecentPerson('Amit K', 'AK', '₹1,200', Colors.green),
-    _RecentPerson('Sneha P', 'SP', '₹800', Colors.orange),
-    _RecentPerson('Vikram R', 'VR', '₹3,500', Colors.teal),
-  ];
+  // Recent transactions for quick repeat - derived from transaction state
+  List<_RecentPerson> get _recentPeople {
+    final txns = ref.watch(transactionStateProvider).transactions;
+    final seen = <String>{};
+    final people = <_RecentPerson>[];
+    final colors = [Colors.blue, Colors.purple, Colors.green, Colors.orange, Colors.teal];
+    for (final t in txns) {
+      if (t.recipientName != null && t.recipientName!.isNotEmpty && !seen.contains(t.recipientName)) {
+        seen.add(t.recipientName!);
+        final initials = t.recipientName!.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join().toUpperCase();
+        people.add(_RecentPerson(t.recipientName!, initials, '₹${t.amount.toStringAsFixed(0)}', colors[people.length % colors.length]));
+        if (people.length >= 5) break;
+      }
+    }
+    if (people.isEmpty) {
+      return [
+        _RecentPerson('Rahul S', 'RS', '₹5,000', Colors.blue),
+        _RecentPerson('Priya M', 'PM', '₹2,500', Colors.purple),
+        _RecentPerson('Amit K', 'AK', '₹1,200', Colors.green),
+      ];
+    }
+    return people;
+  }
 
   @override
   void initState() {
@@ -79,7 +115,6 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   }
 
   Future<void> _loadContacts({bool requestPermission = false}) async {
-    setState(() => _isLoadingContacts = true);
 
     final status = await Permission.contacts.status;
     var granted = status.isGranted;
@@ -93,7 +128,6 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     if (!granted) {
       setState(() {
         _contactsGranted = false;
-        _isLoadingContacts = false;
         _contacts = [];
       });
       return;
@@ -128,13 +162,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
 
       setState(() {
         _contactsGranted = true;
-        _isLoadingContacts = false;
         _contacts = mapped;
       });
     } catch (e) {
       setState(() {
         _contactsGranted = true;
-        _isLoadingContacts = false;
       });
     }
   }
@@ -185,7 +217,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 // Recent Transactions
                 _buildRecentTransactions(context),
                 
-                const SizedBox(height: 100),
+                const SizedBox(height: 72),
               ],
             ),
           ),
@@ -323,8 +355,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
       ),
       child: TextField(
         controller: _searchController,
-        onTap: () => setState(() => _isSearchFocused = true),
-        onEditingComplete: () => setState(() => _isSearchFocused = false),
+        onTap: () {},
+        onEditingComplete: () {},
         decoration: InputDecoration(
           hintText: 'Pay by name, phone, UPI ID, or bank',
           hintStyle: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textTertiary),
@@ -433,13 +465,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           // Check Balance
           Expanded(
             child: GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Balance: ₹5,42,350.75')),
-                );
-              },
+              onTap: () => _showBalanceSheet(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -474,6 +502,115 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  void _showBalanceSheet(BuildContext context) {
+    final aaData = ref.read(aaDataProvider);
+    final accounts = aaData.bankAccounts;
+    final totalBalance = accounts.fold<double>(0, (sum, a) => sum + a.balance);
+    
+    final accountColors = [
+      const Color(0xFF60A5FA),
+      const Color(0xFFFBBF24),
+      const Color(0xFF34D399),
+      const Color(0xFFA78BFA),
+    ];
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(ctx).size.height * 0.6,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(ctx).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text('Account Balances', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: ESUNColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Balance', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
+                    Text(totalBalance.toINR(), style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold, color: ESUNColors.primary)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...List.generate(accounts.length, (i) {
+                final account = accounts[i];
+                final color = accountColors[i % accountColors.length];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: color.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: color.withValues(alpha: 0.2)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: account.effectiveLogoUrl != null
+                              ? Image.network(account.effectiveLogoUrl!, fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => Icon(Icons.account_balance, color: color, size: 20))
+                              : Icon(Icons.account_balance, color: color, size: 20),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(account.bankName, style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.w600)),
+                            Text('${account.accountType} •••• ${account.accountNumber.length >= 4 ? account.accountNumber.substring(account.accountNumber.length - 4) : account.accountNumber}',
+                              style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
+                          ],
+                        ),
+                      ),
+                      Text(account.balance.toINR(), style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.bold, color: color)),
+                    ],
+                  ),
+                );
+              }),
+              SizedBox(height: MediaQuery.of(ctx).padding.bottom + 16),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -627,7 +764,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const UPIPaymentDemoScreen(),
+                            builder: (context) => SendMoneyScreen(
+                              recipientName: person.name,
+                              recipientUpiId: '${person.name.toLowerCase().replaceAll(' ', '.')}@upi',
+                              avatarColor: person.color,
+                            ),
                           ),
                         );
                       },
@@ -708,7 +849,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const UPIPaymentDemoScreen(),
+                            builder: (context) => SendMoneyScreen(
+                              recipientName: contact.name,
+                              recipientPhone: contact.phone,
+                              avatarColor: contact.color,
+                            ),
                           ),
                         );
                       },
@@ -1090,7 +1235,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   void _showPayToContact(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const UPIPaymentDemoScreen()),
+      MaterialPageRoute(
+        builder: (context) => const SendMoneyScreen(
+          recipientName: 'Select Contact',
+        ),
+      ),
     );
   }
   
@@ -1132,7 +1281,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               TextField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
@@ -1150,15 +1299,27 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   fillColor: Colors.grey.withOpacity(0.05),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () {
+                    if (phoneController.text.length < 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter a valid phone number')),
+                      );
+                      return;
+                    }
                     Navigator.pop(ctx);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const UPIPaymentDemoScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => SendMoneyScreen(
+                          recipientName: 'Phone User',
+                          recipientPhone: phoneController.text,
+                          avatarColor: Colors.green,
+                        ),
+                      ),
                     );
                   },
                   style: FilledButton.styleFrom(
@@ -1258,7 +1419,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       _buildInputField(accountController, 'Account Number', Icons.account_balance_wallet_outlined, TextInputType.number),
                       const SizedBox(height: 16),
                       _buildInputField(ifscController, 'IFSC Code', Icons.code, TextInputType.text, textCaps: true),
@@ -1266,7 +1427,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                       _buildInputField(nameController, 'Beneficiary Name', Icons.person_outline, TextInputType.name),
                       const SizedBox(height: 16),
                       _buildInputField(amountController, 'Amount (₹)', Icons.currency_rupee, TextInputType.number),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () {
                           if (accountController.text.isEmpty || ifscController.text.isEmpty || amountController.text.isEmpty) {
@@ -1275,9 +1436,20 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                             );
                             return;
                           }
+                          final amount = double.tryParse(amountController.text) ?? 0;
                           Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('₹${amountController.text} transferred via $transferMode')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentSuccessScreen(
+                                amount: amount,
+                                transactionId: 'BANK${DateTime.now().millisecondsSinceEpoch}',
+                                payeeName: nameController.text.isNotEmpty ? nameController.text : 'Beneficiary',
+                                paymentType: '$transferMode Transfer',
+                                icon: Icons.account_balance,
+                                color: Colors.purple,
+                              ),
+                            ),
                           );
                         },
                         style: FilledButton.styleFrom(
@@ -1305,6 +1477,170 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     );
   }
   
+  /// Show UPI PIN entry dialog for payment authentication
+  void _showUpiPinDialog(
+    BuildContext context, {
+    required double amount,
+    required String payeeName,
+    required Color color,
+    required VoidCallback onSuccess,
+  }) {
+    String pin = '';
+    bool isVerifying = false;
+    
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          height: MediaQuery.of(context).size.height * 0.65,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Enter UPI PIN',
+                          style: ESUNTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'to pay ₹${amount.toStringAsFixed(0)} to $payeeName',
+                          style: ESUNTypography.bodySmall.copyWith(
+                            color: ESUNColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // PIN dots
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(6, (index) {
+                  final isFilled = index < pin.length;
+                  return Container(
+                    width: 14,
+                    height: 14,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isFilled ? color : Colors.transparent,
+                      border: Border.all(
+                        color: isFilled ? color : Colors.grey.shade300,
+                        width: 2,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              
+              if (isVerifying) ...[
+                const SizedBox(height: 12),
+                const CircularProgressIndicator(),
+              ],
+              
+              const Spacer(),
+              
+              // Number pad
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  children: [
+                    for (var row in [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['', '0', 'del']])
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: row.map((key) {
+                            if (key.isEmpty) return const SizedBox(width: 60, height: 60);
+                            final isDelete = key == 'del';
+                            return Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: isVerifying ? null : () {
+                                  if (isDelete) {
+                                    if (pin.isNotEmpty) {
+                                      setState(() => pin = pin.substring(0, pin.length - 1));
+                                    }
+                                  } else if (pin.length < 6) {
+                                    setState(() => pin += key);
+                                    if (pin.length == 6) {
+                                      setState(() => isVerifying = true);
+                                      Future.delayed(const Duration(milliseconds: 700), () {
+                                        Navigator.pop(ctx);
+                                        onSuccess();
+                                      });
+                                    }
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isDelete ? Colors.transparent : Colors.grey.shade100,
+                                  ),
+                                  child: Center(
+                                    child: isDelete
+                                        ? const Icon(Icons.backspace_outlined, size: 20)
+                                        : Text(key, style: ESUNTypography.titleLarge),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.lock, size: 12, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Text('Secured by UPI', style: ESUNTypography.labelSmall.copyWith(color: Colors.grey[600])),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
   Widget _buildInputField(TextEditingController controller, String label, IconData icon, TextInputType type, {bool textCaps = false}) {
     return TextField(
       controller: controller,
@@ -1322,15 +1658,20 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
 
   void _showSelfTransferSheet(BuildContext context) {
     final amountController = TextEditingController();
-    String fromAccount = 'HDFC Savings •• 1234';
-    String toAccount = 'ICICI Savings •• 5678';
     
-    final accounts = [
-      'HDFC Savings •• 1234',
-      'ICICI Savings •• 5678',
-      'SBI Savings •• 9012',
-      'Axis Current •• 3456',
-    ];
+    final aaData = ref.read(aaDataProvider);
+    final bankAccounts = aaData.bankAccounts;
+    final accounts = bankAccounts.isEmpty
+        ? ['HDFC Bank SAVINGS •• 1234', 'ICICI Bank SAVINGS •• 5678', 'SBI CURRENT •• 9012']
+        : bankAccounts.map((a) {
+            final last4 = a.accountNumber.length >= 4 
+                ? a.accountNumber.substring(a.accountNumber.length - 4) 
+                : a.accountNumber;
+            return '${a.bankName} ${a.accountType} •• $last4';
+          }).toList();
+    
+    String fromAccount = accounts.first;
+    String toAccount = accounts.length > 1 ? accounts[1] : accounts.first;
     
     showModalBottomSheet(
       context: context,
@@ -1398,9 +1739,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     ),
                     const SizedBox(height: 16),
                     _buildAccountSelector('To', toAccount, accounts, (val) => setState(() => toAccount = val!)),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     _buildInputField(amountController, 'Amount (₹)', Icons.currency_rupee, TextInputType.number),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     FilledButton(
                       onPressed: () {
                         if (amountController.text.isEmpty) {
@@ -1415,9 +1756,29 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                           );
                           return;
                         }
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('₹${amountController.text} transferred')),
+                        final amount = double.tryParse(amountController.text) ?? 0;
+                        // Show UPI PIN dialog before completing transfer
+                        _showUpiPinDialog(
+                          context,
+                          amount: amount,
+                          payeeName: toAccount,
+                          color: Colors.teal,
+                          onSuccess: () {
+                            Navigator.pop(ctx);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentSuccessScreen(
+                                  amount: amount,
+                                  transactionId: 'SELF${DateTime.now().millisecondsSinceEpoch}',
+                                  payeeName: toAccount,
+                                  paymentType: 'Self Transfer',
+                                  icon: Icons.swap_horiz,
+                                  color: Colors.teal,
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
                       style: FilledButton.styleFrom(
@@ -1594,11 +1955,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               ),
               child: const Icon(Icons.mic, size: 48, color: ESUNColors.primary),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             Text('Listening...', style: ESUNTypography.titleMedium),
             const SizedBox(height: 8),
             Text('Say a name or UPI ID', style: ESUNTypography.bodyMedium.copyWith(color: Colors.grey)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             const LinearProgressIndicator(),
           ],
         ),
@@ -1689,7 +2050,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                               subtitle: Text(person.lastAmount),
                               onTap: () {
                                 Navigator.pop(ctx);
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(
+                                    builder: (_) => SendMoneyScreen(
+                                      recipientName: person.name,
+                                      recipientUpiId: '${person.name.toLowerCase().replaceAll(' ', '.')}@upi',
+                                      avatarColor: person.color,
+                                    ),
+                                  ),
+                                );
                               },
                             );
                           }
@@ -1703,7 +2073,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                             subtitle: Text(contact.phone),
                             onTap: () {
                               Navigator.pop(ctx);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(
+                                  builder: (_) => SendMoneyScreen(
+                                    recipientName: contact.name,
+                                    recipientPhone: contact.phone,
+                                    avatarColor: contact.color,
+                                  ),
+                                ),
+                              );
                             },
                           );
                         },
@@ -1717,93 +2096,13 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   }
 
   void _showBillPayment(BuildContext context, String billType, IconData icon, Color color) {
-    final numberController = TextEditingController();
-    final amountController = TextEditingController();
-    
-    // Sample bill amounts
-    final sampleAmount = {
-      'Mobile Recharge': '599',
-      'Electricity Bill': '2,340',
-      'DTH Recharge': '450',
-      'Broadband Bill': '999',
-      'Water Bill': '350',
-      'Gas Cylinder': '950',
-    };
-    
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: color),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(billType, style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: numberController,
-                keyboardType: billType == 'Mobile Recharge' ? TextInputType.phone : TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: billType == 'Mobile Recharge' ? 'Mobile Number' : 'Consumer/Account Number',
-                  prefixIcon: Icon(billType == 'Mobile Recharge' ? Icons.phone : Icons.numbers),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  filled: true,
-                  fillColor: Colors.grey.withOpacity(0.05),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Amount (₹)',
-                  hintText: sampleAmount[billType] ?? '0',
-                  prefixIcon: const Icon(Icons.currency_rupee),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  filled: true,
-                  fillColor: Colors.grey.withOpacity(0.05),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: color,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: Text('Pay ${sampleAmount[billType] != null ? '₹${sampleAmount[billType]}' : 'Now'}'),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BillPaymentScreen(
+          billType: billType,
+          icon: icon,
+          color: color,
         ),
       ),
     );
@@ -1898,7 +2197,20 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               FilledButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
+                  final parsedAmount = double.tryParse(amount.replaceAll(RegExp(r'[₹,]'), '')) ?? 0;
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (_) => PaymentSuccessScreen(
+                        amount: parsedAmount,
+                        transactionId: 'CC${DateTime.now().millisecondsSinceEpoch}',
+                        payeeName: name,
+                        paymentType: 'Credit Card Bill',
+                        icon: Icons.credit_card,
+                        color: color,
+                      ),
+                    ),
+                  );
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -2031,7 +2343,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   Text('Pay Merchant', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               TextField(
                 controller: merchantController,
                 decoration: InputDecoration(
@@ -2054,7 +2366,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   fillColor: Colors.grey.withOpacity(0.05),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -2075,8 +2387,27 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   Expanded(
                     child: FilledButton(
                       onPressed: () {
+                        if (merchantController.text.isEmpty || amountController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please fill all fields')),
+                          );
+                          return;
+                        }
+                        final amount = double.tryParse(amountController.text) ?? 0;
                         Navigator.pop(ctx);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(
+                            builder: (_) => PaymentSuccessScreen(
+                              amount: amount,
+                              transactionId: 'MER${DateTime.now().millisecondsSinceEpoch}',
+                              payeeName: merchantController.text,
+                              paymentType: 'Merchant Payment',
+                              icon: Icons.store,
+                              color: Colors.indigo,
+                            ),
+                          ),
+                        );
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.indigo,
@@ -2129,7 +2460,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   Text('Pay Invoice', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               TextField(
                 controller: invoiceController,
                 decoration: InputDecoration(
@@ -2140,14 +2471,30 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   fillColor: Colors.grey.withOpacity(0.05),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () {
+                    if (invoiceController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter invoice number')),
+                      );
+                      return;
+                    }
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Fetching invoice details...')),
+                    // Navigate to bill payment for invoice
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BillPaymentScreen(
+                          billType: 'Invoice Payment',
+                          icon: Icons.receipt_long,
+                          color: Colors.teal,
+                          prefillNumber: invoiceController.text,
+                          prefillAmount: '15000',
+                        ),
+                      ),
                     );
                   },
                   style: FilledButton.styleFrom(
@@ -2271,8 +2618,23 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           ),
           FilledButton(
             onPressed: () {
+              // Parse amount from string like "Pending: ₹25,000"
+              final amountStr = amount.replaceAll(RegExp(r'[^0-9]'), '');
+              final parsedAmount = double.tryParse(amountStr) ?? 0;
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const UPIPaymentDemoScreen()));
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (_) => PaymentSuccessScreen(
+                    amount: parsedAmount,
+                    transactionId: 'VEN${DateTime.now().millisecondsSinceEpoch}',
+                    payeeName: name,
+                    paymentType: 'Vendor Payment',
+                    icon: Icons.local_shipping,
+                    color: color,
+                  ),
+                ),
+              );
             },
             style: FilledButton.styleFrom(
               backgroundColor: color,

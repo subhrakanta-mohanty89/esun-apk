@@ -11,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../theme/theme.dart';
-import '../../core/services/permission_service.dart';
 
 /// UPI data parsed from QR code
 class UPIQRData {
@@ -232,7 +231,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             const Icon(Icons.qr_code_2, size: 48, color: ESUNColors.primary),
             const SizedBox(height: 16),
             Text(
@@ -253,7 +252,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -404,7 +403,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
   Widget _buildPermissionDeniedView() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -432,7 +431,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
               style: ESUNTypography.bodyMedium.copyWith(color: Colors.white70),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () async {
                 final status = await Permission.camera.status;
@@ -463,7 +462,6 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
     return LayoutBuilder(
       builder: (context, constraints) {
         final scanAreaSize = constraints.maxWidth * 0.7;
-        final horizontalPadding = (constraints.maxWidth - scanAreaSize) / 2;
         final verticalPadding = (constraints.maxHeight - scanAreaSize) / 2;
 
         return Stack(
@@ -640,10 +638,10 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
       right: 0,
       child: Container(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).padding.bottom + 24,
+          bottom: MediaQuery.of(context).padding.bottom + 12,
           left: 32,
           right: 32,
-          top: 24,
+          top: 20,
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -744,7 +742,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Success Icon
           Container(
             padding: const EdgeInsets.all(16),
@@ -758,12 +756,12 @@ class _PaymentConfirmationSheet extends StatelessWidget {
               color: ESUNColors.primary,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           Text(
             'QR Code Scanned',
             style: ESUNTypography.headlineSmall,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Payee Details
           Container(
             width: double.infinity,
@@ -836,7 +834,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Action Buttons
           Row(
             children: [

@@ -23,14 +23,12 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
   String _emailOtp = '';
   bool _isVerifying = false;
   bool _permissionsRequested = false;
-  String? _errorMessage;
 
   Future<void> _verify() async {
     if (_phoneOtp.length != 6 || _emailOtp.length != 6) return;
 
     setState(() {
       _isVerifying = true;
-      _errorMessage = null;
     });
     
     final ok = await ref.read(authStateProvider.notifier).login(
@@ -54,7 +52,6 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
       final err = ref.read(authStateProvider).error ?? 'Invalid OTP code';
       setState(() {
         _isVerifying = false;
-        _errorMessage = err;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(err)),

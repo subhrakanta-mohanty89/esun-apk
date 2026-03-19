@@ -3,7 +3,6 @@
 /// Professional rewards hub with gamification, cashback, gift cards, and more.
 
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,9 +23,9 @@ class RewardsScreen extends ConsumerStatefulWidget {
 class _RewardsScreenState extends ConsumerState<RewardsScreen>
     with TickerProviderStateMixin {
   late Timer _dailyTimer;
-  Duration _timeRemaining = const Duration(hours: 4, minutes: 36, seconds: 6);
+  late Duration _timeRemaining;
   
-  // User rewards data
+  // User rewards data - state managed for session
   int _coinBalance = 19546;
   int _cashbackBalance = 247;
   int _scratchCards = 5;
@@ -34,10 +33,15 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
   int _totalEarned = 45230;
   int _level = 12;
   double _levelProgress = 0.68;
+  bool _dailyClaimed = false;
 
   @override
   void initState() {
     super.initState();
+    // Calculate actual time remaining until midnight
+    final now = DateTime.now();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    _timeRemaining = midnight.difference(now);
     _startDailyTimer();
   }
 
@@ -111,7 +115,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
               // Referral Card
               _buildReferralCard(),
 
-              const SizedBox(height: 80),
+              const SizedBox(height: 72),
             ],
           ),
         ),
@@ -912,53 +916,38 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
   Widget _buildBrandLogo(String brandName, Color color, IconData fallbackIcon, double iconSize) {
     final normalized = brandName.toLowerCase();
     
-    // Brand-specific text logos
-    if (normalized.contains('amazon')) {
-      return Text(
-        'amazon',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: iconSize * 0.7,
-          color: const Color(0xFFFF9900),
-          fontStyle: FontStyle.italic,
+    // Brand logo URL mapping
+    final brandLogos = <String, String>{
+      'amazon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.in&size=128',
+      'flipkart': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://flipkart.com&size=128',
+      'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+      'myntra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://myntra.com&size=128',
+      'spotify': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://spotify.com&size=128',
+      'netflix': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://netflix.com&size=128',
+      'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    };
+
+    String? logoUrl;
+    for (final entry in brandLogos.entries) {
+      if (normalized.contains(entry.key)) {
+        logoUrl = entry.value;
+        break;
+      }
+    }
+
+    if (logoUrl != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.network(
+          logoUrl,
+          width: iconSize,
+          height: iconSize,
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => Icon(fallbackIcon, color: color, size: iconSize),
         ),
       );
-    } else if (normalized.contains('flipkart')) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.play_arrow, color: Colors.blue, size: iconSize * 0.8),
-          Text(
-            'F',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: iconSize,
-              color: Colors.blue,
-            ),
-          ),
-        ],
-      );
-    } else if (normalized.contains('swiggy')) {
-      return Icon(Icons.fastfood_rounded, color: Colors.orange, size: iconSize);
-    } else if (normalized.contains('spotify')) {
-      return Icon(Icons.music_note_rounded, color: const Color(0xFF1DB954), size: iconSize);
-    } else if (normalized.contains('netflix')) {
-      return Text(
-        'NETF',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: iconSize * 0.65,
-          color: const Color(0xFFE50914),
-          letterSpacing: -1,
-        ),
-      );
-    } else if (normalized.contains('myntra')) {
-      return Icon(Icons.checkroom, color: Colors.pink, size: iconSize);
-    } else if (normalized.contains('zomato')) {
-      return Icon(Icons.restaurant, color: const Color(0xFFCB202D), size: iconSize);
     }
     
-    // Fallback to icon
     return Icon(fallbackIcon, color: color, size: iconSize);
   }
 
@@ -1121,7 +1110,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
   void _showDailyReward() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         backgroundColor: ESUNColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
@@ -1141,24 +1130,46 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
               child: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32),
             ),
             const SizedBox(height: ESUNSpacing.md),
-            Text(
-              'Come back in ' + _formatDuration(_timeRemaining),
-              style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary),
-            ),
+            if (_dailyClaimed)
+              Text(
+                'Come back in ${_formatDuration(_timeRemaining)}',
+                style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary),
+              )
+            else
+              Text(
+                'Claim your 100 coins!',
+                style: ESUNTypography.bodyMedium.copyWith(
+                  color: Colors.amber,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             const SizedBox(height: 4),
             Text(
-              'Claim 100 coins daily!',
-              style: ESUNTypography.bodySmall.copyWith(
-                color: Colors.amber,
-                fontWeight: FontWeight.bold,
-              ),
+              'Day $_currentStreak streak 🔥',
+              style: ESUNTypography.labelMedium,
             ),
           ],
         ),
         actions: [
+          if (!_dailyClaimed)
+            FilledButton(
+              onPressed: () {
+                setState(() {
+                  _coinBalance += 100;
+                  _totalEarned += 100;
+                  _currentStreak++;
+                  _dailyClaimed = true;
+                });
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('+100 coins claimed!')),
+                );
+              },
+              child: const Text('Claim'),
+            ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(_dailyClaimed ? 'OK' : 'Later'),
           ),
         ],
       ),
@@ -1166,26 +1177,133 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
   }
 
   void _showSpinWheel() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening Spin & Win...')),
+    final prizes = [50, 100, 200, 500, 1000, 25];
+    final won = prizes[(DateTime.now().millisecondsSinceEpoch % prizes.length)];
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('🎰 Spin & Win!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.celebration, size: 48, color: Colors.amber),
+            const SizedBox(height: 12),
+            Text('You won $won coins!', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold, color: ESUNColors.success)),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              setState(() { _coinBalance += won; _totalEarned += won; });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Collect'),
+          ),
+        ],
+      ),
     );
   }
 
   void _showStore() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening Rewards Store...')),
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Rewards Store', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: ESUNSpacing.lg),
+            ListTile(
+              leading: const Icon(Icons.card_giftcard, color: Colors.orange),
+              title: const Text('Amazon Gift Card'),
+              subtitle: const Text('500 coins = ₹50'),
+              trailing: FilledButton(
+                onPressed: _coinBalance >= 500 ? () {
+                  setState(() { _coinBalance -= 500; _cashbackBalance += 50; });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('₹50 Amazon voucher redeemed!')));
+                } : null,
+                child: const Text('Redeem'),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_cafe, color: Colors.brown),
+              title: const Text('Starbucks Voucher'),
+              subtitle: const Text('1000 coins = ₹100'),
+              trailing: FilledButton(
+                onPressed: _coinBalance >= 1000 ? () {
+                  setState(() { _coinBalance -= 1000; _cashbackBalance += 100; });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('₹100 Starbucks voucher redeemed!')));
+                } : null,
+                child: const Text('Redeem'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   void _showOffers() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening Card Offers...')),
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Active Offers', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: ESUNSpacing.lg),
+            ListTile(
+              leading: const Icon(Icons.percent, color: Colors.green),
+              title: const Text('5% Cashback on Investments'),
+              subtitle: const Text('Min ₹5,000 investment'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.flash_on, color: Colors.orange),
+              title: const Text('2x Coins on Bill Payments'),
+              subtitle: const Text('Valid this week'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.people, color: Colors.blue),
+              title: const Text('Refer & Earn ₹500'),
+              subtitle: const Text('Per successful referral'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   void _showGiftCard(String brand) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Opening ' + brand + ' gift cards...')),
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('$brand Gift Card', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: ESUNSpacing.lg),
+            Text('Redeem your coins for $brand vouchers', style: ESUNTypography.bodyMedium),
+            const SizedBox(height: ESUNSpacing.lg),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$brand voucher added to wallet')));
+                },
+                child: const Text('Redeem 1000 Coins'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1206,22 +1324,20 @@ class _FeaturedReward {
   final int coins;
   final Color color;
   final IconData icon;
-  final String? logoUrl;
 
-  _FeaturedReward(this.name, this.value, this.coins, this.color, this.icon, [this.logoUrl]);
+  _FeaturedReward(this.name, this.value, this.coins, this.color, this.icon);
   
   static const Map<String, String> _brandLogos = {
-    'amazon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png',
-    'swiggy': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/200px-Swiggy_logo.svg.png',
-    'spotify': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Spotify_icon.svg/200px-Spotify_icon.svg.png',
-    'netflix': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/200px-Netflix_2015_logo.svg.png',
-    'zomato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Zomato_logo.png/200px-Zomato_logo.png',
-    'flipkart': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Flipkart_logo.png/200px-Flipkart_logo.png',
-    'myntra': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Myntra_logo.png/200px-Myntra_logo.png',
+    'amazon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.in&size=128',
+    'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+    'spotify': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://spotify.com&size=128',
+    'netflix': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://netflix.com&size=128',
+    'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    'flipkart': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://flipkart.com&size=128',
+    'myntra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://myntra.com&size=128',
   };
   
   String? get effectiveLogoUrl {
-    if (logoUrl != null) return logoUrl;
     final normalized = name.toLowerCase();
     for (final entry in _brandLogos.entries) {
       if (normalized.contains(entry.key)) return entry.value;
@@ -1235,28 +1351,26 @@ class _GiftCardData {
   final int discount;
   final Color color;
   final IconData icon;
-  final String? logoUrl;
 
-  _GiftCardData(this.brand, this.discount, this.color, this.icon, [this.logoUrl]);
+  _GiftCardData(this.brand, this.discount, this.color, this.icon);
   
   static const Map<String, String> _brandLogos = {
-    'amazon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png',
-    'flipkart': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Flipkart_logo.png/200px-Flipkart_logo.png',
-    'swiggy': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/200px-Swiggy_logo.svg.png',
-    'myntra': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Myntra_logo.png/200px-Myntra_logo.png',
-    'zomato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Zomato_logo.png/200px-Zomato_logo.png',
-    'spotify': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Spotify_icon.svg/200px-Spotify_icon.svg.png',
-    'netflix': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/200px-Netflix_2015_logo.svg.png',
-    'paytm': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/200px-Paytm_Logo_%28standalone%29.svg.png',
-    'google play': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/200px-Google_Play_Store_badge_EN.svg.png',
-    'uber': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/200px-Uber_logo_2018.svg.png',
-    'ola': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Ola_Cabs_logo.svg/200px-Ola_Cabs_logo.svg.png',
-    'bookmyshow': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/BookMyShow_logo.svg/200px-BookMyShow_logo.svg.png',
-    'mitra': 'https://cdn.iconscout.com/icon/free/png-256/free-store-logo-icon-download-in-svg-png-gif-file-formats--shopping-ecommerce-supermarket-pack-e-commerce-icons-1460762.png',
+    'amazon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.in&size=128',
+    'flipkart': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://flipkart.com&size=128',
+    'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+    'myntra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://myntra.com&size=128',
+    'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    'spotify': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://spotify.com&size=128',
+    'netflix': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://netflix.com&size=128',
+    'paytm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128',
+    'google play': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://play.google.com&size=128',
+    'uber': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://uber.com&size=128',
+    'ola': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://uber.com&size=128',
+    'bookmyshow': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bookmyshow.com&size=128',
+    'mitra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.in&size=128',
   };
   
   String? get effectiveLogoUrl {
-    if (logoUrl != null) return logoUrl;
     final normalized = brand.toLowerCase();
     if (_brandLogos.containsKey(normalized)) {
       return _brandLogos[normalized];

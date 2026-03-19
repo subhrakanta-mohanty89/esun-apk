@@ -11,6 +11,7 @@ import '../../routes/app_routes.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../state/app_state.dart';
 import '../../core/network/api_service.dart';
+import '../../state/transaction_state.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -36,7 +37,7 @@ class ProfileScreen extends ConsumerWidget {
             _buildProfileHeader(context, profile),
             
             // Account Stats
-            _buildAccountStats(context),
+            _buildAccountStats(context, ref),
             
             // Menu Items
             _buildMenuSection(context, ref),
@@ -44,7 +45,7 @@ class ProfileScreen extends ConsumerWidget {
             // Logout
             _buildLogoutButton(context, ref),
             
-            const SizedBox(height: ESUNSpacing.xxl),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -129,18 +130,32 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildAccountStats(BuildContext context) {
+  Widget _buildAccountStats(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(userProfileProvider).valueOrNull;
+    final txnCount = ref.watch(transactionStateProvider).transactions.length;
+    
+    // Parse created_at from profile
+    String memberSince = 'New';
+    final createdAt = profile?['created_at'];
+    if (createdAt != null) {
+      try {
+        final dt = DateTime.parse(createdAt.toString());
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        memberSince = '${months[dt.month - 1]} ${dt.year}';
+      } catch (_) {}
+    }
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
       child: FPCard(
         child: Row(
           children: [
             Expanded(
-              child: _buildStatItem('Member Since', 'Jan 2023', Icons.calendar_today),
+              child: _buildStatItem('Member Since', memberSince, Icons.calendar_today),
             ),
             Container(width: 1, height: 50, color: ESUNColors.border),
             Expanded(
-              child: _buildStatItem('Transactions', '1,234', Icons.receipt_long),
+              child: _buildStatItem('Transactions', '$txnCount', Icons.receipt_long),
             ),
             Container(width: 1, height: 50, color: ESUNColors.border),
             Expanded(
@@ -283,7 +298,7 @@ final userProfileProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
   final api = ref.read(apiServiceProvider);
   final result = await api.get<Map<String, dynamic>>('${ApiConfig.apiPrefix}/users/me');
   if (result.isError) return null;
-  final body = result.data as Map<String, dynamic>?;
+  final body = result.data;
   if (body == null || body['success'] != true) return null;
   return body['data'] as Map<String, dynamic>?;
 });

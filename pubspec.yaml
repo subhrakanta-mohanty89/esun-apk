@@ -61,7 +61,7 @@ dependencies:
   qr_flutter: ^4.1.0
   
   # Biometrics
-  app_links: ^7.0.0
+  app_links: ^6.3.0
   
   # Analytics
   firebase_analytics: ^11.6.0

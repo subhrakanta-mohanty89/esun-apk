@@ -75,10 +75,12 @@ class BankAccountData {
       accountType: json['account_type'] ?? json['type'] ?? 'SAVINGS',
       balance: (json['balance'] as num?)?.toDouble() ?? 0.0,
       ifscCode: json['ifsc_code'] ?? json['ifscCode'],
-      branch: json['branch'],
-      lastUpdated: json['last_updated'] != null 
-          ? DateTime.tryParse(json['last_updated']) 
-          : null,
+      branch: json['branch_name'] ?? json['branch'],
+      lastUpdated: json['last_synced_at'] != null 
+          ? DateTime.tryParse(json['last_synced_at']) 
+          : (json['last_updated'] != null 
+              ? DateTime.tryParse(json['last_updated']) 
+              : null),
       logoUrl: json['logo_url'] as String?,
     );
   }
@@ -97,37 +99,40 @@ class BankAccountData {
     return match.value.isNotEmpty ? match.value : null;
   }
   
+  static String _faviconUrl(String domain) =>
+      'https://www.google.com/s2/favicons?domain=$domain&sz=128';
+
   static final Map<String, String> _bankLogos = {
-    'hdfc bank': 'https://www.hdfcbank.com/content/dam/HDFCbank/images/logo.png',
-    'hdfc': 'https://www.hdfcbank.com/content/dam/HDFCbank/images/logo.png',
-    'icici bank': 'https://www.icicibank.com/etc.clientlibs/icicibank/clientlibs/clientlib-base-web/resources/assets/images/logo.png',
-    'icici': 'https://www.icicibank.com/etc.clientlibs/icicibank/clientlibs/clientlib-base-web/resources/assets/images/logo.png',
-    'sbi': 'https://sbi.co.in/documents/16012/115064/sbi-logo.png',
-    'state bank of india': 'https://sbi.co.in/documents/16012/115064/sbi-logo.png',
-    'axis bank': 'https://www.axisbank.com/images/axis-bank-logo.png',
-    'axis': 'https://www.axisbank.com/images/axis-bank-logo.png',
-    'kotak': 'https://www.kotak.com/content/dam/Kotak/kotak-bank/images/kotak-logo.svg',
-    'kotak mahindra bank': 'https://www.kotak.com/content/dam/Kotak/kotak-bank/images/kotak-logo.svg',
-    'yes bank': 'https://www.yesbank.in/o/yes-bank-web-theme/images/yes_bank_logo.svg',
-    'punjab national bank': 'https://www.pnbindia.in/images/logo.png',
-    'pnb': 'https://www.pnbindia.in/images/logo.png',
-    'bank of baroda': 'https://www.bankofbaroda.in/documents/d/guest/bob-logo-new.png',
-    'canara bank': 'https://canarabank.com/assets/site/images/logo.png',
-    'union bank': 'https://www.unionbankofindia.co.in/images/logo.png',
-    'indian bank': 'https://www.indianbank.in/sites/all/themes/idfc_first_theme/images/logo.svg',
-    'idfc first bank': 'https://www.idfcfirstbank.com/images/logo/idfc-first-bank-logo.svg',
-    'federal bank': 'https://www.federalbank.co.in/documents/10180/21119/fb-logo.svg',
-    'indusind bank': 'https://www.indusind.com/iblogs/wp-content/themes/Developer/assets/images/indusind-logo.svg',
+    'hdfc bank': _faviconUrl('hdfcbank.com'),
+    'hdfc': _faviconUrl('hdfcbank.com'),
+    'icici bank': _faviconUrl('icicibank.com'),
+    'icici': _faviconUrl('icicibank.com'),
+    'sbi': _faviconUrl('sbi.co.in'),
+    'state bank of india': _faviconUrl('sbi.co.in'),
+    'axis bank': _faviconUrl('axisbank.com'),
+    'axis': _faviconUrl('axisbank.com'),
+    'kotak': _faviconUrl('kotak.com'),
+    'kotak mahindra bank': _faviconUrl('kotak.com'),
+    'yes bank': _faviconUrl('yesbank.in'),
+    'punjab national bank': _faviconUrl('pnbindia.in'),
+    'pnb': _faviconUrl('pnbindia.in'),
+    'bank of baroda': _faviconUrl('bankofbaroda.in'),
+    'canara bank': _faviconUrl('canarabank.com'),
+    'union bank': _faviconUrl('unionbankofindia.co.in'),
+    'indian bank': _faviconUrl('indianbank.in'),
+    'idfc first bank': _faviconUrl('idfcfirstbank.com'),
+    'federal bank': _faviconUrl('federalbank.co.in'),
+    'indusind bank': _faviconUrl('indusind.com'),
   };
   
   // Mock data - matches seeded database values
   static List<BankAccountData> get mockList => [
-    BankAccountData(bankName: 'HDFC Bank', accountNumber: 'XXXX8847', accountType: 'SAVINGS', balance: 542350.75,
-      logoUrl: 'https://www.hdfcbank.com/content/dam/HDFCbank/images/logo.png'),
-    BankAccountData(bankName: 'ICICI Bank', accountNumber: 'XXXX3392', accountType: 'SAVINGS', balance: 187500.00,
-      logoUrl: 'https://www.icicibank.com/etc.clientlibs/icicibank/clientlibs/clientlib-base-web/resources/assets/images/logo.png'),
-    BankAccountData(bankName: 'SBI', accountNumber: 'XXXX7156', accountType: 'SALARY', balance: 325000.00,
-      logoUrl: 'https://sbi.co.in/documents/16012/115064/sbi-logo.png'),
+    BankAccountData(bankName: 'HDFC Bank', accountNumber: 'XXXX1234', accountType: 'SAVINGS', balance: 542350.75,
+      logoUrl: _faviconUrl('hdfcbank.com')),
+    BankAccountData(bankName: 'ICICI Bank', accountNumber: 'XXXX5678', accountType: 'SAVINGS', balance: 187500.00,
+      logoUrl: _faviconUrl('icicibank.com')),
+    BankAccountData(bankName: 'State Bank of India', accountNumber: 'XXXX9012', accountType: 'CURRENT', balance: 325000.00,
+      logoUrl: _faviconUrl('sbi.co.in')),
   ];
 }
 
@@ -166,62 +171,62 @@ class InvestmentHolding {
   
   static final Map<String, String> _companyLogos = {
     // Banks
-    'hdfcbank': 'https://companieslogo.com/img/orig/HDB-bb6c1c30.png',
-    'hdfc bank': 'https://companieslogo.com/img/orig/HDB-bb6c1c30.png',
-    'icicibank': 'https://companieslogo.com/img/orig/IBN-189d6746.png',
-    'icici bank': 'https://companieslogo.com/img/orig/IBN-189d6746.png',
-    'sbin': 'https://companieslogo.com/img/orig/SBIN.NS-c0359dfd.png',
-    'sbi': 'https://companieslogo.com/img/orig/SBIN.NS-c0359dfd.png',
-    'axisbank': 'https://companieslogo.com/img/orig/AXISBANK.NS-c1c58d16.png',
-    'axis bank': 'https://companieslogo.com/img/orig/AXISBANK.NS-c1c58d16.png',
-    'kotakbank': 'https://companieslogo.com/img/orig/KOTAKBANK.NS-cfc1a0c6.png',
+    'hdfcbank': 'https://companieslogo.com/img/orig/HDB-bb6320df.png',
+    'hdfc bank': 'https://companieslogo.com/img/orig/HDB-bb6320df.png',
+    'icicibank': 'https://companieslogo.com/img/orig/IBN-83539eea.png',
+    'icici bank': 'https://companieslogo.com/img/orig/IBN-83539eea.png',
+    'sbin': 'https://companieslogo.com/img/orig/SBIN.NS-7d7e5a18.png',
+    'sbi': 'https://companieslogo.com/img/orig/SBIN.NS-7d7e5a18.png',
+    'axisbank': 'https://companieslogo.com/img/orig/AXISBANK.NS-27b1a785.png',
+    'axis bank': 'https://companieslogo.com/img/orig/AXISBANK.NS-27b1a785.png',
+    'kotakbank': 'https://companieslogo.com/img/orig/KOTAKBANK.NS-09b0cf3f.png',
     
     // IT Companies
-    'infy': 'https://companieslogo.com/img/orig/INFY-9d3f8f7e.png',
-    'infosys': 'https://companieslogo.com/img/orig/INFY-9d3f8f7e.png',
-    'tcs': 'https://companieslogo.com/img/orig/TCS.NS-7401f1bd.png',
-    'wipro': 'https://companieslogo.com/img/orig/WIPRO.NS-d7027c3c.png',
-    'hcltech': 'https://companieslogo.com/img/orig/HCLTECH.NS-6d56101b.png',
-    'techm': 'https://companieslogo.com/img/orig/TECHM.NS-a80db389.png',
+    'infy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://infosys.com&size=128',
+    'infosys': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://infosys.com&size=128',
+    'tcs': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tcs.com&size=128',
+    'wipro': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://wipro.com&size=128',
+    'hcltech': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hcltech.com&size=128',
+    'techm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://techmahindra.com&size=128',
     
     // Major Conglomerates
-    'reliance': 'https://companieslogo.com/img/orig/RELIANCE.NS-c0f19c7e.png',
-    'reliance industries': 'https://companieslogo.com/img/orig/RELIANCE.NS-c0f19c7e.png',
-    'tatamotors': 'https://companieslogo.com/img/orig/TATAMOTORS.NS-16f69c4e.png',
-    'tata motors': 'https://companieslogo.com/img/orig/TATAMOTORS.NS-16f69c4e.png',
-    'tatasteel': 'https://companieslogo.com/img/orig/TATASTEEL.NS-09b87bbb.png',
-    'bhartiartl': 'https://companieslogo.com/img/orig/BHARTIARTL.NS-5d75aaed.png',
-    'airtel': 'https://companieslogo.com/img/orig/BHARTIARTL.NS-5d75aaed.png',
-    'itc': 'https://companieslogo.com/img/orig/ITC.NS-5c351c53.png',
-    'hindunilvr': 'https://companieslogo.com/img/orig/HINDUNILVR.NS-41c8e7bb.png',
-    'hul': 'https://companieslogo.com/img/orig/HINDUNILVR.NS-41c8e7bb.png',
+    'reliance': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ril.com&size=128',
+    'reliance industries': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ril.com&size=128',
+    'tatamotors': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatamotors.com&size=128',
+    'tata motors': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatamotors.com&size=128',
+    'tatasteel': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatasteel.com&size=128',
+    'bhartiartl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128',
+    'airtel': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128',
+    'itc': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://itcportal.com&size=128',
+    'hindunilvr': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hul.co.in&size=128',
+    'hul': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hul.co.in&size=128',
     
     // Consumer/Tech
-    'swiggy': 'https://companieslogo.com/img/orig/SWIGGY.NS-e13f0b4d.png',
-    'zomato': 'https://companieslogo.com/img/orig/ZOMATO.NS-90ff4ea8.png',
-    'ola': 'https://companieslogo.com/img/orig/OLECTRA-GREENTECH.NS-4e6b2e3c.png',
-    'boat': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/BoAt_Logo.svg',
-    'nykaa': 'https://companieslogo.com/img/orig/NYKAA.NS-4e6d3f9c.png',
-    'paytm': 'https://companieslogo.com/img/orig/PAYTM.NS-c8e94c40.png',
+    'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+    'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    'ola': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://olaelectric.com&size=128',
+    'boat': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://boat-lifestyle.com&size=128',
+    'nykaa': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://nykaa.com&size=128',
+    'paytm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128',
     
     // Auto
-    'maruti': 'https://companieslogo.com/img/orig/MARUTI.NS-9c0bcf29.png',
-    'bajaj-auto': 'https://companieslogo.com/img/orig/BAJAJ-AUTO.NS-f5cbe96c.png',
-    'eichermot': 'https://companieslogo.com/img/orig/EICHERMOT.NS-acf47c5d.png',
-    'm&m': 'https://companieslogo.com/img/orig/M%26M.NS-eb3f4af5.png',
-    'mahindra': 'https://companieslogo.com/img/orig/M%26M.NS-eb3f4af5.png',
+    'maruti': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://marutisuzuki.com&size=128',
+    'bajaj-auto': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bajajauto.com&size=128',
+    'eichermot': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://eicher.in&size=128',
+    'm&m': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mahindra.com&size=128',
+    'mahindra': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mahindra.com&size=128',
     
     // Financial
-    'hdfclife': 'https://companieslogo.com/img/orig/HDFCLIFE.NS-2a7e55b4.png',
-    'sbilife': 'https://companieslogo.com/img/orig/SBILIFE.NS-0fdd8e51.png',
-    'bajfinance': 'https://companieslogo.com/img/orig/BAJFINANCE.NS-c39b4f91.png',
+    'hdfclife': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfclife.com&size=128',
+    'sbilife': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbilife.co.in&size=128',
+    'bajfinance': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bajajfinserv.in&size=128',
     
     // Mutual Fund AMCs
-    'axis bluechip': 'https://www.axismf.com/images/Logo.svg',
-    'groww': 'https://groww.in/images/groww-logo.svg',
-    'hdfc mutual': 'https://www.hdfcfund.com/content/dam/abc/india/fund-assets/images/hdfcmf-logo.svg',
-    'sbi mutual': 'https://www.sbimf.com/assets/images/sbi-mf-logo.svg',
-    'icici pru': 'https://www.icicipruamc.com/content/dam/icicipruamc/images/logo/icici-pru-logo.svg',
+    'axis bluechip': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axismf.com&size=128',
+    'groww': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://groww.in&size=128',
+    'hdfc mutual': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcfund.com&size=128',
+    'sbi mutual': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbimf.com&size=128',
+    'icici pru': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicipruamc.com&size=128',
   };
   
   InvestmentHolding({
@@ -483,18 +488,18 @@ class InsuranceData {
   }
   
   static final Map<String, String> _insuranceProviderLogos = {
-    'lic of india': 'https://licindia.in/o/lic-theme/images/lic-of-india-logo.png',
-    'lic': 'https://licindia.in/o/lic-theme/images/lic-of-india-logo.png',
-    'hdfc life': 'https://www.hdfclife.com/content/dam/hdfclifeinsurancecompany/about-us/investor-corner/HDFC%20Life%20Logo.png',
-    'hdfc ergo': 'https://www.hdfcergo.com/images/hdfc-ergo-logo.png',
-    'icici prudential': 'https://www.iciciprulife.com/content/dam/icicipru/logos/icici-pru-life-logo.svg',
-    'icici lombard': 'https://www.icicilombard.com/content/dam/icicilombard/images/logo/icici-lombard-logo.png',
-    'sbi life': 'https://www.sbilife.co.in/sites/all/themes/bootstrapsbilife/images/logo.png',
-    'max life': 'https://www.maxlifeinsurance.com/content/dam/maxlifeinsurance/images/Max_Life_Logo.png',
-    'bajaj allianz': 'https://www.bajajallianzlife.com/etc/designs/bajajallianzlife/common-assets/images/logo.png',
-    'tata aia': 'https://www.tataaia.com/content/dam/tataaialifeinsurancecompanylimited/navigations/tata-aia-logo.svg',
-    'kotak life': 'https://insurance.kotak.com/content/dam/kli/images/kli-logo.svg',
-    'reliance nippon': 'https://www.reliancenipponlife.com/ReactApp/images/rnli-logo.svg',
+    'lic of india': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128',
+    'lic': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128',
+    'hdfc life': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfclife.com&size=128',
+    'hdfc ergo': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128',
+    'icici prudential': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iciciprulife.com&size=128',
+    'icici lombard': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicilombard.com&size=128',
+    'sbi life': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbilife.co.in&size=128',
+    'max life': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128',
+    'bajaj allianz': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bajajallianz.com&size=128',
+    'tata aia': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tataaia.com&size=128',
+    'kotak life': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotaklife.com&size=128',
+    'reliance nippon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://reliancenipponlife.com&size=128',
   };
   
   // Mock data - matches seeded database values
@@ -504,28 +509,28 @@ class InsuranceData {
       type: 'TERM', sumAssured: 10000000, premiumAmount: 15000,
       premiumFrequency: 'YEARLY', startDate: DateTime(2021, 6, 15),
       expiryDate: DateTime(2051, 6, 15), status: 'ACTIVE',
-      logoUrl: 'https://licindia.in/o/lic-theme/images/lic-of-india-logo.png',
+      logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128',
     ),
     InsuranceData(
       id: '2', provider: 'Max Life', policyNumber: 'POL****2938',
       type: 'ULIP', sumAssured: 2500000, premiumAmount: 50000,
       premiumFrequency: 'YEARLY', startDate: DateTime(2023, 3, 10),
       expiryDate: DateTime(2043, 3, 10), status: 'ACTIVE',
-      logoUrl: 'https://www.maxlifeinsurance.com/content/dam/maxlifeinsurance/images/Max_Life_Logo.png',
+      logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128',
     ),
     InsuranceData(
       id: '3', provider: 'HDFC ERGO', policyNumber: 'POL****8472',
       type: 'HEALTH', sumAssured: 500000, premiumAmount: 12000,
       premiumFrequency: 'YEARLY', startDate: DateTime(2024, 1, 1),
       expiryDate: DateTime(2025, 1, 1), status: 'ACTIVE',
-      logoUrl: 'https://www.hdfcergo.com/images/hdfc-ergo-logo.png',
+      logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128',
     ),
     InsuranceData(
       id: '4', provider: 'ICICI Lombard', policyNumber: 'POL****6183',
       type: 'VEHICLE', sumAssured: 1200000, premiumAmount: 8000,
       premiumFrequency: 'YEARLY', startDate: DateTime(2025, 9, 20),
       expiryDate: DateTime(2026, 9, 20), status: 'ACTIVE',
-      logoUrl: 'https://www.icicilombard.com/content/dam/icicilombard/images/logo/icici-lombard-logo.png',
+      logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicilombard.com&size=128',
     ),
   ];
 }
@@ -699,6 +704,21 @@ class AADataState {
     this.insurances = const [],
   });
   
+  /// Factory constructor with default mock data for immediate display
+  factory AADataState.withDefaults() {
+    return AADataState(
+      isLoaded: true,
+      lastUpdated: DateTime.now(),
+      snapshot: FinancialSnapshot.mock,
+      assetBreakdown: AssetBreakdown.mock,
+      bankAccounts: BankAccountData.mockList,
+      investments: InvestmentHolding.mockList,
+      fixedDeposits: FixedDepositData.mockList,
+      loans: LoanData.mockList,
+      insurances: InsuranceData.mockList,
+    );
+  }
+  
   AADataState copyWith({
     bool? isLoading,
     bool? isLoaded,
@@ -739,6 +759,66 @@ class AADataState {
   // Net worth calculation
   double get calculatedNetWorth => 
       totalBankBalance + totalInvestmentValue + totalFDValue - totalLoanOutstanding;
+
+  // ---- Financial Health Score (computed from live data) ----
+  double get _monthlyIncome => snapshot?.totalMonthlyIncome ?? 185000;
+  double get _monthlyExpense => snapshot?.totalMonthlyExpense ?? 95000;
+  double get _totalEmi => loans.fold<double>(0, (s, l) => s + l.emiAmount);
+  int get creditScore => 780; // from snapshot / credit bureau
+
+  String get creditLabel {
+    if (creditScore >= 750) return 'Excellent';
+    if (creditScore >= 700) return 'Good';
+    if (creditScore >= 650) return 'Fair';
+    return 'Poor';
+  }
+
+  /// Savings factor: (income - expense - emi) / income
+  double get savingsFactor {
+    if (_monthlyIncome <= 0) return 0;
+    final rate = (_monthlyIncome - _monthlyExpense - _totalEmi) / _monthlyIncome;
+    return rate.clamp(0.0, 1.0);
+  }
+
+  /// Spending factor: 1 - (expense / income) — lower spending = better
+  double get spendingFactor {
+    if (_monthlyIncome <= 0) return 0;
+    return (1.0 - (_monthlyExpense / _monthlyIncome)).clamp(0.0, 1.0);
+  }
+
+  /// Investment factor: investmentValue / totalAssets
+  double get investmentFactor {
+    final total = totalBankBalance + totalInvestmentValue + totalFDValue;
+    if (total <= 0) return 0;
+    return (totalInvestmentValue / total).clamp(0.0, 1.0);
+  }
+
+  /// Debt factor: 1 - (outstanding / assets) — lower debt = better
+  double get debtFactor {
+    final total = totalBankBalance + totalInvestmentValue + totalFDValue;
+    if (total <= 0) return totalLoanOutstanding > 0 ? 0.0 : 1.0;
+    return (1.0 - (totalLoanOutstanding / (total + totalLoanOutstanding))).clamp(0.0, 1.0);
+  }
+
+  /// Overall health score 0–100
+  int get healthScore {
+    // Weighted: savings 25%, spending 20%, investments 20%, debt 20%, credit 15%
+    final creditFactor = (creditScore - 300) / 600; // normalize 300-900 → 0-1
+    final raw = (savingsFactor * 25 +
+                 spendingFactor * 20 +
+                 investmentFactor * 20 +
+                 debtFactor * 20 +
+                 creditFactor.clamp(0.0, 1.0) * 15);
+    return raw.round().clamp(0, 100);
+  }
+
+  String get healthLabel {
+    if (healthScore >= 80) return 'Excellent';
+    if (healthScore >= 65) return 'Good';
+    if (healthScore >= 50) return 'Fair';
+    if (healthScore >= 35) return 'Poor';
+    return 'Critical';
+  }
 }
 
 // ============================================================================
@@ -805,7 +885,9 @@ class AADataNotifier extends StateNotifier<AADataState> {
     try {
       final result = await _api.get('/api/v1/data/linked-accounts');
       if (result.isSuccess && result.data != null) {
-        final accounts = result.data['accounts'] as List?;
+        final body = result.data;
+        final inner = body['data'] ?? body;
+        final accounts = inner['accounts'] as List?;
         return accounts?.map((a) => AALinkedAccount.fromJson(a)).toList() ?? [];
       }
     } catch (_) {}
@@ -816,7 +898,9 @@ class AADataNotifier extends StateNotifier<AADataState> {
     try {
       final result = await _api.get('/api/v1/aa/bank-accounts');
       if (result.isSuccess && result.data != null) {
-        final accounts = result.data['accounts'] as List?;
+        final body = result.data;
+        final inner = body['data'] ?? body;
+        final accounts = inner['accounts'] as List?;
         return accounts?.map((a) => BankAccountData.fromJson(a)).toList() ?? [];
       }
     } catch (_) {}
@@ -827,7 +911,9 @@ class AADataNotifier extends StateNotifier<AADataState> {
     try {
       final result = await _api.get('/api/v1/aa/investments');
       if (result.isSuccess && result.data != null) {
-        final holdings = result.data['holdings'] as List?;
+        final body = result.data;
+        final inner = body['data'] ?? body;
+        final holdings = inner['holdings'] as List?;
         return holdings?.map((h) => InvestmentHolding.fromJson(h)).toList() ?? [];
       }
     } catch (_) {}
@@ -838,7 +924,9 @@ class AADataNotifier extends StateNotifier<AADataState> {
     try {
       final result = await _api.get('/api/v1/aa/loans');
       if (result.isSuccess && result.data != null) {
-        final loans = result.data['loans'] as List?;
+        final body = result.data;
+        final inner = body['data'] ?? body;
+        final loans = inner['loans'] as List?;
         return loans?.map((l) => LoanData.fromJson(l)).toList() ?? [];
       }
     } catch (_) {}
@@ -849,7 +937,9 @@ class AADataNotifier extends StateNotifier<AADataState> {
     try {
       final result = await _api.get('/api/v1/aa/insurances');
       if (result.isSuccess && result.data != null) {
-        final insurances = result.data['insurances'] as List?;
+        final body = result.data;
+        final inner = body['data'] ?? body;
+        final insurances = inner['insurances'] as List?;
         return insurances?.map((i) => InsuranceData.fromJson(i)).toList() ?? [];
       }
     } catch (_) {}
@@ -890,7 +980,7 @@ class AADataNotifier extends StateNotifier<AADataState> {
     );
   }
   
-  /// Load mock data for demo/testing
+  /// Load mock data for demo/testing — uses same 3 banks as mockList
   void loadMockData() {
     state = state.copyWith(
       isLoading: false,
@@ -898,119 +988,212 @@ class AADataNotifier extends StateNotifier<AADataState> {
       lastUpdated: DateTime.now(),
       snapshot: FinancialSnapshot.mock,
       assetBreakdown: AssetBreakdown.mock,
-      bankAccounts: [
-        BankAccountData(
-          bankName: 'HDFC Bank',
-          accountNumber: 'XXXX1234',
-          accountType: 'SAVINGS',
-          balance: 85000,
-          lastUpdated: DateTime.now(),
-        ),
-        BankAccountData(
-          bankName: 'ICICI Bank',
-          accountNumber: 'XXXX5678',
-          accountType: 'SAVINGS',
-          balance: 120889,
-          lastUpdated: DateTime.now(),
-        ),
-      ],
-      investments: [
-        InvestmentHolding(
-          id: '1',
-          name: 'HDFC Mid-Cap Opportunities Fund',
-          type: 'MUTUAL_FUND',
-          symbol: 'HDFCMIDCAP',
-          quantity: 156.34,
-          avgBuyPrice: 892.45,
-          currentValue: 162500,
-          returns: 23000,
-          returnsPercentage: 16.5,
-          provider: 'CAMS',
-        ),
-        InvestmentHolding(
-          id: '2',
-          name: 'Reliance Industries Ltd',
-          type: 'STOCK',
-          symbol: 'RELIANCE',
-          quantity: 50,
-          avgBuyPrice: 2200,
-          currentValue: 148500,
-          returns: 38500,
-          returnsPercentage: 35.0,
-          provider: 'NSDL',
-        ),
-        InvestmentHolding(
-          id: '3',
-          name: 'Nippon India ETF Nifty BeES',
-          type: 'ETF',
-          symbol: 'NIFTYBEES',
-          quantity: 200,
-          avgBuyPrice: 230,
-          currentValue: 52000,
-          returns: 6000,
-          returnsPercentage: 13.04,
-          provider: 'CDSL',
-        ),
-      ],
-      loans: [
-        LoanData(
-          id: '1',
-          lenderName: 'SBI',
-          loanType: 'HOME',
-          accountNumber: 'XXXX9012',
-          principalAmount: 5000000,
-          outstandingAmount: 3200000,
-          emiAmount: 42500,
-          interestRate: 8.5,
-          tenure: 240,
-          remainingTenure: 168,
-          nextEmiDate: DateTime.now().add(const Duration(days: 15)),
-          status: 'ACTIVE',
-        ),
-        LoanData(
-          id: '2',
-          lenderName: 'HDFC Bank',
-          loanType: 'PERSONAL',
-          accountNumber: 'XXXX3456',
-          principalAmount: 300000,
-          outstandingAmount: 180000,
-          emiAmount: 12500,
-          interestRate: 12.5,
-          tenure: 36,
-          remainingTenure: 18,
-          nextEmiDate: DateTime.now().add(const Duration(days: 10)),
-          status: 'ACTIVE',
-        ),
-      ],
-      insurances: [
-        InsuranceData(
-          id: '1',
-          provider: 'LIC of India',
-          policyNumber: 'XXXX7890',
-          type: 'TERM',
-          sumAssured: 10000000,
-          premiumAmount: 12000,
-          premiumFrequency: 'YEARLY',
-          startDate: DateTime(2023, 1, 1),
-          expiryDate: DateTime(2053, 1, 1),
-          status: 'ACTIVE',
-          nominees: ['Spouse'],
-        ),
-        InsuranceData(
-          id: '2',
-          provider: 'Star Health',
-          policyNumber: 'XXXX4567',
-          type: 'HEALTH',
-          sumAssured: 1000000,
-          premiumAmount: 18000,
-          premiumFrequency: 'YEARLY',
-          startDate: DateTime(2024, 1, 1),
-          expiryDate: DateTime(2025, 1, 1),
-          status: 'ACTIVE',
-        ),
-      ],
+      bankAccounts: BankAccountData.mockList,
+      investments: InvestmentHolding.mockList,
+      fixedDeposits: FixedDepositData.mockList,
+      loans: LoanData.mockList,
+      insurances: InsuranceData.mockList,
     );
   }
+  
+  /// Deduct amount from a bank account balance (for payments/transfers)
+  void deductFromBalance({
+    required double amount,
+    required String accountIdentifier,
+    String? description,
+    String? recipientName,
+    String? category,
+    String? mode,
+  }) {
+    String? matchedAccountId;
+    final updatedAccounts = state.bankAccounts.map((account) {
+      // Match by account number, last 4 digits, or bank name (bidirectional)
+      final idLower = accountIdentifier.toLowerCase();
+      final bankLower = account.bankName.toLowerCase();
+      // Extract last 4 digits from identifier (e.g. "HDFC Bank savings •• 1234" → "1234")
+      final digitMatches = RegExp(r'\d{4}').allMatches(accountIdentifier).toList();
+      final last4 = digitMatches.isNotEmpty ? digitMatches.last.group(0)! : '';
+      final matches = account.accountNumber.contains(accountIdentifier) ||
+                      accountIdentifier.contains(account.accountNumber) ||
+                      (last4.isNotEmpty && account.accountNumber.contains(last4)) ||
+                      bankLower.contains(idLower) ||
+                      idLower.contains(bankLower);
+      if (matches && matchedAccountId == null) {
+        matchedAccountId = account.accountNumber;
+        return BankAccountData(
+          bankName: account.bankName,
+          accountNumber: account.accountNumber,
+          accountType: account.accountType,
+          balance: (account.balance - amount).clamp(0, double.infinity),
+          ifscCode: account.ifscCode,
+          branch: account.branch,
+          lastUpdated: DateTime.now(),
+          logoUrl: account.logoUrl,
+        );
+      }
+      return account;
+    }).toList();
+
+    // Update snapshot with new net worth
+    final newBankBalance = updatedAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    final oldBankBalance = state.bankAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    final balanceDiff = newBankBalance - oldBankBalance;
+    
+    final currentSnapshot = state.snapshot ?? FinancialSnapshot.mock;
+    final updatedSnapshot = FinancialSnapshot(
+      netWorth: currentSnapshot.netWorth + balanceDiff,
+      totalAssets: currentSnapshot.totalAssets + balanceDiff,
+      totalLiabilities: currentSnapshot.totalLiabilities,
+      totalMonthlyIncome: currentSnapshot.totalMonthlyIncome,
+      totalMonthlyExpense: currentSnapshot.totalMonthlyExpense + amount,
+      savingsRate: currentSnapshot.savingsRate,
+      netWorthChange: currentSnapshot.netWorthChange,
+      snapshotDate: DateTime.now(),
+    );
+
+    // Update asset breakdown
+    final currentAssets = state.assetBreakdown ?? AssetBreakdown.mock;
+    final updatedAssets = AssetBreakdown(
+      mutualFunds: currentAssets.mutualFunds,
+      stocks: currentAssets.stocks,
+      etfs: currentAssets.etfs,
+      bankBalance: newBankBalance,
+      fixedDeposits: currentAssets.fixedDeposits,
+      realEstate: currentAssets.realEstate,
+      gold: currentAssets.gold,
+      others: currentAssets.others,
+    );
+
+    state = state.copyWith(
+      bankAccounts: updatedAccounts,
+      snapshot: updatedSnapshot,
+      assetBreakdown: updatedAssets,
+      lastUpdated: DateTime.now(),
+    );
+
+    // Persist to backend
+    _syncBalanceToBackend(
+      accountIdentifier: matchedAccountId ?? accountIdentifier,
+      amount: -amount,
+      description: description ?? 'Debit transaction',
+      recipientName: recipientName,
+      category: category,
+      mode: mode,
+    );
+  }
+
+  /// Add amount to a bank account balance (for income/refunds)
+  void addToBalance({
+    required double amount,
+    required String accountIdentifier,
+    String? description,
+    String? recipientName,
+    String? category,
+    String? mode,
+  }) {
+    String? matchedAccountId;
+    final updatedAccounts = state.bankAccounts.map((account) {
+      final idLower = accountIdentifier.toLowerCase();
+      final bankLower = account.bankName.toLowerCase();
+      final digitMatches = RegExp(r'\d{4}').allMatches(accountIdentifier).toList();
+      final last4 = digitMatches.isNotEmpty ? digitMatches.last.group(0)! : '';
+      final matches = account.accountNumber.contains(accountIdentifier) ||
+                      accountIdentifier.contains(account.accountNumber) ||
+                      (last4.isNotEmpty && account.accountNumber.contains(last4)) ||
+                      bankLower.contains(idLower) ||
+                      idLower.contains(bankLower);
+      if (matches && matchedAccountId == null) {
+        matchedAccountId = account.accountNumber;
+        return BankAccountData(
+          bankName: account.bankName,
+          accountNumber: account.accountNumber,
+          accountType: account.accountType,
+          balance: account.balance + amount,
+          ifscCode: account.ifscCode,
+          branch: account.branch,
+          lastUpdated: DateTime.now(),
+          logoUrl: account.logoUrl,
+        );
+      }
+      return account;
+    }).toList();
+
+    // Update snapshot
+    final newBankBalance = updatedAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    final oldBankBalance = state.bankAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    final balanceDiff = newBankBalance - oldBankBalance;
+    
+    final currentSnapshot = state.snapshot ?? FinancialSnapshot.mock;
+    final updatedSnapshot = FinancialSnapshot(
+      netWorth: currentSnapshot.netWorth + balanceDiff,
+      totalAssets: currentSnapshot.totalAssets + balanceDiff,
+      totalLiabilities: currentSnapshot.totalLiabilities,
+      totalMonthlyIncome: currentSnapshot.totalMonthlyIncome + amount,
+      totalMonthlyExpense: currentSnapshot.totalMonthlyExpense,
+      savingsRate: currentSnapshot.savingsRate,
+      netWorthChange: currentSnapshot.netWorthChange,
+      snapshotDate: DateTime.now(),
+    );
+
+    // Update asset breakdown
+    final currentAssets = state.assetBreakdown ?? AssetBreakdown.mock;
+    final updatedAssets = AssetBreakdown(
+      mutualFunds: currentAssets.mutualFunds,
+      stocks: currentAssets.stocks,
+      etfs: currentAssets.etfs,
+      bankBalance: newBankBalance,
+      fixedDeposits: currentAssets.fixedDeposits,
+      realEstate: currentAssets.realEstate,
+      gold: currentAssets.gold,
+      others: currentAssets.others,
+    );
+
+    state = state.copyWith(
+      bankAccounts: updatedAccounts,
+      snapshot: updatedSnapshot,
+      assetBreakdown: updatedAssets,
+      lastUpdated: DateTime.now(),
+    );
+
+    // Persist to backend
+    _syncBalanceToBackend(
+      accountIdentifier: matchedAccountId ?? accountIdentifier,
+      amount: amount,
+      description: description ?? 'Credit transaction',
+      recipientName: recipientName,
+      category: category,
+      mode: mode,
+    );
+  }
+
+  /// Sync balance change to backend (fire-and-forget)
+  Future<void> _syncBalanceToBackend({
+    required String accountIdentifier,
+    required double amount,
+    required String description,
+    String? recipientName,
+    String? category,
+    String? mode,
+  }) async {
+    try {
+      await _api.post(
+        '/api/v1/aa/update-balance',
+        data: {
+          'account_id': accountIdentifier,
+          'amount': amount,
+          'description': description,
+          'recipient_name': recipientName ?? '',
+          'category': category ?? 'transfer',
+          'mode': mode ?? 'upi',
+        },
+      );
+    } catch (_) {
+      // Best-effort sync; local state is already updated
+    }
+  }
+
+  /// Get total bank balance 
+  double get totalBankBalance => state.totalBankBalance;
   
   /// Clear all AA data (on logout)
   void clear() {
@@ -1026,7 +1209,10 @@ class AADataNotifier extends StateNotifier<AADataState> {
 // ============================================================================
 
 final aaDataProvider = StateNotifierProvider<AADataNotifier, AADataState>((ref) {
-  return AADataNotifier(ref);
+  final notifier = AADataNotifier(ref);
+  // Load default data immediately for fast UI rendering
+  notifier.loadMockData();
+  return notifier;
 });
 
 // Computed providers for specific screens

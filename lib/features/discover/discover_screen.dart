@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../theme/theme.dart';
 import '../../routes/app_routes.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../shared/widgets/smart_network_image.dart';
 import '../../state/aa_data_state.dart';
 import '../../core/utils/utils.dart';
 
@@ -70,7 +71,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             // Rewards
             _buildRewards(context),
             
-            const SizedBox(height: 80),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -131,7 +132,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -156,7 +157,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               ),
             ],
           ),
-          const SizedBox(height: ESUNSpacing.md),
+          const SizedBox(height: ESUNSpacing.sm),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -179,11 +180,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   Widget _buildProductCard(_ProductItem product) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Opening ${product.name}...')),
-        );
-      },
+      onTap: () => _showProductDetail(product.name, product.subtitle, product.color, product.icon),
       child: Container(
         padding: const EdgeInsets.all(ESUNSpacing.md),
         decoration: BoxDecoration(
@@ -253,7 +250,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   // My Insurance Policies (from Account Aggregator)
   Widget _buildMyInsurancePolicies(BuildContext context) {
     final aaData = ref.watch(aaDataProvider);
-    final insurances = aaData.insurances ?? InsuranceData.mockList;
+    final insurances = aaData.insurances;
     
     if (insurances.isEmpty) {
       return const SizedBox.shrink();
@@ -362,24 +359,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             child: insurance.effectiveLogoUrl != null
                 ? ClipRRect(
                     borderRadius: ESUNRadius.xsRadius,
-                    child: Image.network(
-                      insurance.effectiveLogoUrl!,
+                    child: SmartNetworkImage(
+                      imageUrl: insurance.effectiveLogoUrl!,
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,
+                      placeholderIcon: getInsuranceIcon(insurance.type),
+                      placeholderColor: getInsuranceColor(insurance.type),
                       errorBuilder: (_, __, ___) => Icon(
                         getInsuranceIcon(insurance.type),
                         color: getInsuranceColor(insurance.type),
                         size: 24,
                       ),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Icon(
-                          getInsuranceIcon(insurance.type),
-                          color: getInsuranceColor(insurance.type).withOpacity(0.5),
-                          size: 24,
-                        );
-                      },
                     ),
                   )
                 : Icon(
@@ -505,7 +496,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -530,7 +521,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               ),
             ],
           ),
-          const SizedBox(height: ESUNSpacing.md),
+          const SizedBox(height: ESUNSpacing.sm),
           SizedBox(
             height: 170,
             child: ListView.builder(
@@ -550,9 +541,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   Widget _buildLendingCard(_LendingProduct product) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Opening ${product.name}...')),
-        );
+        context.push(AppRoutes.borrow);
       },
       child: Container(
         width: 180,
@@ -702,11 +691,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   Widget _buildEducationCard(_EducationItem course) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Opening ${course.title}...')),
-        );
-      },
+      onTap: () => _showProductDetail(course.title, 'Learn about ${course.title.toLowerCase()} with expert content.', Colors.indigo, Icons.school),
       child: Container(
         margin: const EdgeInsets.only(bottom: ESUNSpacing.md),
         padding: const EdgeInsets.all(ESUNSpacing.md),
@@ -896,7 +881,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     ];
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -906,21 +891,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: ESUNSpacing.sm),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
-            ),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              return _buildCategoryItem(cat);
-            },
+          const SizedBox(height: 4),
+          Row(
+            children: categories.sublist(0, 4).map((cat) {
+              return Expanded(child: _buildCategoryItem(cat));
+            }).toList(),
+          ),
+          Row(
+            children: categories.sublist(4).map((cat) {
+              return Expanded(child: _buildCategoryItem(cat));
+            }).toList(),
           ),
         ],
       ),
@@ -963,7 +943,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     ];
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -973,7 +953,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: ESUNSpacing.md),
+          const SizedBox(height: ESUNSpacing.sm),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -2128,6 +2108,67 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 borderRadius: ESUNRadius.mdRadius,
               ),
               child: const Icon(Icons.redeem, color: Color(0xFFF59E0B)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  void _showProductDetail(String title, String description, Color color, IconData icon) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: ESUNRadius.mdRadius,
+                  ),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                const SizedBox(width: ESUNSpacing.md),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: ESUNSpacing.lg),
+            Text(
+              description,
+              style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary),
+            ),
+            const SizedBox(height: ESUNSpacing.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Close'),
+                  ),
+                ),
+                const SizedBox(width: ESUNSpacing.md),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      // Navigate to invest screen for investment products
+                      context.push(AppRoutes.invest);
+                    },
+                    child: const Text('Explore'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

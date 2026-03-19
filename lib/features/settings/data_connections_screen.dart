@@ -13,7 +13,6 @@ import '../../shared/widgets/widgets.dart';
 import '../../state/app_state.dart';
 import '../../core/network/api_service.dart';
 import '../../core/analytics/analytics_service.dart';
-import '../../services/reminder_service.dart';
 import '../../services/aggregator_service.dart';
 
 /// Connection status enum
@@ -154,29 +153,29 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
       children: [
         // Info Card
         _buildInfoCard(),
-        const SizedBox(height: ESUNSpacing.xl),
+        const SizedBox(height: ESUNSpacing.lg),
 
         // Connections Section
         _buildSectionHeader('Your Connections'),
         const SizedBox(height: ESUNSpacing.sm),
         ...connections.map((conn) => _buildConnectionCard(conn)),
-        const SizedBox(height: ESUNSpacing.xl),
+        const SizedBox(height: ESUNSpacing.lg),
 
         // Linked Accounts Section (from Aggregator)
         _buildSectionHeader('Linked Accounts'),
         const SizedBox(height: ESUNSpacing.sm),
         _buildLinkedAccountsSection(),
-        const SizedBox(height: ESUNSpacing.xl),
+        const SizedBox(height: ESUNSpacing.lg),
 
         // Reminders Section
         _buildSectionHeader('Notifications & Reminders'),
         const SizedBox(height: ESUNSpacing.sm),
         _buildRemindersCard(),
-        const SizedBox(height: ESUNSpacing.xxl),
+        const SizedBox(height: ESUNSpacing.lg),
 
         // Regulatory Protection Footer
         _buildRegulatoryFooter(),
-        const SizedBox(height: ESUNSpacing.lg),
+        const SizedBox(height: ESUNSpacing.md),
       ],
     );
   }
@@ -667,7 +666,6 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
         icon = Icons.error_outline;
         break;
       case ConnectionStatus.notLinked:
-      default:
         label = 'Not Linked';
         color = ESUNColors.textTertiary;
         icon = Icons.link_off;
@@ -934,7 +932,6 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
       case ConnectionStatus.error:
         return ESUNColors.error;
       case ConnectionStatus.notLinked:
-      default:
         return ESUNColors.textTertiary;
     }
   }
@@ -1032,7 +1029,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
     }
 
     // Refresh connections
-    ref.refresh(dataConnectionsProvider);
+    ref.invalidate(dataConnectionsProvider);
   }
 
   void _handleViewLastSync(DataConnection connection) {

@@ -1,18 +1,106 @@
 /// ESUN Alerts Screen
 /// 
-/// Notifications and alerts center.
+/// Notifications and alerts center - derives from transaction history.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../state/transaction_state.dart';
 
-class AlertsScreen extends ConsumerWidget {
+class AlertsScreen extends ConsumerStatefulWidget {
   const AlertsScreen({super.key});
   
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AlertsScreen> createState() => _AlertsScreenState();
+}
+
+class _AlertsScreenState extends ConsumerState<AlertsScreen> {
+  bool _allRead = false;
+  
+  List<_NotificationItem> _buildNotificationsFromTransactions() {
+    final txns = ref.watch(transactionStateProvider).transactions;
+    final notifications = <_NotificationItem>[];
+    
+    for (int i = 0; i < txns.length && i < 20; i++) {
+      final t = txns[i];
+      final ago = DateTime.now().difference(t.timestamp);
+      String timeText;
+      if (ago.inMinutes < 60) {
+        timeText = '${ago.inMinutes} min ago';
+      } else if (ago.inHours < 24) {
+        timeText = '${ago.inHours} hours ago';
+      } else if (ago.inDays < 2) {
+        timeText = 'Yesterday';
+      } else {
+        timeText = '${ago.inDays} days ago';
+      }
+      
+      IconData icon;
+      Color color;
+      String title;
+      String category = 'payment';
+      
+      if (t.isDebit) {
+        if (t.type == TransactionType.billPayment) {
+          icon = Icons.receipt_long;
+          color = ESUNColors.warning;
+          title = 'Bill Payment';
+          category = 'payment';
+        } else {
+          icon = Icons.check_circle;
+          color = ESUNColors.success;
+          title = 'Payment Successful';
+          category = 'payment';
+        }
+      } else {
+        icon = Icons.account_balance;
+        color = ESUNColors.success;
+        title = 'Credit Received';
+        category = 'payment';
+      }
+      
+      notifications.add(_NotificationItem(
+        icon: icon,
+        title: title,
+        body: '${t.isDebit ? "₹${t.amount.toStringAsFixed(0)} - " : "₹${t.amount.toStringAsFixed(0)} + "}${t.title}',
+        time: timeText,
+        color: color,
+        isRead: _allRead || i > 2,
+        category: category,
+      ));
+    }
+    
+    // Add static offers
+    notifications.add(_NotificationItem(
+      icon: Icons.local_offer,
+      title: 'Special Offer',
+      body: 'Get 5% cashback on your next investment!',
+      time: 'Today',
+      color: Colors.purple,
+      isRead: _allRead,
+      category: 'offer',
+    ));
+    notifications.add(_NotificationItem(
+      icon: Icons.trending_up,
+      title: 'Investment Update',
+      body: 'Your portfolio performance is looking good. Check Wealth Manager.',
+      time: 'Today',
+      color: Colors.blue,
+      isRead: _allRead,
+      category: 'offer',
+    ));
+    
+    return notifications;
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    final all = _buildNotificationsFromTransactions();
+    final payments = all.where((n) => n.category == 'payment').toList();
+    final offers = all.where((n) => n.category == 'offer').toList();
+    
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -20,7 +108,12 @@ class AlertsScreen extends ConsumerWidget {
           title: const Text('Notifications'),
           actions: [
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() => _allRead = true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('All notifications marked as read')),
+                );
+              },
               child: const Text('Mark all read'),
             ),
           ],
@@ -34,9 +127,9 @@ class AlertsScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            _buildNotificationList(_allNotifications),
-            _buildNotificationList(_paymentNotifications),
-            _buildNotificationList(_offerNotifications),
+            _buildNotificationList(all),
+            _buildNotificationList(payments),
+            _buildNotificationList(offers),
           ],
         ),
       ),
@@ -135,79 +228,6 @@ class AlertsScreen extends ConsumerWidget {
       ),
     );
   }
-  
-  static final List<_NotificationItem> _allNotifications = [
-    _NotificationItem(
-      icon: Icons.check_circle,
-      title: 'Payment Successful',
-      body: '₹5,000 sent to Rahul Sharma via UPI',
-      time: '2 min ago',
-      color: ESUNColors.success,
-      isRead: false,
-    ),
-    _NotificationItem(
-      icon: Icons.local_offer,
-      title: 'Special Offer',
-      body: 'Get 5% cashback on your next investment! Valid till Jan 31',
-      time: '1 hour ago',
-      color: Colors.purple,
-      isRead: false,
-    ),
-    _NotificationItem(
-      icon: Icons.warning,
-      title: 'Bill Reminder',
-      body: 'Electricity bill of ₹2,340 due in 3 days',
-      time: '3 hours ago',
-      color: ESUNColors.warning,
-      isRead: true,
-    ),
-    _NotificationItem(
-      icon: Icons.account_balance,
-      title: 'Salary Credited',
-      body: '₹75,000 credited to your HDFC account',
-      time: 'Yesterday',
-      color: ESUNColors.success,
-      isRead: true,
-    ),
-    _NotificationItem(
-      icon: Icons.trending_up,
-      title: 'Investment Update',
-      body: 'Your portfolio is up 2.5% this week. Great progress!',
-      time: 'Yesterday',
-      color: Colors.blue,
-      isRead: true,
-    ),
-  ];
-  
-  static final List<_NotificationItem> _paymentNotifications = [
-    _NotificationItem(
-      icon: Icons.check_circle,
-      title: 'Payment Successful',
-      body: '₹5,000 sent to Rahul Sharma via UPI',
-      time: '2 min ago',
-      color: ESUNColors.success,
-      isRead: false,
-    ),
-    _NotificationItem(
-      icon: Icons.account_balance,
-      title: 'Salary Credited',
-      body: '₹75,000 credited to your HDFC account',
-      time: 'Yesterday',
-      color: ESUNColors.success,
-      isRead: true,
-    ),
-  ];
-  
-  static final List<_NotificationItem> _offerNotifications = [
-    _NotificationItem(
-      icon: Icons.local_offer,
-      title: 'Special Offer',
-      body: 'Get 5% cashback on your next investment! Valid till Jan 31',
-      time: '1 hour ago',
-      color: Colors.purple,
-      isRead: false,
-    ),
-  ];
 }
 
 class _NotificationItem {
@@ -217,6 +237,7 @@ class _NotificationItem {
   final String time;
   final Color color;
   final bool isRead;
+  final String category;
   
   _NotificationItem({
     required this.icon,
@@ -225,6 +246,7 @@ class _NotificationItem {
     required this.time,
     required this.color,
     required this.isRead,
+    this.category = 'all',
   });
 }
 

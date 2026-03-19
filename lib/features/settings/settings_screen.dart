@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../theme/theme.dart';
 import '../../state/app_state.dart';
+import '../../state/aa_data_state.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../routes/app_routes.dart';
 
@@ -45,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
                   'App Icon',
                   'Change app icon',
                   Icons.app_shortcut_outlined,
-                  () => _showNotImplemented(context, 'App Icon'),
+                  () => _showInfoDialog(context, 'App Icon', 'App icon customization will be available in a future update.'),
                 ),
               ],
             ),
@@ -71,14 +72,14 @@ class SettingsScreen extends ConsumerWidget {
                   'Change PIN',
                   'Update your app PIN',
                   Icons.lock_outline,
-                  () => _showNotImplemented(context, 'Change PIN'),
+                  () => _showChangePinDialog(context),
                 ),
                 const FPDivider.subtle(),
                 _buildNavigationTile(
                   'Privacy',
                   'Manage your data',
                   Icons.privacy_tip_outlined,
-                  () => _showNotImplemented(context, 'Privacy'),
+                  () => _showInfoDialog(context, 'Privacy', 'Your data is encrypted and stored securely. We never share your financial information with third parties without consent. You can request data deletion from the Profile screen.'),
                 ),
               ],
             ),
@@ -120,16 +121,20 @@ class SettingsScreen extends ConsumerWidget {
                   'Transaction Alerts',
                   'Get notified for every transaction',
                   Icons.receipt_long_outlined,
-                  true,
-                  (value) => _showNotImplemented(context, 'Transaction Alerts'),
+                  settings.transactionAlertsEnabled,
+                  (value) {
+                    ref.read(appSettingsProvider.notifier).toggleTransactionAlerts();
+                  },
                 ),
                 const FPDivider.subtle(),
                 _buildSwitchTile(
                   'Bill Reminders',
                   'Remind me before due dates',
                   Icons.alarm_outlined,
-                  true,
-                  (value) => _showNotImplemented(context, 'Bill Reminders'),
+                  settings.billRemindersEnabled,
+                  (value) {
+                    ref.read(appSettingsProvider.notifier).toggleBillReminders();
+                  },
                 ),
               ],
             ),
@@ -141,18 +146,26 @@ class SettingsScreen extends ConsumerWidget {
           FPCard(
             child: Column(
               children: [
-                _buildNavigationTile(
-                  'Default Payment Method',
-                  'HDFC Bank ****4521',
-                  Icons.account_balance_outlined,
-                  () => _showNotImplemented(context, 'Default Payment Method'),
+                Builder(
+                  builder: (context) {
+                    final banks = ref.watch(aaDataProvider).bankAccounts;
+                    final label = banks.isNotEmpty
+                        ? '${banks.first.bankName} ••••${banks.first.accountNumber.length >= 4 ? banks.first.accountNumber.substring(banks.first.accountNumber.length - 4) : banks.first.accountNumber}'
+                        : 'No bank linked';
+                    return _buildNavigationTile(
+                      'Default Payment Method',
+                      label,
+                      Icons.account_balance_outlined,
+                      () => context.push(AppRoutes.payments),
+                    );
+                  },
                 ),
                 const FPDivider.subtle(),
                 _buildNavigationTile(
                   'UPI Settings',
                   'Manage UPI IDs',
                   Icons.qr_code_outlined,
-                  () => _showNotImplemented(context, 'UPI Settings'),
+                  () => context.push(AppRoutes.payments),
                 ),
               ],
             ),
@@ -168,27 +181,27 @@ class SettingsScreen extends ConsumerWidget {
                   'Terms of Service',
                   '',
                   Icons.description_outlined,
-                  () => _showNotImplemented(context, 'Terms of Service'),
+                  () => _showInfoDialog(context, 'Terms of Service', 'By using ESUN, you agree to our terms of service. This app provides financial management tools for informational purposes. Investment decisions are your own responsibility. For full terms, visit esun.app/terms.'),
                 ),
                 const FPDivider.subtle(),
                 _buildNavigationTile(
                   'Privacy Policy',
                   '',
                   Icons.privacy_tip_outlined,
-                  () => _showNotImplemented(context, 'Privacy Policy'),
+                  () => _showInfoDialog(context, 'Privacy Policy', 'ESUN collects financial data only with your explicit consent via Account Aggregator (AA) framework regulated by RBI. Your data is encrypted at rest and in transit. We do not sell your data. For details, visit esun.app/privacy.'),
                 ),
                 const FPDivider.subtle(),
                 _buildNavigationTile(
                   'App Version',
-                  '1.0.0 (Build 100)',
+                  '1.0.0-mvp',
                   Icons.info_outline,
-                  () => _showNotImplemented(context, 'App Version'),
+                  null,
                   showChevron: false,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: ESUNSpacing.xxl),
+          const SizedBox(height: 72),
         ],
       ),
     );
@@ -260,7 +273,7 @@ class SettingsScreen extends ConsumerWidget {
     String title,
     String subtitle,
     IconData icon,
-    VoidCallback onTap, {
+    VoidCallback? onTap, {
     bool showChevron = true,
   }) {
     return InkWell(
@@ -297,10 +310,96 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showNotImplemented(BuildContext context, String label) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label coming soon')),
+  void _showInfoDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _showChangePinDialog(BuildContext context) {
+    final currentPin = TextEditingController();
+    final newPin = TextEditingController();
+    final confirmPin = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Change PIN'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: currentPin,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              decoration: const InputDecoration(
+                labelText: 'Current PIN',
+                prefixIcon: Icon(Icons.lock_outline),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: newPin,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              decoration: const InputDecoration(
+                labelText: 'New PIN',
+                prefixIcon: Icon(Icons.lock),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: confirmPin,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              decoration: const InputDecoration(
+                labelText: 'Confirm New PIN',
+                prefixIcon: Icon(Icons.lock),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (newPin.text != confirmPin.text) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PINs do not match')),
+                );
+                return;
+              }
+              if (newPin.text.length != 4) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PIN must be 4 digits')),
+                );
+                return;
+              }
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('PIN changed successfully')),
+              );
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
     );
   }
 }

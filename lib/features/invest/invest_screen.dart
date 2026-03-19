@@ -2,9 +2,6 @@
 /// 
 /// Wealth management hub for stocks, mutual funds, FDs, and more.
 
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +47,7 @@ class InvestScreen extends ConsumerWidget {
             _NetWorthBreakdownSection(),
             
             // Credit & Health Scores
-            _buildScoresCard(context),
+            _buildScoresCard(context, ref),
             
             // Investment Categories
             _buildCategories(context),
@@ -85,7 +82,7 @@ class InvestScreen extends ConsumerWidget {
             // Explore Funds
             _buildExploreFunds(context),
             
-            const SizedBox(height: 80),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -100,6 +97,7 @@ class InvestScreen extends ConsumerWidget {
     );
   }
   
+  // ignore: unused_element
   Widget _buildPortfolioSummary(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
@@ -597,6 +595,7 @@ class InvestScreen extends ConsumerWidget {
   }
 
   Widget _buildStockTile(_StockData stock) {
+    final logoUrl = stock.effectiveLogoUrl;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(ESUNSpacing.md),
@@ -611,17 +610,38 @@ class InvestScreen extends ConsumerWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: stock.isUp ? ESUNColors.success.withOpacity(0.1) : ESUNColors.error.withOpacity(0.1),
+              color: Colors.white,
               borderRadius: ESUNRadius.smRadius,
+              border: Border.all(color: ESUNColors.border),
             ),
-            child: Center(
-              child: Text(
-                stock.symbol.substring(0, 2),
-                style: ESUNTypography.titleSmall.copyWith(
-                  color: stock.isUp ? ESUNColors.success : ESUNColors.error,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            child: ClipRRect(
+              borderRadius: ESUNRadius.smRadius,
+              child: logoUrl != null
+                  ? Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.network(
+                        logoUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Text(
+                            stock.symbol.substring(0, 2),
+                            style: ESUNTypography.titleSmall.copyWith(
+                              color: stock.isUp ? ESUNColors.success : ESUNColors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        stock.symbol.substring(0, 2),
+                        style: ESUNTypography.titleSmall.copyWith(
+                          color: stock.isUp ? ESUNColors.success : ESUNColors.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: ESUNSpacing.md),
@@ -707,7 +727,7 @@ class InvestScreen extends ConsumerWidget {
           ),
           const SizedBox(height: ESUNSpacing.sm),
           SizedBox(
-            height: 175,
+            height: 195,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: ipos.length,
@@ -723,6 +743,7 @@ class InvestScreen extends ConsumerWidget {
   }
 
   Widget _buildIPOCard(_IPOData ipo) {
+    final logoUrl = ipo.effectiveLogoUrl;
     return Container(
       width: 200,
       margin: const EdgeInsets.only(right: ESUNSpacing.md),
@@ -737,38 +758,41 @@ class InvestScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              if (ipo.effectiveLogoUrl != null)
-                Container(
-                  width: 28,
-                  height: 28,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: ESUNColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      ipo.effectiveLogoUrl!,
-                      width: 28,
-                      height: 28,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.business_rounded,
-                        size: 16,
-                        color: ESUNColors.textSecondary,
-                      ),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Icon(
-                          Icons.business_rounded,
-                          size: 16,
-                          color: ESUNColors.textSecondary.withOpacity(0.5),
-                        );
-                      },
-                    ),
-                  ),
+              Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: ESUNColors.border),
                 ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: logoUrl != null
+                      ? Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Image.network(
+                            logoUrl,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => const Center(
+                              child: Icon(
+                                Icons.business_rounded,
+                                size: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const Center(
+                          child: Icon(
+                            Icons.business_rounded,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                ),
+              ),
               Expanded(
                 child: Text(
                   ipo.company,
@@ -898,6 +922,7 @@ class InvestScreen extends ConsumerWidget {
   }
 
   Widget _buildBrokerTile(BuildContext context, _BrokerData broker) {
+    final logoUrl = broker.effectiveLogoUrl;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(ESUNSpacing.md),
@@ -914,17 +939,38 @@ class InvestScreen extends ConsumerWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: ESUNColors.surfaceVariant,
+              color: Colors.white,
               borderRadius: ESUNRadius.smRadius,
+              border: Border.all(color: ESUNColors.border),
             ),
-            child: Center(
-              child: Text(
-                broker.name.substring(0, 2).toUpperCase(),
-                style: ESUNTypography.titleSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: ESUNColors.primary,
-                ),
-              ),
+            child: ClipRRect(
+              borderRadius: ESUNRadius.smRadius,
+              child: logoUrl != null
+                  ? Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.network(
+                        logoUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Text(
+                            broker.name.substring(0, 2).toUpperCase(),
+                            style: ESUNTypography.titleSmall.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: ESUNColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        broker.name.substring(0, 2).toUpperCase(),
+                        style: ESUNTypography.titleSmall.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: ESUNColors.primary,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: ESUNSpacing.md),
@@ -1011,7 +1057,7 @@ class InvestScreen extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: ESUNSpacing.sm),
             Text(
               'Link your demat account to track all investments in one place',
               style: ESUNTypography.bodyMedium.copyWith(
@@ -1062,6 +1108,7 @@ class InvestScreen extends ConsumerWidget {
   }
 
   // Net Worth Card
+  // ignore: unused_element
   Widget _buildNetWorthCard(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
@@ -1163,7 +1210,18 @@ class InvestScreen extends ConsumerWidget {
   }
 
   // Credit & Health Score
-  Widget _buildScoresCard(BuildContext context) {
+  Widget _buildScoresCard(BuildContext context, WidgetRef ref) {
+    final aaData = ref.watch(aaDataProvider);
+    final healthScore = aaData.healthScore;
+    final healthLabel = aaData.healthLabel;
+    final creditScore = aaData.creditScore;
+    final creditLabel = aaData.creditLabel;
+    final healthColor = healthScore >= 65
+        ? Colors.blue
+        : healthScore >= 50
+            ? ESUNColors.warning
+            : Colors.red;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
       child: Row(
@@ -1171,9 +1229,9 @@ class InvestScreen extends ConsumerWidget {
           Expanded(
             child: _buildScoreCard(
               'Credit Score',
-              752,
+              creditScore,
               900,
-              'Excellent',
+              creditLabel,
               ESUNColors.success,
               Icons.verified,
             ),
@@ -1182,10 +1240,10 @@ class InvestScreen extends ConsumerWidget {
           Expanded(
             child: _buildScoreCard(
               'Financial Health',
-              78,
+              healthScore,
               100,
-              'Good',
-              Colors.blue,
+              healthLabel,
+              healthColor,
               Icons.favorite,
             ),
           ),
@@ -1233,7 +1291,7 @@ class InvestScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: ESUNSpacing.sm),
           ClipRRect(
             borderRadius: ESUNRadius.fullRadius,
             child: LinearProgressIndicator(
@@ -1243,7 +1301,7 @@ class InvestScreen extends ConsumerWidget {
               minHeight: 6,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: ESUNSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
@@ -1265,7 +1323,7 @@ class InvestScreen extends ConsumerWidget {
   
   Widget _buildHoldings(BuildContext context, WidgetRef ref) {
     final aaData = ref.watch(aaDataProvider);
-    final investments = aaData.investments ?? InvestmentHolding.mockList;
+    final investments = aaData.investments;
     
     // Get color for investment based on type
     Color getInvestmentColor(String type) {
@@ -1337,6 +1395,29 @@ class InvestScreen extends ConsumerWidget {
     final totalValue = currentPrice * quantity;
     final totalPL = change * quantity;
     
+    // Resolve logo
+    final holdingLogos = <String, String>{
+      'hdfc bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128',
+      'hdfc': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128',
+      'infosys': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://infosys.com&size=128',
+      'reliance': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ril.com&size=128',
+      'tcs': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tcs.com&size=128',
+      'icici': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128',
+      'axis': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128',
+      'wipro': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://wipro.com&size=128',
+      'bharti': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128',
+      'tata': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatamotors.com&size=128',
+      'sbi': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128',
+      'kotak': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128',
+      'maruti': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://marutisuzuki.com&size=128',
+      'itc': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://itcportal.com&size=128',
+    };
+    final n = name.toLowerCase();
+    String? logoUrl;
+    for (final e in holdingLogos.entries) {
+      if (n.contains(e.key)) { logoUrl = e.value; break; }
+    }
+
     return FPCard(
       child: Row(
         children: [
@@ -1344,17 +1425,38 @@ class InvestScreen extends ConsumerWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: Colors.white,
               borderRadius: ESUNRadius.smRadius,
+              border: Border.all(color: ESUNColors.border),
             ),
-            child: Center(
-              child: Text(
-                name.substring(0, 2).toUpperCase(),
-                style: ESUNTypography.titleSmall.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            child: ClipRRect(
+              borderRadius: ESUNRadius.smRadius,
+              child: logoUrl != null
+                  ? Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.network(
+                        logoUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(
+                            name.substring(0, 2).toUpperCase(),
+                            style: ESUNTypography.titleSmall.copyWith(
+                              color: color,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        name.substring(0, 2).toUpperCase(),
+                        style: ESUNTypography.titleSmall.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: ESUNSpacing.md),
@@ -1698,7 +1800,7 @@ class InvestScreen extends ConsumerWidget {
               color: ESUNColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: ESUNSpacing.sm),
           Text(
             returns,
             style: ESUNTypography.titleSmall.copyWith(
@@ -1772,7 +1874,7 @@ class InvestScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: ESUNSpacing.lg),
                     _buildFundStatRow('1Y Returns', returns, ESUNColors.success),
                     _buildFundStatRow('3Y Returns', '+42.5%', ESUNColors.success),
                     _buildFundStatRow('5Y Returns', '+65.2%', ESUNColors.success),
@@ -1780,7 +1882,7 @@ class InvestScreen extends ConsumerWidget {
                     _buildFundStatRow('AUM', '₹12,450 Cr', ESUNColors.textPrimary),
                     _buildFundStatRow('Expense Ratio', '1.05%', ESUNColors.textPrimary),
                     _buildFundStatRow('Min. Investment', '₹500', ESUNColors.textPrimary),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: ESUNSpacing.lg),
                     Row(
                       children: [
                         Expanded(
@@ -1996,12 +2098,23 @@ class InvestScreen extends ConsumerWidget {
                           _showFundDetails(context, fund.id, fund.name, fund.category, fund.returns, fund.rating, fund.color);
                         },
                         leading: Container(
+                          width: 44,
+                          height: 44,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: fund.color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Icon(Icons.pie_chart, color: fund.color, size: 24),
+                          child: fund.logoUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.network(
+                                    fund.logoUrl!,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => Icon(Icons.pie_chart, color: fund.color, size: 24),
+                                  ),
+                                )
+                              : Icon(Icons.pie_chart, color: fund.color, size: 24),
                         ),
                         title: Text(fund.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                         subtitle: Text(fund.category),
@@ -2324,7 +2437,7 @@ class _PortfolioSliderWidgetState extends ConsumerState<_PortfolioSliderWidget> 
 
   Widget _buildPortfolioSlide() {
     final aaData = ref.watch(aaDataProvider);
-    final investments = aaData.investments ?? InvestmentHolding.mockList;
+    final investments = aaData.investments;
     
     // Calculate total portfolio value from AA investments
     final totalPortfolio = investments.fold(0.0, (sum, inv) => sum + inv.currentValue);
@@ -2505,6 +2618,31 @@ class _FundPick {
   final Color color;
   
   _FundPick(this.id, this.name, this.category, this.returns, this.rating, this.color);
+
+  String? get logoUrl {
+    final n = name.toLowerCase();
+    for (final entry in _amcLogos.entries) {
+      if (n.contains(entry.key)) return entry.value;
+    }
+    return null;
+  }
+
+  static final Map<String, String> _amcLogos = {
+    'axis': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axismf.com&size=128',
+    'hdfc': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcfund.com&size=128',
+    'sbi': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbimf.com&size=128',
+    'icici': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicipruamc.com&size=128',
+    'kotak': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotakmf.com&size=128',
+    'nippon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mf.nipponindiaim.com&size=128',
+    'parag': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amc.ppfas.com&size=128',
+    'quant': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://quantmutual.com&size=128',
+    'tata': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatamutualfund.com&size=128',
+    'aditya': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://adityabirlacapital.com&size=128',
+    'uti': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://utimf.com&size=128',
+    'mirae': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://miraeassetmf.co.in&size=128',
+    'canara': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://canararobeco.com&size=128',
+    'motilal': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://motilaloswalmf.com&size=128',
+  };
 }
 
 class _StockData {
@@ -2516,6 +2654,35 @@ class _StockData {
   final bool isUp;
 
   _StockData(this.symbol, this.name, this.price, this.change, this.changePercent, this.isUp);
+
+  // Get logo URL based on symbol
+  String? get effectiveLogoUrl {
+    final normalized = symbol.toLowerCase().trim();
+    return _stockLogos[normalized];
+  }
+
+  static final Map<String, String> _stockLogos = {
+    'reliance': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ril.com&size=128',
+    'tcs': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tcs.com&size=128',
+    'hdfcbank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128',
+    'infy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://infosys.com&size=128',
+    'icicibank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128',
+    'bhartiartl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128',
+    'sbin': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128',
+    'axisbank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128',
+    'kotakbank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128',
+    'wipro': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://wipro.com&size=128',
+    'hcltech': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hcltech.com&size=128',
+    'tatamotors': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tatamotors.com&size=128',
+    'maruti': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://marutisuzuki.com&size=128',
+    'itc': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://itcportal.com&size=128',
+    'hindunilvr': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hul.co.in&size=128',
+    'asianpaint': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.asianpaints.com&size=128',
+    'bajfinance': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bajajfinserv.in&size=128',
+    'techm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://techmahindra.com&size=128',
+    'sunpharma': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sunpharma.com&size=128',
+    'titan': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://titancompany.in&size=128',
+  };
 }
 
 class _IPOData {
@@ -2525,13 +2692,11 @@ class _IPOData {
   final String dates;
   final String status;
   final Color statusColor;
-  final String? logoUrl;
   
-  _IPOData(this.company, this.sector, this.priceRange, this.dates, this.status, this.statusColor, [this.logoUrl]);
+  _IPOData(this.company, this.sector, this.priceRange, this.dates, this.status, this.statusColor);
   
   // Get logo URL based on company name
   String? get effectiveLogoUrl {
-    if (logoUrl != null) return logoUrl;
     final normalized = company.toLowerCase().trim();
     if (_ipoLogos.containsKey(normalized)) {
       return _ipoLogos[normalized];
@@ -2544,15 +2709,15 @@ class _IPOData {
   }
   
   static final Map<String, String> _ipoLogos = {
-    'swiggy': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/200px-Swiggy_logo.svg.png',
-    'ola': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Ola_Cabs_logo.svg/200px-Ola_Cabs_logo.svg.png',
-    'ola electric': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Ola_Cabs_logo.svg/200px-Ola_Cabs_logo.svg.png',
-    'boat': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/BoAt_Logo.svg',
-    'firstcry': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Firstcry_logo.svg/200px-Firstcry_logo.svg.png',
-    'nykaa': 'https://companieslogo.com/img/orig/NYKAA.NS-4e6d3f9c.png',
-    'zomato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Zomato_logo.png/200px-Zomato_logo.png',
-    'paytm': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Paytm_logo.png/200px-Paytm_logo.png',
-    'policybazaar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Paisabazaar_logo.svg/200px-Paisabazaar_logo.svg.png',
+    'swiggy': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://swiggy.com&size=128',
+    'ola': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://olaelectric.com&size=128',
+    'ola electric': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://olaelectric.com&size=128',
+    'boat': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://boat-lifestyle.com&size=128',
+    'firstcry': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://firstcry.com&size=128',
+    'nykaa': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://nykaa.com&size=128',
+    'zomato': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zomato.com&size=128',
+    'paytm': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128',
+    'policybazaar': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://policybazaar.com&size=128',
   };
 }
 
@@ -2564,6 +2729,25 @@ class _BrokerData {
   final String? portfolioValue;
 
   _BrokerData(this.name, this.iconPath, this.status, this.isConnected, this.portfolioValue);
+
+  // Get logo URL based on broker name
+  String? get effectiveLogoUrl {
+    final normalized = name.toLowerCase().trim();
+    return _brokerLogos[normalized];
+  }
+
+  static final Map<String, String> _brokerLogos = {
+    'zerodha': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://zerodha.com&size=128',
+    'groww': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://groww.in&size=128',
+    'upstox': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://upstox.com&size=128',
+    'angel one': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://angelone.in&size=128',
+    '5paisa': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://5paisa.com&size=128',
+    'icici direct': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicidirect.com&size=128',
+    'hdfc securities': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcsec.com&size=128',
+    'kotak securities': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotaksecurities.com&size=128',
+    'sharekhan': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sharekhan.com&size=128',
+    'motilal oswal': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://motilaloswal.com&size=128',
+  };
 }
 
 // ============================================================================
@@ -2576,7 +2760,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
     final aaData = ref.watch(aaDataProvider);
     final snapshot = aaData.snapshot ?? FinancialSnapshot.mock;
     final assets = aaData.assetBreakdown ?? AssetBreakdown.mock;
-    final insurances = aaData.insurances ?? InsuranceData.mockList;
+    final insurances = aaData.insurances;
     
     String formatAmount(double amount) {
       if (amount >= 10000000) {
@@ -2604,7 +2788,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
     ];
     
     return Padding(
-      padding: const EdgeInsets.all(ESUNSpacing.lg),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2654,7 +2838,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: ESUNSpacing.lg),
+          const SizedBox(height: ESUNSpacing.sm),
           
           // Assets vs Liabilities Summary Row
           Container(
@@ -2703,94 +2887,108 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: ESUNSpacing.lg),
+          const SizedBox(height: ESUNSpacing.xs),
           
-          // Main Categories - 2x2 Grid
-          GridView.count(
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            childAspectRatio: 1.6,
-            crossAxisSpacing: ESUNSpacing.md,
-            mainAxisSpacing: ESUNSpacing.md,
-            physics: const NeverScrollableScrollPhysics(),
-            children: mainCategories.map((item) {
-                final totalAssetValue = totalInvestments + totalInsurance + totalSavings + totalOthers;
-                final percentage = totalAssetValue > 0 
-                    ? ((item.value / totalAssetValue) * 100).toStringAsFixed(1) 
-                    : '0';
-                
-                return Container(
-                  padding: const EdgeInsets.all(ESUNSpacing.md),
-                  decoration: BoxDecoration(
-                    color: ESUNColors.cardBackground,
-                    borderRadius: ESUNRadius.mdRadius,
-                    border: Border.all(color: ESUNColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ESUNColors.cardShadow,
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: item.color.withOpacity(0.1),
-                              borderRadius: ESUNRadius.smRadius,
-                            ),
-                            child: Icon(item.icon, color: item.color, size: 18),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: item.color.withOpacity(0.1),
-                              borderRadius: ESUNRadius.fullRadius,
-                            ),
-                            child: Text(
-                              '$percentage%',
-                              style: ESUNTypography.labelSmall.copyWith(
-                                color: item.color,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: ESUNSpacing.sm),
-                      Text(
-                        item.label,
-                        style: ESUNTypography.bodySmall.copyWith(
-                          color: ESUNColors.textSecondary,
-                          fontSize: 11,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        formatAmount(item.value),
-                        style: ESUNTypography.titleSmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: ESUNColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+          // Main Categories - 2x2 layout
+          ..._buildCategoryRows(mainCategories, formatAmount, totalInvestments + totalInsurance + totalSavings + totalOthers),
         ],
       ),
     );
+  }
+  
+  List<Widget> _buildCategoryRows(List<_AssetItem> items, String Function(double) formatAmount, double totalAssetValue) {
+    Widget buildCard(_AssetItem item) {
+      final percentage = totalAssetValue > 0 
+          ? ((item.value / totalAssetValue) * 100).toStringAsFixed(1) 
+          : '0';
+      return Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(ESUNSpacing.md),
+          decoration: BoxDecoration(
+            color: ESUNColors.cardBackground,
+            borderRadius: ESUNRadius.mdRadius,
+            border: Border.all(color: ESUNColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: ESUNColors.cardShadow,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: item.color.withOpacity(0.1),
+                      borderRadius: ESUNRadius.smRadius,
+                    ),
+                    child: Icon(item.icon, color: item.color, size: 16),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: item.color.withOpacity(0.1),
+                      borderRadius: ESUNRadius.fullRadius,
+                    ),
+                    child: Text(
+                      '$percentage%',
+                      style: ESUNTypography.labelSmall.copyWith(
+                        color: item.color,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item.label,
+                style: ESUNTypography.bodySmall.copyWith(
+                  color: ESUNColors.textSecondary,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                formatAmount(item.value),
+                style: ESUNTypography.titleSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: ESUNColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    return [
+      Row(
+        children: [
+          buildCard(items[0]),
+          const SizedBox(width: ESUNSpacing.sm),
+          buildCard(items[1]),
+        ],
+      ),
+      const SizedBox(height: ESUNSpacing.sm),
+      Row(
+        children: [
+          buildCard(items[2]),
+          const SizedBox(width: ESUNSpacing.sm),
+          buildCard(items[3]),
+        ],
+      ),
+    ];
   }
   
   Widget _buildSummaryItem(String label, String value, IconData icon, Color color) {

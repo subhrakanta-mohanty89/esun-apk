@@ -96,15 +96,15 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         children: [
           // KPI Cards Row
           _buildKPISection(context, dashboard),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
           // AA Conversion Funnel
           _buildFunnelSection(context, ref),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
           // Active Alerts
           _buildAlertsSection(context, ref),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
           // Error Metrics
           _buildErrorSection(context, dashboard),
@@ -260,7 +260,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             funnel.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text('Error loading funnel: $e'),
@@ -292,7 +292,6 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         final index = entry.key;
         final Map<String, dynamic> stageData = entry.value as Map<String, dynamic>;
         final name = stageData['name'] as String? ?? '';
-        final count = stageData['count'] as int? ?? 0;
         final rate = stageData['conversion_rate'] as double? ?? 0;
         final color = colors[index % colors.length];
         

@@ -10,9 +10,6 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../theme/theme.dart';
 import '../../routes/app_routes.dart';
 import '../../state/aa_data_state.dart';
-import '../../state/app_state.dart';
-import '../../core/utils/utils.dart';
-import '../../shared/widgets/widgets.dart';
 
 // ============================================================================
 // Net Worth Screen (Main)
@@ -85,7 +82,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
               // Quick Actions
               _buildQuickActions(context),
               
-              const SizedBox(height: ESUNSpacing.xxl),
+              const SizedBox(height: 72),
             ],
           ),
         ),
@@ -489,8 +486,6 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
   }
   
   Widget _buildLiabilitiesSection(AADataState aaData) {
-    final totalLiabilities = aaData.totalLoanOutstanding;
-    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
       child: Column(
@@ -1320,7 +1315,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
         if (breakdown.realEstate == 0 && breakdown.gold == 0 && breakdown.others == 0)
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(48),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   Icon(

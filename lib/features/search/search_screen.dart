@@ -4,9 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../state/transaction_state.dart';
+import '../../routes/app_routes.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
@@ -72,6 +76,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
   
   Widget _buildSuggestions() {
+    final transactions = ref.watch(transactionStateProvider).transactions;
+    // Use recent transaction titles as search chips, fallback to defaults
+    final recentSearches = transactions.isNotEmpty
+        ? transactions.take(4).map((t) => t.title).toSet().toList()
+        : ['Amazon', 'Salary', 'Electricity', 'SIP'];
+    
     return ListView(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       children: [
@@ -86,12 +96,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: [
-            _buildSearchChip('Amazon'),
-            _buildSearchChip('Salary'),
-            _buildSearchChip('Electricity'),
-            _buildSearchChip('SIP'),
-          ],
+          children: recentSearches.map((s) => _buildSearchChip(s)).toList(),
         ),
         const SizedBox(height: ESUNSpacing.xl),
         
@@ -103,10 +108,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
         ),
         const SizedBox(height: ESUNSpacing.md),
-        _buildQuickAction(Icons.send, 'Send Money', 'UPI, Bank Transfer'),
-        _buildQuickAction(Icons.receipt_long, 'Pay Bills', 'Electricity, Mobile, DTH'),
-        _buildQuickAction(Icons.trending_up, 'Invest', 'Stocks, Mutual Funds'),
-        _buildQuickAction(Icons.account_balance, 'Bank Statement', 'Download statements'),
+        _buildQuickAction(Icons.send, 'Send Money', 'UPI, Bank Transfer', () => context.push(AppRoutes.payments)),
+        _buildQuickAction(Icons.receipt_long, 'Pay Bills', 'Electricity, Mobile, DTH', () => context.push(AppRoutes.billPayments)),
+        _buildQuickAction(Icons.trending_up, 'Invest', 'Stocks, Mutual Funds', () => context.push(AppRoutes.invest)),
+        _buildQuickAction(Icons.account_balance, 'Bank Statement', 'Download statements', () => context.push(AppRoutes.reports)),
         
         const SizedBox(height: ESUNSpacing.xl),
         
@@ -149,7 +154,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
   
-  Widget _buildQuickAction(IconData icon, String title, String subtitle) {
+  Widget _buildQuickAction(IconData icon, String title, String subtitle, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(bottom: ESUNSpacing.sm),
       child: ListTile(
@@ -169,7 +174,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
         ),
         contentPadding: EdgeInsets.zero,
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }
@@ -255,49 +260,102 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               )
             : const Icon(Icons.chevron_right, color: ESUNColors.textTertiary),
         contentPadding: EdgeInsets.zero,
-        onTap: () {},
+        onTap: () {
+          // If it's a feature result (no amount), navigate
+          if (result.amount == null) {
+            final routes = {
+              'Send Money': AppRoutes.payments,
+              'Pay Bills': AppRoutes.billPayments,
+              'Invest': AppRoutes.invest,
+              'Bank Statement': AppRoutes.reports,
+              'Borrow': AppRoutes.borrow,
+              'Rewards': AppRoutes.rewards,
+            };
+            final route = routes[result.title];
+            if (route != null) context.push(route);
+          }
+        },
       ),
     );
   }
   
   List<_SearchResult> _getSearchResults(String query) {
     final lowerQuery = query.toLowerCase();
+    final transactions = ref.read(transactionStateProvider).transactions;
+    final formatter = NumberFormat('#,##0', 'en_IN');
     
-    final allResults = [
-      _SearchResult(
-        icon: Icons.shopping_bag,
-        title: 'Amazon',
-        subtitle: 'Shopping • Dec 20, 2024',
-        amount: '-₹2,499',
-        color: Colors.orange,
-      ),
-      _SearchResult(
-        icon: Icons.account_balance,
-        title: 'Salary Credit',
-        subtitle: 'Income • Dec 1, 2024',
-        amount: '+₹75,000',
-        color: ESUNColors.success,
-      ),
-      _SearchResult(
-        icon: Icons.bolt,
-        title: 'Electricity Bill',
-        subtitle: 'Bills • Nov 15, 2024',
-        amount: '-₹2,340',
-        color: Colors.amber,
-      ),
-      _SearchResult(
-        icon: Icons.trending_up,
-        title: 'SIP Investment',
-        subtitle: 'Investment • Dec 5, 2024',
-        amount: '-₹10,000',
-        color: Colors.blue,
-      ),
-    ];
+    // Map transactions to search results
+    final results = transactions.where((txn) {
+      final title = txn.title.toLowerCase();
+      final subtitle = (txn.subtitle ?? '').toLowerCase();
+      final category = (txn.category ?? '').toLowerCase();
+      final recipient = (txn.recipientName ?? '').toLowerCase();
+      return title.contains(lowerQuery) ||
+          subtitle.contains(lowerQuery) ||
+          category.contains(lowerQuery) ||
+          recipient.contains(lowerQuery);
+    }).map((txn) {
+      final isCredit = txn.type == TransactionType.income || txn.type == TransactionType.refund;
+      final amountStr = '${isCredit ? '+' : '-'}₹${formatter.format(txn.amount)}';
+      
+      IconData icon;
+      Color color;
+      switch (txn.type) {
+        case TransactionType.billPayment:
+          icon = Icons.receipt_long;
+          color = Colors.amber;
+          break;
+        case TransactionType.upiTransfer:
+          icon = Icons.send;
+          color = ESUNColors.primary;
+          break;
+        case TransactionType.bankTransfer:
+          icon = Icons.account_balance;
+          color = Colors.blue;
+          break;
+        case TransactionType.recharge:
+          icon = Icons.phone_android;
+          color = Colors.green;
+          break;
+        case TransactionType.income:
+          icon = Icons.account_balance;
+          color = ESUNColors.success;
+          break;
+        case TransactionType.refund:
+          icon = Icons.replay;
+          color = ESUNColors.success;
+          break;
+      }
+      
+      final dateStr = DateFormat('MMM d, yyyy').format(txn.timestamp);
+      
+      return _SearchResult(
+        icon: icon,
+        title: txn.title,
+        subtitle: '${txn.category ?? txn.type.name} • $dateStr',
+        amount: amountStr,
+        color: color,
+      );
+    }).toList();
     
-    return allResults.where((r) => 
-      r.title.toLowerCase().contains(lowerQuery) ||
-      r.subtitle.toLowerCase().contains(lowerQuery)
-    ).toList();
+    // Also search feature keywords
+    final featureResults = <_SearchResult>[];
+    final features = {
+      'send money': _SearchResult(icon: Icons.send, title: 'Send Money', subtitle: 'UPI, Bank Transfer', color: ESUNColors.primary),
+      'pay bills': _SearchResult(icon: Icons.receipt_long, title: 'Pay Bills', subtitle: 'Electricity, Mobile, DTH', color: Colors.amber),
+      'invest': _SearchResult(icon: Icons.trending_up, title: 'Invest', subtitle: 'Stocks, Mutual Funds', color: Colors.blue),
+      'bank statement': _SearchResult(icon: Icons.account_balance, title: 'Bank Statement', subtitle: 'Download statements', color: Colors.teal),
+      'borrow': _SearchResult(icon: Icons.credit_card, title: 'Borrow', subtitle: 'Loans, EMI Calculator', color: Colors.deepPurple),
+      'rewards': _SearchResult(icon: Icons.card_giftcard, title: 'Rewards', subtitle: 'Coins, Gift Cards', color: Colors.orange),
+    };
+    
+    for (final entry in features.entries) {
+      if (entry.key.contains(lowerQuery) || lowerQuery.contains(entry.key.split(' ').first)) {
+        featureResults.add(entry.value);
+      }
+    }
+    
+    return [...featureResults, ...results];
   }
 }
 

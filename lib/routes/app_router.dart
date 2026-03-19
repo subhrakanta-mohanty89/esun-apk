@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../state/app_state.dart';
 import '../features/shell/main_shell.dart';
 import '../features/splash/splash_screen.dart';
-import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/onboarding_identity.dart';
 import '../features/onboarding/onboarding_verify.dart';
 import '../features/onboarding/feature_intro_screen.dart';
@@ -22,7 +21,6 @@ import '../features/payments/qr_scanner_screen.dart';
 import '../features/payments/payment_history_screen.dart';
 import '../features/invest/invest_screen.dart';
 import '../features/discover/discover_screen.dart';
-import '../features/advisor/advisor_screen.dart';
 import '../features/experts/experts_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/alerts/alerts_screen.dart';
@@ -53,7 +51,6 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
-  final settings = ref.watch(appSettingsProvider);
   
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -62,11 +59,12 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: _RouterRefreshNotifier(ref),
     redirect: (context, state) {
       final isLoading = authState.isLoading;
+      final isInitial = authState.status == AuthStatus.initial;
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final currentPath = state.uri.path;
       
-      // Don't redirect during loading
-      if (isLoading) return null;
+      // Don't redirect during loading or initial state (auth check in progress)
+      if (isLoading || isInitial) return null;
       
       // Splash screen handles initial routing
       if (currentPath == AppRoutes.splash) return null;
@@ -124,7 +122,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           onLinkNow: () => context.go(AppRoutes.aaVerifyPan),
           onDoItLater: () async {
             // Show remind me later dialog
-            final result = await showRemindMeLaterDialog(
+            await showRemindMeLaterDialog(
               context,
               reminderType: ReminderType.accountAggregator,
             );

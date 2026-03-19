@@ -12,6 +12,7 @@ import '../../core/network/api_service.dart';
 import '../../routes/app_routes.dart';
 import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
+import '../../shared/widgets/smart_network_image.dart';
 import '../../state/app_state.dart';
 
 // ============================================================================
@@ -333,8 +334,6 @@ class AAStepIndicator extends StatelessWidget {
           final stepNumber = index + 1;
           final isCompleted = stepNumber < currentStep;
           final isCurrent = stepNumber == currentStep;
-          final isUpcoming = stepNumber > currentStep;
-
           return Expanded(
             child: Row(
               children: [
@@ -497,7 +496,7 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.person_outline, color: ESUNColors.primary, size: 24),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: ESUNSpacing.sm),
                                         Container(
                                           width: 50,
                                           height: 4,
@@ -690,14 +689,21 @@ class _OtpBottomSheetState extends ConsumerState<_OtpBottomSheet> {
   void initState() {
     super.initState();
     _startCountdown();
+    // Listen to focus changes to update cursor indicator
+    _otpFocusNode.addListener(_onFocusChange);
     // Auto-focus the OTP input
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _otpFocusNode.requestFocus();
     });
   }
 
+  void _onFocusChange() {
+    setState(() {}); // Rebuild to show/hide cursor indicator
+  }
+
   @override
   void dispose() {
+    _otpFocusNode.removeListener(_onFocusChange);
     _otpController.dispose();
     _otpFocusNode.dispose();
     super.dispose();
@@ -827,64 +833,100 @@ class _OtpBottomSheetState extends ConsumerState<_OtpBottomSheet> {
                       const SizedBox(height: ESUNSpacing.lg),
                       
                       // OTP Input boxes with hidden TextField
-                      Stack(
-                        children: [
-                          // Hidden TextField for keyboard input
-                          Opacity(
-                            opacity: 0,
-                            child: SizedBox(
-                              height: 48,
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _otpFocusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 6,
-                                autofocus: true,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
-                                    if (_otp.length > 6) _otp = _otp.substring(0, 6);
-                                  });
-                                },
-                                decoration: const InputDecoration(
-                                  counterText: '',
-                                  border: InputBorder.none,
+                      GestureDetector(
+                        onTap: () {
+                          _otpFocusNode.requestFocus();
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: SizedBox(
+                          height: 56,
+                          child: Stack(
+                            children: [
+                              // Hidden TextField for keyboard input - positioned to fill
+                              Positioned.fill(
+                                child: TextField(
+                                  controller: _otpController,
+                                  focusNode: _otpFocusNode,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 6,
+                                  autofocus: true,
+                                  style: const TextStyle(
+                                    color: Colors.transparent,
+                                    height: 0.01,
+                                    fontSize: 1,
+                                  ),
+                                  showCursor: false,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
+                                      if (_otp.length > 6) _otp = _otp.substring(0, 6);
+                                    });
+                                  },
+                                  decoration: const InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          // Visual OTP boxes
-                          GestureDetector(
-                            onTap: () => _otpFocusNode.requestFocus(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(6, (index) {
-                                final hasDigit = index < _otp.length;
-                                return Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: hasDigit ? ESUNColors.primary : ESUNColors.border,
-                                      width: hasDigit ? 2 : 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      hasDigit ? _otp[index] : '-',
-                                      style: ESUNTypography.headlineSmall.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: hasDigit ? ESUNColors.textPrimary : ESUNColors.textSecondary,
+                              // Visual OTP boxes on top
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: List.generate(6, (index) {
+                                  final hasDigit = index < _otp.length;
+                                  final isCurrentBox = index == _otp.length && _otpFocusNode.hasFocus;
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    width: 48,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isCurrentBox 
+                                            ? ESUNColors.primary 
+                                            : (hasDigit ? ESUNColors.primary : ESUNColors.border),
+                                        width: isCurrentBox ? 2 : (hasDigit ? 2 : 1),
                                       ),
+                                      boxShadow: isCurrentBox ? [
+                                        BoxShadow(
+                                          color: ESUNColors.primary.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ] : null,
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
+                                    child: Center(
+                                      child: hasDigit
+                                          ? Text(
+                                              _otp[index],
+                                              style: ESUNTypography.headlineSmall.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: ESUNColors.textPrimary,
+                                              ),
+                                            )
+                                          : (isCurrentBox
+                                              ? Container(
+                                                  width: 2,
+                                                  height: 24,
+                                                  color: ESUNColors.primary,
+                                                )
+                                              : Text(
+                                                  '',
+                                                  style: ESUNTypography.headlineSmall.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: ESUNColors.textSecondary,
+                                                  ),
+                                                )),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                       
                       // Quick fill for prototype
@@ -1631,14 +1673,14 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
 
   // Insurance providers list with logo URLs
   final List<Map<String, dynamic>> _insuranceProviders = [
-    {'name': 'HDFC Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF004C8F), 'logoUrl': 'https://www.hdfclife.com/content/dam/hdfclifeinsurancecompany/about-us/investor-corner/HDFC%20Life%20Logo.png'},
-    {'name': 'HDFC Ergo', 'icon': Icons.shield, 'color': Color(0xFFED1C24), 'logoUrl': 'https://www.hdfcergo.com/images/hdfc-ergo-logo.png'},
-    {'name': 'TATA AIA Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF001F5C), 'logoUrl': 'https://www.tataaia.com/content/dam/tataaialifeinsurancecompanylimited/navigations/tata-aia-logo.svg'},
-    {'name': 'ACKO Life Insurance Limited', 'icon': Icons.shield, 'color': Color(0xFF6B46C1), 'logoUrl': 'https://acko.com/images/v2/acko-logo.svg'},
-    {'name': 'LIC of India', 'icon': Icons.shield, 'color': Color(0xFF003399), 'logoUrl': 'https://licindia.in/o/lic-theme/images/lic-of-india-logo.png'},
-    {'name': 'ICICI Prudential', 'icon': Icons.shield, 'color': Color(0xFFB02A30), 'logoUrl': 'https://www.iciciprulife.com/content/dam/icicipru/logos/icici-pru-life-logo.svg'},
-    {'name': 'SBI Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF22409A), 'logoUrl': 'https://www.sbilife.co.in/sites/all/themes/bootstrapsbilife/images/logo.png'},
-    {'name': 'Max Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF0066CC), 'logoUrl': 'https://www.maxlifeinsurance.com/content/dam/maxlifeinsurance/images/Max_Life_Logo.png'},
+    {'name': 'HDFC Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfclife.com&size=128'},
+    {'name': 'HDFC Ergo', 'icon': Icons.shield, 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128'},
+    {'name': 'TATA AIA Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF001F5C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tataaia.com&size=128'},
+    {'name': 'ACKO Life Insurance Limited', 'icon': Icons.shield, 'color': Color(0xFF6B46C1), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://acko.com&size=128'},
+    {'name': 'LIC of India', 'icon': Icons.shield, 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128'},
+    {'name': 'ICICI Prudential', 'icon': Icons.shield, 'color': Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iciciprulife.com&size=128'},
+    {'name': 'SBI Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbilife.co.in&size=128'},
+    {'name': 'Max Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF0066CC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128'},
     {'name': 'National Insurance Company', 'icon': Icons.shield, 'color': Color(0xFFED1C24), 'comingSoon': true},
   ];
   final Set<String> _selectedInsuranceProviders = {};
@@ -1646,56 +1688,55 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
   // State flags
   bool _isSearchingDeposits = true;
   bool _isSearchingInsurance = false;
-  bool _hasSelectedInsuranceProviders = false;
   bool _depositsSearchComplete = false;
   bool _insuranceSearchComplete = false;
 
   // Comprehensive Indian Banks list with logo URLs
   final List<Map<String, dynamic>> _banks = [
     // Public Sector Banks
-    {'name': 'State Bank of India', 'color': Color(0xFF22409A), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/200px-SBI-logo.svg.png'},
-    {'name': 'Punjab National Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Punjab_National_Bank.svg/200px-Punjab_National_Bank.svg.png'},
-    {'name': 'Bank of Baroda', 'color': Color(0xFFF15A22), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Bank_of_Baroda_logo.svg/200px-Bank_of_Baroda_logo.svg.png'},
-    {'name': 'Canara Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Canara_Bank_Logo.svg/200px-Canara_Bank_Logo.svg.png'},
-    {'name': 'Union Bank of India', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Union_Bank_of_India_Logo.svg/200px-Union_Bank_of_India_Logo.svg.png'},
-    {'name': 'Bank of India', 'color': Color(0xFFFF6600), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Bank_of_India_logo.svg/200px-Bank_of_India_logo.svg.png'},
-    {'name': 'Indian Bank', 'color': Color(0xFF1B3A6D), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Indian_Bank_Logo.svg/200px-Indian_Bank_Logo.svg.png'},
-    {'name': 'Central Bank of India', 'color': Color(0xFF0055A5), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Central_Bank_of_India_Logo.svg/200px-Central_Bank_of_India_Logo.svg.png'},
-    {'name': 'Indian Overseas Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Indian_Overseas_Bank_Logo.svg/200px-Indian_Overseas_Bank_Logo.svg.png'},
-    {'name': 'UCO Bank', 'color': Color(0xFF000066), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/UCO_Bank_logo.svg/200px-UCO_Bank_logo.svg.png'},
-    {'name': 'Bank of Maharashtra', 'color': Color(0xFF003D7C), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Bank_of_Maharashtra_logo.png/200px-Bank_of_Maharashtra_logo.png'},
-    {'name': 'Punjab & Sind Bank', 'color': Color(0xFF1E4D8C), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Punjab_and_sind_bank.png/200px-Punjab_and_sind_bank.png'},
+    {'name': 'State Bank of India', 'color': Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128'},
+    {'name': 'Punjab National Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pnbindia.in&size=128'},
+    {'name': 'Bank of Baroda', 'color': Color(0xFFF15A22), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofbaroda.in&size=128'},
+    {'name': 'Canara Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://canarabank.com&size=128'},
+    {'name': 'Union Bank of India', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://unionbankofindia.co.in&size=128'},
+    {'name': 'Bank of India', 'color': Color(0xFFFF6600), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofindia.co.in&size=128'},
+    {'name': 'Indian Bank', 'color': Color(0xFF1B3A6D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indianbank.in&size=128'},
+    {'name': 'Central Bank of India', 'color': Color(0xFF0055A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://centralbank.net.in&size=128'},
+    {'name': 'Indian Overseas Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iob.in&size=128'},
+    {'name': 'UCO Bank', 'color': Color(0xFF000066), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ucobank.com&size=128'},
+    {'name': 'Bank of Maharashtra', 'color': Color(0xFF003D7C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofmaharashtra.in&size=128'},
+    {'name': 'Punjab & Sind Bank', 'color': Color(0xFF1E4D8C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://psbindia.com&size=128'},
     
     // Private Sector Banks
-    {'name': 'HDFC Bank', 'color': Color(0xFF004C8F), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/200px-HDFC_Bank_Logo.svg.png'},
-    {'name': 'ICICI Bank', 'color': Color(0xFFB02A30), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/200px-ICICI_Bank_Logo.svg.png'},
-    {'name': 'Axis Bank', 'color': Color(0xFF97144D), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Axis_Bank_logo.svg/200px-Axis_Bank_logo.svg.png'},
-    {'name': 'Kotak Mahindra Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Kotak_Mahindra_Bank_logo.svg/200px-Kotak_Mahindra_Bank_logo.svg.png'},
-    {'name': 'IndusInd Bank', 'color': Color(0xFF6D1F7A), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/IndusInd_Bank_logo.svg/200px-IndusInd_Bank_logo.svg.png'},
-    {'name': 'Yes Bank', 'color': Color(0xFF0033A0), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/YES_BANK_Logo.svg/200px-YES_BANK_Logo.svg.png'},
-    {'name': 'IDFC First Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/IDFC_First_Bank_logo.svg/200px-IDFC_First_Bank_logo.svg.png'},
-    {'name': 'Federal Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Federal_Bank_Logo.svg/200px-Federal_Bank_Logo.svg.png'},
-    {'name': 'South Indian Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/South_Indian_Bank_Logo.svg/200px-South_Indian_Bank_Logo.svg.png'},
-    {'name': 'Karnataka Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/5/50/Karnataka_Bank_Logo.svg/200px-Karnataka_Bank_Logo.svg.png'},
-    {'name': 'Karur Vysya Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/9/97/Karur_Vysya_Bank_logo.svg/200px-Karur_Vysya_Bank_logo.svg.png'},
-    {'name': 'Bandhan Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Bandhan_Bank_Logo.svg/200px-Bandhan_Bank_Logo.svg.png'},
-    {'name': 'RBL Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/0/03/RBL_Bank.svg/200px-RBL_Bank.svg.png'},
-    {'name': 'City Union Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/3/3c/City_Union_Bank_logo.png'},
-    {'name': 'Tamilnad Mercantile Bank', 'color': Color(0xFF0052A5), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/3/37/Tamilnad_Mercantile_Bank_Logo.png'},
-    {'name': 'DCB Bank', 'color': Color(0xFF6B1F7A), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/DCB_Bank_Logo.svg/200px-DCB_Bank_Logo.svg.png'},
-    {'name': 'Dhanlaxmi Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d0/Dhanlaxmi_Bank_Logo.svg/200px-Dhanlaxmi_Bank_Logo.svg.png'},
+    {'name': 'HDFC Bank', 'color': Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128'},
+    {'name': 'ICICI Bank', 'color': Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128'},
+    {'name': 'Axis Bank', 'color': Color(0xFF97144D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128'},
+    {'name': 'Kotak Mahindra Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128'},
+    {'name': 'IndusInd Bank', 'color': Color(0xFF6D1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indusind.com&size=128'},
+    {'name': 'Yes Bank', 'color': Color(0xFF0033A0), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://yesbank.co.in&size=128'},
+    {'name': 'IDFC First Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://idfcfirstbank.com&size=128'},
+    {'name': 'Federal Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://federalbank.co.in&size=128'},
+    {'name': 'South Indian Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://southindianbank.com&size=128'},
+    {'name': 'Karnataka Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://karnatakabank.com&size=128'},
+    {'name': 'Karur Vysya Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kvb.in&size=128'},
+    {'name': 'Bandhan Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bandhanbank.com&size=128'},
+    {'name': 'RBL Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://rblbank.com&size=128'},
+    {'name': 'City Union Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cityunionbank.com&size=128'},
+    {'name': 'Tamilnad Mercantile Bank', 'color': Color(0xFF0052A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tmb.in&size=128'},
+    {'name': 'DCB Bank', 'color': Color(0xFF6B1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dcbbank.com&size=128'},
+    {'name': 'Dhanlaxmi Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dhanlaxmibank.com&size=128'},
     
     // Small Finance Banks
-    {'name': 'AU Small Finance Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/AU_Small_Finance_Bank_logo.svg/200px-AU_Small_Finance_Bank_logo.svg.png'},
-    {'name': 'Equitas Small Finance Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Equitas_Small_Finance_Bank.svg/200px-Equitas_Small_Finance_Bank.svg.png'},
-    {'name': 'Ujjivan Small Finance Bank', 'color': Color(0xFF009639), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Ujjivan_Small_Finance_Bank_logo.svg/200px-Ujjivan_Small_Finance_Bank_logo.svg.png'},
+    {'name': 'AU Small Finance Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://aubank.in&size=128'},
+    {'name': 'Equitas Small Finance Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://equitasbank.com&size=128'},
+    {'name': 'Ujjivan Small Finance Bank', 'color': Color(0xFF009639), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ujjivansfb.in&size=128'},
     
     // Payments Banks
-    {'name': 'Paytm Payments Bank', 'color': Color(0xFF00B9F5), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/200px-Paytm_Logo_%28standalone%29.svg.png'},
-    {'name': 'Airtel Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Airtel_logo.svg/200px-Airtel_logo.svg.png'},
-    {'name': 'India Post Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/India_Post_Payments_Bank_logo.svg/200px-India_Post_Payments_Bank_logo.svg.png'},
-    {'name': 'Fino Payments Bank', 'color': Color(0xFF1E3A5F), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f0/Fino_Payments_Bank_Logo.svg/200px-Fino_Payments_Bank_Logo.svg.png'},
-    {'name': 'Jio Payments Bank', 'color': Color(0xFF0A3D92), 'logoUrl': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Reliance_Jio_Logo.svg/200px-Reliance_Jio_Logo.svg.png'},
+    {'name': 'Paytm Payments Bank', 'color': Color(0xFF00B9F5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128'},
+    {'name': 'Airtel Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128'},
+    {'name': 'India Post Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ippbonline.com&size=128'},
+    {'name': 'Fino Payments Bank', 'color': Color(0xFF1E3A5F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://finobank.com&size=128'},
+    {'name': 'Jio Payments Bank', 'color': Color(0xFF0A3D92), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jio.com&size=128'},
   ];
   final Set<String> _selectedBanks = {};
 
@@ -1732,7 +1773,6 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
   void _simulateInsuranceSearch() {
     setState(() {
       _isSearchingInsurance = true;
-      _hasSelectedInsuranceProviders = true;
     });
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
@@ -2319,16 +2359,14 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
                       child: hasLogo
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(3),
-                              child: Image.network(
-                                bankData['logoUrl'] as String,
+                              child: SmartNetworkImage(
+                                imageUrl: bankData['logoUrl'] as String,
                                 width: 22,
                                 height: 22,
                                 fit: BoxFit.contain,
+                                placeholderIcon: Icons.account_balance,
+                                placeholderColor: bankData['color'] as Color,
                                 errorBuilder: (_, __, ___) => Icon(Icons.account_balance, size: 14, color: bankData['color'] as Color),
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Icon(Icons.account_balance, size: 14, color: (bankData['color'] as Color).withOpacity(0.5));
-                                },
                               ),
                             )
                           : Icon(Icons.account_balance, size: 14, color: bankData['color'] as Color),
@@ -2547,16 +2585,14 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
                       child: hasLogo
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(3),
-                              child: Image.network(
-                                bankData['logoUrl'] as String,
+                              child: SmartNetworkImage(
+                                imageUrl: bankData['logoUrl'] as String,
                                 width: 22,
                                 height: 22,
                                 fit: BoxFit.contain,
+                                placeholderIcon: Icons.account_balance,
+                                placeholderColor: bankData['color'] as Color,
                                 errorBuilder: (_, __, ___) => Icon(Icons.account_balance, size: 14, color: bankData['color'] as Color),
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Icon(Icons.account_balance, size: 14, color: (bankData['color'] as Color).withOpacity(0.5));
-                                },
                               ),
                             )
                           : Icon(Icons.account_balance, size: 14, color: bankData['color'] as Color),
@@ -3220,29 +3256,18 @@ class _AddMoreProvidersSheetState extends State<_AddMoreProvidersSheet> {
                     child: hasLogo
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(6),
-                            child: Image.network(
-                              provider['logoUrl'] as String,
+                            child: SmartNetworkImage(
+                              imageUrl: provider['logoUrl'] as String,
                               width: 32,
                               height: 32,
                               fit: BoxFit.contain,
+                              placeholderIcon: Icons.account_balance,
+                              placeholderColor: provider['color'] as Color,
                               errorBuilder: (context, error, stackTrace) => Icon(
                                 Icons.account_balance,
                                 color: provider['color'] as Color,
                                 size: 20,
                               ),
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: provider['color'] as Color,
-                                    ),
-                                  ),
-                                );
-                              },
                             ),
                           )
                         : Icon(
@@ -3305,14 +3330,21 @@ class _LinkAccountOtpBottomSheetState extends State<_LinkAccountOtpBottomSheet> 
   void initState() {
     super.initState();
     _startCountdown();
+    // Listen to focus changes to update cursor indicator
+    _otpFocusNode.addListener(_onFocusChange);
     // Auto-focus the OTP input
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _otpFocusNode.requestFocus();
     });
   }
 
+  void _onFocusChange() {
+    setState(() {}); // Rebuild to show/hide cursor indicator
+  }
+
   @override
   void dispose() {
+    _otpFocusNode.removeListener(_onFocusChange);
     _otpController.dispose();
     _otpFocusNode.dispose();
     super.dispose();
@@ -3434,68 +3466,98 @@ class _LinkAccountOtpBottomSheetState extends State<_LinkAccountOtpBottomSheet> 
                       const SizedBox(height: ESUNSpacing.lg),
                       
                       // OTP Input boxes with hidden TextField
-                      Stack(
-                        children: [
-                          // Hidden TextField for keyboard input
-                          Opacity(
-                            opacity: 0,
-                            child: SizedBox(
-                              height: 46,
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _otpFocusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 6,
-                                autofocus: true,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
-                                    if (_otp.length > 6) _otp = _otp.substring(0, 6);
-                                  });
-                                  // Auto-submit when 6 digits entered
-                                  if (_otp.length == 6) {
-                                    _submitOtp();
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  counterText: '',
-                                  border: InputBorder.none,
+                      GestureDetector(
+                        onTap: () {
+                          _otpFocusNode.requestFocus();
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: SizedBox(
+                          height: 56,
+                          child: Stack(
+                            children: [
+                              // Hidden TextField for keyboard input
+                              Positioned.fill(
+                                child: TextField(
+                                  controller: _otpController,
+                                  focusNode: _otpFocusNode,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 6,
+                                  autofocus: true,
+                                  style: const TextStyle(
+                                    color: Colors.transparent,
+                                    height: 0.01,
+                                    fontSize: 1,
+                                  ),
+                                  showCursor: false,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
+                                      if (_otp.length > 6) _otp = _otp.substring(0, 6);
+                                    });
+                                    // Auto-submit when 6 digits entered
+                                    if (_otp.length == 6) {
+                                      _submitOtp();
+                                    }
+                                  },
+                                  decoration: const InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          // Visual OTP boxes
-                          GestureDetector(
-                            onTap: () => _otpFocusNode.requestFocus(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(6, (index) {
-                                final hasDigit = index < _otp.length;
-                                return Container(
-                                  width: 46,
-                                  height: 46,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: hasDigit ? ESUNColors.primary : ESUNColors.border,
-                                      width: hasDigit ? 2 : 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      hasDigit ? _otp[index] : '-',
-                                      style: ESUNTypography.headlineSmall.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: hasDigit ? ESUNColors.textPrimary : ESUNColors.textSecondary,
+                              // Visual OTP boxes
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: List.generate(6, (index) {
+                                  final hasDigit = index < _otp.length;
+                                  final isCurrentBox = index == _otp.length && _otpFocusNode.hasFocus;
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    width: 46,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isCurrentBox 
+                                            ? ESUNColors.primary 
+                                            : (hasDigit ? ESUNColors.primary : ESUNColors.border),
+                                        width: isCurrentBox ? 2 : (hasDigit ? 2 : 1),
                                       ),
+                                      boxShadow: isCurrentBox ? [
+                                        BoxShadow(
+                                          color: ESUNColors.primary.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ] : null,
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
+                                    child: Center(
+                                      child: hasDigit
+                                          ? Text(
+                                              _otp[index],
+                                              style: ESUNTypography.headlineSmall.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: ESUNColors.textPrimary,
+                                              ),
+                                            )
+                                          : (isCurrentBox
+                                              ? Container(
+                                                  width: 2,
+                                                  height: 24,
+                                                  color: ESUNColors.primary,
+                                                )
+                                              : const SizedBox()),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                       
                       // Quick fill for prototype
@@ -3608,14 +3670,21 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
   void initState() {
     super.initState();
     _startCountdown();
+    // Listen to focus changes to update cursor indicator
+    _otpFocusNode.addListener(_onFocusChange);
     // Auto-focus the OTP input
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _otpFocusNode.requestFocus();
     });
   }
 
+  void _onFocusChange() {
+    setState(() {}); // Rebuild to show/hide cursor indicator
+  }
+
   @override
   void dispose() {
+    _otpFocusNode.removeListener(_onFocusChange);
     _otpController.dispose();
     _otpFocusNode.dispose();
     super.dispose();
@@ -3665,24 +3734,24 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
 
   String? get _bankLogoUrl {
     final bankLogos = {
-      'State Bank of India': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/200px-SBI-logo.svg.png',
-      'Punjab National Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Punjab_National_Bank.svg/200px-Punjab_National_Bank.svg.png',
-      'Bank of Baroda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Bank_of_Baroda_logo.svg/200px-Bank_of_Baroda_logo.svg.png',
-      'Canara Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Canara_Bank_Logo.svg/200px-Canara_Bank_Logo.svg.png',
-      'Union Bank of India': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Union_Bank_of_India_Logo.svg/200px-Union_Bank_of_India_Logo.svg.png',
-      'Bank of India': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Bank_of_India_logo.svg/200px-Bank_of_India_logo.svg.png',
-      'Indian Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Indian_Bank_Logo.svg/200px-Indian_Bank_Logo.svg.png',
-      'HDFC Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/200px-HDFC_Bank_Logo.svg.png',
-      'ICICI Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/200px-ICICI_Bank_Logo.svg.png',
-      'Axis Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Axis_Bank_logo.svg/200px-Axis_Bank_logo.svg.png',
-      'Kotak Mahindra Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Kotak_Mahindra_Bank_logo.svg/200px-Kotak_Mahindra_Bank_logo.svg.png',
-      'IndusInd Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/IndusInd_Bank_logo.svg/200px-IndusInd_Bank_logo.svg.png',
-      'Yes Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/YES_BANK_Logo.svg/200px-YES_BANK_Logo.svg.png',
-      'IDFC First Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/IDFC_First_Bank_logo.svg/200px-IDFC_First_Bank_logo.svg.png',
-      'Federal Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Federal_Bank_Logo.svg/200px-Federal_Bank_Logo.svg.png',
-      'AU Small Finance Bank': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/AU_Small_Finance_Bank_logo.svg/200px-AU_Small_Finance_Bank_logo.svg.png',
-      'Bandhan Bank': 'https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Bandhan_Bank_Logo.svg/200px-Bandhan_Bank_Logo.svg.png',
-      'RBL Bank': 'https://upload.wikimedia.org/wikipedia/en/thumb/0/03/RBL_Bank.svg/200px-RBL_Bank.svg.png',
+      'State Bank of India': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128',
+      'Punjab National Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pnbindia.in&size=128',
+      'Bank of Baroda': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofbaroda.in&size=128',
+      'Canara Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://canarabank.com&size=128',
+      'Union Bank of India': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://unionbankofindia.co.in&size=128',
+      'Bank of India': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofindia.co.in&size=128',
+      'Indian Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indianbank.in&size=128',
+      'HDFC Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128',
+      'ICICI Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128',
+      'Axis Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128',
+      'Kotak Mahindra Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128',
+      'IndusInd Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indusind.com&size=128',
+      'Yes Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://yesbank.co.in&size=128',
+      'IDFC First Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://idfcfirstbank.com&size=128',
+      'Federal Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://federalbank.co.in&size=128',
+      'AU Small Finance Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://aubank.in&size=128',
+      'Bandhan Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bandhanbank.com&size=128',
+      'RBL Bank': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://rblbank.com&size=128',
     };
     return bankLogos[widget.bankName];
   }
@@ -3762,17 +3831,15 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
                       child: _bankLogoUrl != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(4),
-                              child: Image.network(
-                                _bankLogoUrl!,
+                              child: SmartNetworkImage(
+                                imageUrl: _bankLogoUrl!,
                                 width: 28,
                                 height: 28,
                                 fit: BoxFit.contain,
+                                placeholderIcon: Icons.account_balance,
+                                placeholderColor: _bankColor,
                                 errorBuilder: (context, error, stackTrace) =>
                                     Icon(Icons.account_balance, size: 16, color: _bankColor),
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Icon(Icons.account_balance, size: 16, color: _bankColor.withOpacity(0.5));
-                                },
                               ),
                             )
                           : Icon(Icons.account_balance, size: 16, color: _bankColor),
@@ -3813,68 +3880,98 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
                       const SizedBox(height: ESUNSpacing.lg),
                       
                       // OTP Input boxes with hidden TextField
-                      Stack(
-                        children: [
-                          // Hidden TextField for keyboard input
-                          Opacity(
-                            opacity: 0,
-                            child: SizedBox(
-                              height: 44,
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _otpFocusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 6,
-                                autofocus: true,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
-                                    if (_otp.length > 6) _otp = _otp.substring(0, 6);
-                                  });
-                                  // Auto-submit when 6 digits entered
-                                  if (_otp.length == 6) {
-                                    _submitOtp();
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  counterText: '',
-                                  border: InputBorder.none,
+                      GestureDetector(
+                        onTap: () {
+                          _otpFocusNode.requestFocus();
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: SizedBox(
+                          height: 56,
+                          child: Stack(
+                            children: [
+                              // Hidden TextField for keyboard input
+                              Positioned.fill(
+                                child: TextField(
+                                  controller: _otpController,
+                                  focusNode: _otpFocusNode,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 6,
+                                  autofocus: true,
+                                  style: const TextStyle(
+                                    color: Colors.transparent,
+                                    height: 0.01,
+                                    fontSize: 1,
+                                  ),
+                                  showCursor: false,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _otp = value.replaceAll(RegExp(r'[^0-9]'), '');
+                                      if (_otp.length > 6) _otp = _otp.substring(0, 6);
+                                    });
+                                    // Auto-submit when 6 digits entered
+                                    if (_otp.length == 6) {
+                                      _submitOtp();
+                                    }
+                                  },
+                                  decoration: const InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          // Visual OTP boxes
-                          GestureDetector(
-                            onTap: () => _otpFocusNode.requestFocus(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(6, (index) {
-                                final hasDigit = index < _otp.length;
-                                return Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: hasDigit ? ESUNColors.primary : ESUNColors.border,
-                                      width: hasDigit ? 2 : 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      hasDigit ? _otp[index] : '',
-                                      style: ESUNTypography.titleLarge.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: ESUNColors.textPrimary,
+                              // Visual OTP boxes
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: List.generate(6, (index) {
+                                  final hasDigit = index < _otp.length;
+                                  final isCurrentBox = index == _otp.length && _otpFocusNode.hasFocus;
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    width: 44,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isCurrentBox 
+                                            ? ESUNColors.primary 
+                                            : (hasDigit ? ESUNColors.primary : ESUNColors.border),
+                                        width: isCurrentBox ? 2 : (hasDigit ? 2 : 1),
                                       ),
+                                      boxShadow: isCurrentBox ? [
+                                        BoxShadow(
+                                          color: ESUNColors.primary.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ] : null,
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
+                                    child: Center(
+                                      child: hasDigit
+                                          ? Text(
+                                              _otp[index],
+                                              style: ESUNTypography.titleLarge.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: ESUNColors.textPrimary,
+                                              ),
+                                            )
+                                          : (isCurrentBox
+                                              ? Container(
+                                                  width: 2,
+                                                  height: 24,
+                                                  color: ESUNColors.primary,
+                                                )
+                                              : const SizedBox()),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                       
                       // Quick fill for prototype
@@ -4670,7 +4767,7 @@ class _AAFinalStepConsentScreenState
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Accounts Shared Section
                   _buildConsentSection(
@@ -4776,7 +4873,7 @@ class _AAFinalStepConsentScreenState
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Info banner
                   Container(
@@ -4938,7 +5035,7 @@ class _AAFinalStepConsentScreenState
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ESUNSpacing.lg),
             const Text(
               'Consent Details',
               style: TextStyle(
@@ -4946,13 +5043,13 @@ class _AAFinalStepConsentScreenState
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ESUNSpacing.lg),
             _buildDetailRow('Data Fetch Type', 'One-time & Periodic'),
             _buildDetailRow('Frequency', 'Once a day'),
             _buildDetailRow('Data Life', '1 Year'),
             _buildDetailRow('Data Storage', 'Encrypted & Secure'),
             _buildDetailRow('Purpose', 'Financial Health Analysis'),
-            const SizedBox(height: 24),
+            const SizedBox(height: ESUNSpacing.lg),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -5102,9 +5199,9 @@ class _AAAnalyzingScreenState extends ConsumerState<AAAnalyzingScreen>
           Expanded(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.all(40),
+                padding: const EdgeInsets.all(24),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 30),
+                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -5141,7 +5238,7 @@ class _AAAnalyzingScreenState extends ConsumerState<AAAnalyzingScreen>
                         },
                       ),
                       
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 20),
                       
                       // Animated message
                       AnimatedSwitcher(
@@ -5247,7 +5344,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
                     
                     // Expense Categories
                     _buildExpenseCategoriesCard(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     
                     // Continue Button
                     SizedBox(
@@ -5322,7 +5419,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
               fontSize: 12,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           
           // Bank accounts
           _buildBankAccountCard(
@@ -6083,6 +6180,7 @@ class _AABottomBar extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _FipListTile extends StatelessWidget {
   final Map<String, dynamic> fip;
   final bool isSelected;
@@ -6133,29 +6231,15 @@ class _FipListTile extends StatelessWidget {
           child: ClipRRect(
             borderRadius: ESUNRadius.smRadius,
             child: logoUrl != null && logoUrl.isNotEmpty
-                ? Image.network(
-                    logoUrl,
+                ? SmartNetworkImage(
+                    imageUrl: logoUrl,
                     width: 40,
                     height: 40,
                     fit: BoxFit.contain,
+                    placeholderIcon: _fallbackIcon,
+                    placeholderColor: ESUNColors.primary,
                     errorBuilder: (context, error, stackTrace) {
                       return Icon(_fallbackIcon, color: ESUNColors.primary, size: 20);
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
                     },
                   )
                 : Icon(_fallbackIcon, color: ESUNColors.primary, size: 20),
@@ -7923,7 +8007,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
                 
                 // Warning icon
                 Container(
@@ -7973,7 +8057,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 
                 // Reason selection
                 Padding(
@@ -8145,7 +8229,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 
                 Text(
                   'You have declined the account\nsharing request with',
@@ -8176,7 +8260,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                   textAlign: TextAlign.center,
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
                 
                 // Info box
                 Container(
@@ -8246,7 +8330,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 
                 // Footer
                 Padding(
@@ -8589,23 +8673,17 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.network(
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/200px-HDFC_Bank_Logo.svg.png',
+                            SmartNetworkImage(
+                              imageUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128',
                               width: 16,
                               height: 16,
+                              placeholderIcon: Icons.account_balance,
+                              placeholderColor: const Color(0xFF004C8F),
                               errorBuilder: (_, __, ___) => const Icon(
                                 Icons.account_balance,
                                 size: 16,
                                 color: Color(0xFF004C8F),
                               ),
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Icon(
-                                  Icons.account_balance,
-                                  size: 16,
-                                  color: Color(0xFF004C8F),
-                                );
-                              },
                             ),
                             const SizedBox(width: 4),
                             const Text(
@@ -8621,7 +8699,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                     ],
                   ),
                   
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   
                   // Accounts Shared section
                   Container(

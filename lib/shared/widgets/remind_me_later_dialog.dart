@@ -67,7 +67,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
               ),
             ),
           ),
-          const SizedBox(height: ESUNSpacing.xl),
+          const SizedBox(height: ESUNSpacing.lg),
 
           // Icon & Title
           Container(
@@ -101,7 +101,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: ESUNSpacing.xl),
+          const SizedBox(height: ESUNSpacing.lg),
 
           // Reminder time options
           ...ReminderHours.values.map((hours) => _buildTimeOption(hours)),
@@ -126,7 +126,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
               _buildChannelChip(ReminderChannel.both, Icons.all_inbox_outlined, 'Both'),
             ],
           ),
-          const SizedBox(height: ESUNSpacing.xl),
+          const SizedBox(height: ESUNSpacing.lg),
 
           // Set Reminder button
           SizedBox(

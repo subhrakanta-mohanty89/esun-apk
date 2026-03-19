@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../theme/theme.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../shared/widgets/qr_sheet.dart';
+import '../../state/aa_data_state.dart';
 import 'upi_payment_demo_screen.dart';
 
 class PaymentsScreen extends ConsumerStatefulWidget {
@@ -172,7 +173,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
             // Payment History
             _buildRecentPayments(context),
             
-            const SizedBox(height: 80),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -800,7 +801,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       TextField(
                         controller: accountController,
                         keyboardType: TextInputType.number,
@@ -844,7 +845,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () {
                           if (accountController.text.isEmpty || ifscController.text.isEmpty || amountController.text.isEmpty) {
@@ -885,15 +886,20 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   
   void _showSelfTransferSheet(BuildContext context) {
     final amountController = TextEditingController();
-    String fromAccount = 'HDFC Savings •• 1234';
-    String toAccount = 'ICICI Savings •• 5678';
     
-    final accounts = [
-      'HDFC Savings •• 1234',
-      'ICICI Savings •• 5678',
-      'SBI Savings •• 9012',
-      'Axis Current •• 3456',
-    ];
+    final aaData = ref.read(aaDataProvider);
+    final bankAccounts = aaData.bankAccounts;
+    final accounts = bankAccounts.isEmpty
+        ? ['HDFC Bank SAVINGS •• 1234', 'ICICI Bank SAVINGS •• 5678', 'SBI CURRENT •• 9012']
+        : bankAccounts.map((a) {
+            final last4 = a.accountNumber.length >= 4 
+                ? a.accountNumber.substring(a.accountNumber.length - 4) 
+                : a.accountNumber;
+            return '${a.bankName} ${a.accountType} •• $last4';
+          }).toList();
+    
+    String fromAccount = accounts.first;
+    String toAccount = accounts.length > 1 ? accounts[1] : accounts.first;
     
     showModalBottomSheet(
       context: context,
@@ -959,7 +965,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                           onChanged: (val) => setState(() => fromAccount = val!),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       // Swap Icon
                       Center(
                         child: GestureDetector(
@@ -980,7 +986,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       // To Account
                       Text('To Account', style: ESUNTypography.labelMedium.copyWith(color: ESUNColors.textSecondary)),
                       const SizedBox(height: 8),
@@ -1009,7 +1015,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () {
                           if (amountController.text.isEmpty) {

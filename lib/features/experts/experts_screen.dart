@@ -214,7 +214,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.all(ESUNSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(ESUNSpacing.lg, ESUNSpacing.lg, ESUNSpacing.lg, 100),
             itemCount: state.experts.length + (state.isLoadingMore ? 1 : 0),
             itemBuilder: (context, index) {
               if (index >= state.experts.length) {
@@ -386,7 +386,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
           // Upcoming Sessions
           _buildUpcomingSessions(context),
           
-          const SizedBox(height: ESUNSpacing.xxl),
+          const SizedBox(height: 72),
         ],
       ),
     );
@@ -1607,7 +1607,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                           'What to bring',
                           style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: ESUNSpacing.sm),
                         _buildBringItem(Icons.badge, 'Valid ID Proof'),
                         _buildBringItem(Icons.description, 'Relevant documents'),
                         _buildBringItem(Icons.phone_android, 'Your device for verification'),
@@ -2006,7 +2006,7 @@ void _showCallUi(BuildContext context, {required bool micOn, required bool camOn
                 Positioned(
                   left: 16,
                   right: 16,
-                  bottom: MediaQuery.of(context).padding.bottom + 24,
+                  bottom: MediaQuery.of(context).padding.bottom + 12,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

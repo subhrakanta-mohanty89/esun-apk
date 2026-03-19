@@ -28,7 +28,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     
@@ -58,17 +58,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
   
   Future<void> _initializeApp() async {
-    // Simulate initialization tasks
-    await Future.delayed(const Duration(seconds: 2));
+    // Minimum splash display time for branding
+    await Future.delayed(const Duration(milliseconds: 300));
     
     if (!mounted) return;
     
-    // Wait for auth state to finish loading if still initial
+    // Wait for auth state to finish loading
     AuthState authState = ref.read(authStateProvider);
     
-    // Poll until auth state is determined (max 5 seconds)
+    // Poll until auth state is fully determined (max 10 seconds)
+    // This ensures we don't navigate until authentication is resolved
     int attempts = 0;
-    while ((authState.isLoading || authState.status == AuthStatus.initial) && attempts < 50) {
+    const maxAttempts = 30; // 3 seconds max
+    while ((authState.isLoading || authState.status == AuthStatus.initial) && attempts < maxAttempts) {
       await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       authState = ref.read(authStateProvider);
@@ -76,6 +78,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
     
     if (!mounted) return;
+    
+    // Safety check: if still loading after timeout, default to unauthenticated
+    if (authState.isLoading || authState.status == AuthStatus.initial) {
+      authState = const AuthState(status: AuthStatus.unauthenticated, isLoading: false);
+    }
     
     // Get app settings to check onboarding status
     final appSettings = ref.read(appSettingsProvider);

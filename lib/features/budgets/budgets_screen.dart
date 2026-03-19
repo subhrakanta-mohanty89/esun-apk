@@ -143,7 +143,7 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
             // Budget Tips
             _buildBudgetTips(context),
             
-            const SizedBox(height: ESUNSpacing.xxl),
+            const SizedBox(height: 72),
           ],
         ),
       ),
@@ -151,10 +151,14 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
   }
   
   Widget _buildMonthlyOverview(BuildContext context) {
-    const totalBudget = 80000.0;
-    const spent = 52340.0;
-    const remaining = totalBudget - spent;
-    const progress = spent / totalBudget;
+    final totalBudget = _budgets.fold<double>(0, (s, b) => s + b.limit);
+    final spent = _budgets.fold<double>(0, (s, b) => s + b.spent);
+    final remaining = totalBudget - spent;
+    final progress = totalBudget > 0 ? spent / totalBudget : 0.0;
+    
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    final now = DateTime.now();
+    final monthLabel = '${months[now.month - 1]} ${now.year}';
     
     return Padding(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
@@ -166,7 +170,7 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'January 2024',
+                  monthLabel,
                   style: ESUNTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -303,6 +307,26 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
       padding: const EdgeInsets.only(bottom: ESUNSpacing.sm),
       child: FPCard(
         onTap: () => _addOrEditBudget(budget: budget, index: index),
+        onLongPress: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Delete Budget?'),
+              content: Text('Remove "${budget.name}" from your budgets?'),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                FilledButton(
+                  onPressed: () {
+                    setState(() => _budgets.removeAt(index));
+                    Navigator.pop(ctx);
+                  },
+                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+        },
         child: Column(
           children: [
             Row(

@@ -14,8 +14,8 @@ import '../../shared/widgets/qr_sheet.dart';
 import '../profile/profile_screen.dart';
 import '../../state/app_state.dart';
 import '../../state/aa_data_state.dart';
+import '../../state/transaction_state.dart';
 import '../../core/analytics/analytics_service.dart';
-import '../../services/reminder_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +42,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return '$name@ESUN';
   }
   
-  static const String _userBankLabel = 'HDFC • 1234';
+  String get _userBankLabel {
+    final banks = ref.watch(aaDataProvider).bankAccounts;
+    if (banks.isNotEmpty) {
+      final b = banks.first;
+      final last4 = b.accountNumber.length >= 4
+          ? b.accountNumber.substring(b.accountNumber.length - 4)
+          : b.accountNumber;
+      return '${b.bankName} • $last4';
+    }
+    return 'Link Bank Account';
+  }
   final ScrollController _scrollController = ScrollController();
   final PageController _cardPageController = PageController();
   bool _isHeaderCollapsed = false;
@@ -59,23 +69,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Check data linking status after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkDataLinkingStatus();
-      _loadAAData();
+      _refreshAADataIfNeeded();
     });
   }
   
-  void _loadAAData() {
+  /// Refresh AA data from server if user has AA connected
+  void _refreshAADataIfNeeded() {
     final authState = ref.read(authStateProvider);
-    final aaData = ref.read(aaDataProvider);
     
-    // Load AA data if user is authenticated and AA is connected
+    // Fetch real data from server if AA is connected
     if (authState.status == AuthStatus.authenticated && authState.aaConnected) {
-      if (!aaData.isLoaded && !aaData.isLoading) {
-        ref.read(aaDataProvider.notifier).fetchAllData();
-      }
-    } else if (authState.status == AuthStatus.authenticated && !aaData.isLoaded) {
-      // Load mock data for demo purposes
-      ref.read(aaDataProvider.notifier).loadMockData();
+      ref.read(aaDataProvider.notifier).fetchAllData();
     }
+    // Mock data is already loaded by provider initialization
   }
   
   void _checkDataLinkingStatus() {
@@ -361,7 +367,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Promotions
                 _buildPromotions(context),
                 
-                const SizedBox(height: 80),
+                const SizedBox(height: 72),
               ],
             ),
           ),
@@ -371,6 +377,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   Widget _buildAppBar(BuildContext context, bool isDark) {
+    // Get AA data for dynamic balance in collapsed header
+    final aaData = ref.watch(aaDataProvider);
+    final assets = aaData.assetBreakdown ?? AssetBreakdown.mock;
+    final bankBalance = assets.bankBalance > 0
+        ? assets.bankBalance
+        : aaData.bankAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    
     return SliverAppBar(
       expandedHeight: 80,
       floating: false,
@@ -391,7 +404,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         opacity: _isHeaderCollapsed ? 1.0 : 0.0,
         duration: ESUNAnimations.fast,
         child: Text(
-          _isBalanceHidden ? '₹••••••' : '₹5,42,350.75',
+          _isBalanceHidden ? '₹••••••' : bankBalance.toINR(),
           style: ESUNTypography.titleLarge.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -492,6 +505,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   Widget _buildTotalBalanceCard() {
+    // Get AA data for bank balance display
+    final aaData = ref.watch(aaDataProvider);
+    final assets = aaData.assetBreakdown ?? AssetBreakdown.mock;
+    final bankBalance = assets.bankBalance > 0
+        ? assets.bankBalance
+        : aaData.bankAccounts.fold<double>(0, (sum, a) => sum + a.balance);
+    
+    // Get transaction state for spending data
+    final monthSpending = ref.watch(monthSpendingProvider);
+    
+    // Calculate monthly income (credits) vs expenses
+    final monthIncome = 120000.0; // From salary etc.
+    
+    // Format amounts for display
+    String formatAmount(double amount) {
+      if (amount >= 100000) {
+        return '₹${(amount / 100000).toStringAsFixed(1)}L';
+      } else if (amount >= 1000) {
+        return '₹${(amount / 1000).toStringAsFixed(1)}K';
+      }
+      return '₹${amount.toStringAsFixed(0)}';
+    }
+    
     return FPGradientCard(
       gradient: ESUNColors.heroCardGradient,
       child: Column(
@@ -550,7 +586,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SizedBox(height: ESUNSpacing.md),
           Text(
-            _isBalanceHidden ? '₹••••••' : 542350.75.toINR(),
+            _isBalanceHidden ? '₹••••••' : bankBalance.toINR(),
             style: ESUNTypography.amountLarge.copyWith(
               color: Colors.white,
               fontSize: 32,
@@ -595,13 +631,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             child: Row(
               children: [
-                Expanded(child: _buildBalanceChip(Icons.arrow_upward_rounded, 'Income', _isBalanceHidden ? '₹••••' : '₹1.2L', const Color(0xFF4ADE80))),
+                Expanded(child: _buildBalanceChip(Icons.arrow_upward_rounded, 'Income', _isBalanceHidden ? '₹••••' : formatAmount(monthIncome), const Color(0xFF4ADE80))),
                 Container(
                   height: 40,
                   width: 1,
                   color: Colors.white.withOpacity(0.2),
                 ),
-                Expanded(child: _buildBalanceChip(Icons.arrow_downward_rounded, 'Spent', _isBalanceHidden ? '₹••••' : '₹45.8K', const Color(0xFFFB7185))),
+                Expanded(child: _buildBalanceChip(Icons.arrow_downward_rounded, 'Spent', _isBalanceHidden ? '₹••••' : formatAmount(monthSpending), const Color(0xFFFB7185))),
               ],
             ),
           ),
@@ -890,14 +926,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   // AA Assets Overview - Beautiful cards showing synced data
+  // ignore: unused_element
   Widget _buildAAAssetsOverview(BuildContext context) {
     final aaData = ref.watch(aaDataProvider);
     final snapshot = aaData.snapshot ?? FinancialSnapshot.mock;
-    final assets = aaData.assetBreakdown ?? AssetBreakdown.mock;
-    final investments = aaData.investments ?? InvestmentHolding.mockList;
-    final bankAccounts = aaData.bankAccounts ?? BankAccountData.mockList;
-    final fds = aaData.fixedDeposits ?? FixedDepositData.mockList;
-    final insurances = aaData.insurances ?? InsuranceData.mockList;
+    final investments = aaData.investments;
+    final bankAccounts = aaData.bankAccounts;
+    final fds = aaData.fixedDeposits;
+    final insurances = aaData.insurances;
     
     // Calculate investment breakdown
     final equityValue = investments.where((i) => i.type.toLowerCase() == 'stock').fold(0.0, (sum, i) => sum + i.currentValue);
@@ -1207,6 +1243,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showAccountsSheet(BuildContext context) {
+    final aaData = ref.read(aaDataProvider);
+    final accounts = aaData.bankAccounts;
+    final totalBalance = accounts.fold<double>(0, (sum, a) => sum + a.balance);
+    
+    final accountColors = [
+      const Color(0xFF60A5FA),
+      const Color(0xFFFBBF24),
+      const Color(0xFF34D399),
+      const Color(0xFFA78BFA),
+      const Color(0xFFFB7185),
+    ];
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1232,41 +1280,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            Text(
-              'Linked Accounts',
-              style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Linked Accounts',
+                  style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  _isBalanceHidden ? '₹••••••' : totalBalance.toINR(),
+                  style: ESUNTypography.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: ESUNColors.primary,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: ESUNSpacing.lg),
-            _buildAccountItem(
-              'HDFC Bank',
-              'Savings A/c •••• 1234',
-              '₹2,45,000.00',
-              const Color(0xFF60A5FA),
-              Icons.account_balance,
-            ),
-            const SizedBox(height: ESUNSpacing.md),
-            _buildAccountItem(
-              'ICICI Bank',
-              'Savings A/c •••• 5678',
-              '₹1,89,350.75',
-              const Color(0xFFFBBF24),
-              Icons.account_balance,
-            ),
-            const SizedBox(height: ESUNSpacing.md),
-            _buildAccountItem(
-              'SBI',
-              'Savings A/c •••• 9012',
-              '₹1,08,000.00',
-              const Color(0xFF34D399),
-              Icons.account_balance,
-            ),
+            ...List.generate(accounts.length, (index) {
+              final account = accounts[index];
+              final color = accountColors[index % accountColors.length];
+              return Padding(
+                padding: EdgeInsets.only(bottom: index < accounts.length - 1 ? ESUNSpacing.md : 0),
+                child: _buildAccountItem(
+                  account.bankName,
+                  '${account.accountType} A/c •••• ${account.accountNumber.length >= 4 ? account.accountNumber.substring(account.accountNumber.length - 4) : account.accountNumber}',
+                  _isBalanceHidden ? '₹••••••' : account.balance.toINR(),
+                  color,
+                  logoUrl: account.effectiveLogoUrl,
+                ),
+              );
+            }),
             const SizedBox(height: ESUNSpacing.xl),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
-                  // TODO: Navigate to add account
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Add Bank Account'),
@@ -1285,7 +1335,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
   
-  Widget _buildAccountItem(String name, String accountNo, String balance, Color color, IconData icon) {
+  Widget _buildAccountItem(String name, String accountNo, String balance, Color color, {String? logoUrl}) {
     return Container(
       padding: const EdgeInsets.all(ESUNSpacing.md),
       decoration: BoxDecoration(
@@ -1296,12 +1346,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: Colors.white,
               borderRadius: ESUNRadius.smRadius,
+              border: Border.all(color: color.withOpacity(0.2)),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: ClipRRect(
+              borderRadius: ESUNRadius.smRadius,
+              child: logoUrl != null
+                  ? Image.network(
+                      logoUrl,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.account_balance,
+                        color: color,
+                        size: 24,
+                      ),
+                    )
+                  : Icon(Icons.account_balance, color: color, size: 24),
+            ),
           ),
           const SizedBox(width: ESUNSpacing.md),
           Expanded(
@@ -1707,6 +1772,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
   
+  // ignore: unused_element
   void _showMoreSheet(BuildContext context) {
     final moreOptions = [
       ('Budgets', Icons.pie_chart_rounded, AppRoutes.budgets, const Color(0xFF2E4A9A)),
@@ -2052,7 +2118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
     
     return Padding(
-      padding: const EdgeInsets.only(left: ESUNSpacing.lg, right: ESUNSpacing.lg, top: ESUNSpacing.md, bottom: ESUNSpacing.sm),
+      padding: const EdgeInsets.only(left: ESUNSpacing.lg, right: ESUNSpacing.lg, top: ESUNSpacing.xs, bottom: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2062,26 +2128,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: ESUNSpacing.sm),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 4,
-            ),
-            itemCount: actions.length,
-            itemBuilder: (context, index) {
-              final action = actions[index];
-              return FPQuickActionButton(
-                icon: action.icon,
-                label: action.label,
-                onPressed: action.onTap,
-                iconColor: action.color,
+          const SizedBox(height: 4),
+          Row(
+            children: actions.sublist(0, 4).map((action) {
+              return Expanded(
+                child: FPQuickActionButton(
+                  icon: action.icon,
+                  label: action.label,
+                  onPressed: action.onTap,
+                  iconColor: action.color,
+                ),
               );
-            },
+            }).toList(),
+          ),
+          Row(
+            children: actions.sublist(4).map((action) {
+              return Expanded(
+                child: FPQuickActionButton(
+                  icon: action.icon,
+                  label: action.label,
+                  onPressed: action.onTap,
+                  iconColor: action.color,
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
@@ -2090,7 +2160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   
   Widget _buildRewardsBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: GestureDetector(
         onTap: () => context.push(AppRoutes.rewards),
         child: Container(
@@ -2176,7 +2246,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   
   Widget _buildAIInsightsBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: GestureDetector(
         onTap: () => context.push(AppRoutes.advisor),
         child: Container(
@@ -2229,7 +2299,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// Coach Kantha Financial Tools Section
   Widget _buildCoachModules(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2381,8 +2451,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   Widget _buildHealthScore(BuildContext context) {
+    final aaData = ref.watch(aaDataProvider);
+    final score = aaData.healthScore;
+    final label = aaData.healthLabel;
+    final scoreNorm = (score / 100).clamp(0.0, 1.0);
+    final scoreColor = score >= 65
+        ? ESUNColors.success
+        : score >= 50
+            ? ESUNColors.warning
+            : Colors.red;
+
+    final savingsVal = aaData.savingsFactor;
+    final spendingVal = aaData.spendingFactor;
+    final investVal = aaData.investmentFactor;
+    final debtVal = aaData.debtFactor;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: FPCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2399,18 +2484,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: ESUNColors.success.withOpacity(0.1),
+                    color: scoreColor.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.trending_up, color: ESUNColors.success, size: 16),
+                      Icon(Icons.trending_up, color: scoreColor, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '+5 pts',
+                        '$score / 100',
                         style: ESUNTypography.labelMedium.copyWith(
-                          color: ESUNColors.success,
+                          color: scoreColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -2433,24 +2518,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: 100,
                         height: 100,
                         child: CircularProgressIndicator(
-                          value: 0.78,
+                          value: scoreNorm,
                           strokeWidth: 10,
                           backgroundColor: ESUNColors.surfaceVariant,
-                          valueColor: const AlwaysStoppedAnimation(ESUNColors.success),
+                          valueColor: AlwaysStoppedAnimation(scoreColor),
                         ),
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '78',
+                            '$score',
                             style: ESUNTypography.headlineMedium.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: ESUNColors.success,
+                              color: scoreColor,
                             ),
                           ),
                           Text(
-                            'Good',
+                            label,
                             style: ESUNTypography.labelSmall.copyWith(
                               color: ESUNColors.textSecondary,
                             ),
@@ -2465,11 +2550,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Expanded(
                   child: Column(
                     children: [
-                      _buildHealthFactor('Savings', 0.85, ESUNColors.success),
+                      _buildHealthFactor('Savings', savingsVal, ESUNColors.success),
                       const SizedBox(height: 8),
-                      _buildHealthFactor('Spending', 0.65, ESUNColors.warning),
+                      _buildHealthFactor('Spending', spendingVal, spendingVal >= 0.5 ? ESUNColors.success : ESUNColors.warning),
                       const SizedBox(height: 8),
-                      _buildHealthFactor('Investments', 0.70, ESUNColors.primary),
+                      _buildHealthFactor('Investments', investVal, ESUNColors.primary),
+                      const SizedBox(height: 8),
+                      _buildHealthFactor('Debt', debtVal, debtVal >= 0.6 ? ESUNColors.success : Colors.red),
                     ],
                   ),
                 ),
@@ -2624,6 +2711,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   Widget _buildRecentTransactions(BuildContext context) {
+    // Get latest transactions from transaction state
+    final recentTransactions = ref.watch(recentTransactionsProvider);
+    
+    // Helper to get time ago string
+    String getTimeAgo(DateTime dateTime) {
+      final now = DateTime.now();
+      final diff = now.difference(dateTime);
+      
+      if (diff.inMinutes < 1) return 'just now';
+      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+      if (diff.inHours < 24) return '${diff.inHours}h ago';
+      if (diff.inDays < 7) return '${diff.inDays}d ago';
+      return '${(diff.inDays / 7).floor()}w ago';
+    }
+    
+    // Helper to get icon for transaction type
+    IconData getIcon(TransactionType type) {
+      switch (type) {
+        case TransactionType.billPayment:
+          return Icons.receipt_long_rounded;
+        case TransactionType.upiTransfer:
+          return Icons.send_rounded;
+        case TransactionType.bankTransfer:
+          return Icons.account_balance_rounded;
+        case TransactionType.recharge:
+          return Icons.smartphone_rounded;
+        case TransactionType.income:
+          return Icons.account_balance_rounded;
+        case TransactionType.refund:
+          return Icons.replay_rounded;
+      }
+    }
+    
+    // Helper to get icon color
+    Color getIconColor(TransactionType type, bool isDebit) {
+      if (!isDebit) return ESUNColors.success;
+      switch (type) {
+        case TransactionType.billPayment:
+          return Colors.purple;
+        case TransactionType.upiTransfer:
+          return Colors.blue;
+        case TransactionType.bankTransfer:
+          return ESUNColors.primary;
+        case TransactionType.recharge:
+          return Colors.orange;
+        case TransactionType.income:
+          return ESUNColors.success;
+        case TransactionType.refund:
+          return ESUNColors.success;
+      }
+    }
+    
     return Padding(
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
@@ -2645,34 +2784,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
           const SizedBox(height: ESUNSpacing.sm),
-          // Transaction list
-          FPTransactionCard(
-            icon: Icons.shopping_bag,
-            iconBackgroundColor: Colors.orange.withOpacity(0.1),
-            iconColor: Colors.orange,
-            title: 'Amazon',
-            subtitle: 'Shopping • 2h ago',
-            amount: '-₹2,499',
-            amountColor: ESUNColors.error,
-          ),
-          FPTransactionCard(
-            icon: Icons.account_balance,
-            iconBackgroundColor: ESUNColors.success.withOpacity(0.1),
-            iconColor: ESUNColors.success,
-            title: 'Salary Credit',
-            subtitle: 'Income • Yesterday',
-            amount: '+₹75,000',
-            amountColor: ESUNColors.success,
-          ),
-          FPTransactionCard(
-            icon: Icons.local_gas_station,
-            iconBackgroundColor: Colors.blue.withOpacity(0.1),
-            iconColor: Colors.blue,
-            title: 'HP Petrol',
-            subtitle: 'Transport • Yesterday',
-            amount: '-₹1,850',
-            amountColor: ESUNColors.error,
-          ),
+          // Dynamic transaction list
+          if (recentTransactions.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
+              decoration: BoxDecoration(
+                color: ESUNColors.surface,
+                borderRadius: ESUNRadius.lgRadius,
+                border: Border.all(color: ESUNColors.border),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.receipt_long_outlined, size: 48, color: ESUNColors.textTertiary),
+                    const SizedBox(height: ESUNSpacing.sm),
+                    Text(
+                      'No transactions yet',
+                      style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ...recentTransactions.take(5).map((tx) {
+              final iconColor = getIconColor(tx.type, tx.isDebit);
+              final amountText = tx.isDebit ? '-₹${tx.amount.toStringAsFixed(0)}' : '+₹${tx.amount.toStringAsFixed(0)}';
+              final category = tx.category ?? (tx.isDebit ? 'Payment' : 'Income');
+              
+              return FPTransactionCard(
+                icon: getIcon(tx.type),
+                iconBackgroundColor: iconColor.withOpacity(0.1),
+                iconColor: iconColor,
+                title: tx.title,
+                subtitle: '$category • ${getTimeAgo(tx.timestamp)}',
+                amount: amountText,
+                amountColor: tx.isDebit ? ESUNColors.error : ESUNColors.success,
+              );
+            }),
         ],
       ),
     );
@@ -3065,7 +3214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   
   Widget _buildPromotions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

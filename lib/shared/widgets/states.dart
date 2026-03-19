@@ -79,7 +79,7 @@ class FPEmptyState extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: ESUNSpacing.xxl),
+          const SizedBox(height: ESUNSpacing.lg),
           Text(
             title,
             style: ESUNTypography.titleLarge,
@@ -96,7 +96,7 @@ class FPEmptyState extends StatelessWidget {
             ),
           ],
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: ESUNSpacing.xxl),
+            const SizedBox(height: ESUNSpacing.lg),
             FPButton.primary(
               label: actionLabel!,
               onPressed: onAction,
@@ -328,7 +328,7 @@ class FPPermissionState extends StatelessWidget {
               color: colorScheme.primary,
             ),
           ),
-          const SizedBox(height: ESUNSpacing.xxl),
+          const SizedBox(height: ESUNSpacing.lg),
           Text(
             title,
             style: ESUNTypography.titleLarge,
@@ -342,7 +342,7 @@ class FPPermissionState extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: ESUNSpacing.xxl),
+          const SizedBox(height: ESUNSpacing.lg),
           FPButton.primary(
             label: actionLabel,
             onPressed: onRequest,

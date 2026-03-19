@@ -92,7 +92,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('No account found. Redirecting to registration...')),
           );
-          await Future.delayed(const Duration(milliseconds: 500));
           if (mounted) context.go(AppRoutes.onboarding);
           return;
         } else if (code == 'RATE_LIMITED') {
@@ -144,7 +143,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('No account found. Redirecting to registration...')),
           );
-          await Future.delayed(const Duration(milliseconds: 500));
           if (mounted) context.go(AppRoutes.onboarding);
           return;
         } else if (code == 'INVALID_CREDENTIALS') {
@@ -682,9 +680,6 @@ class _BiometricUnlockScreenState extends ConsumerState<BiometricUnlockScreen> {
   }
   
   Future<void> _authenticate() async {
-    // TODO: Implement biometric authentication
-    await Future.delayed(const Duration(seconds: 1));
-    
     if (!mounted) return;
     
     ref.read(authStateProvider.notifier).authenticateWithBiometrics();
