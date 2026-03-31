@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../state/transaction_state.dart' as txn_state;
 import '../../theme/theme.dart';
 
 /// Transaction model
@@ -56,253 +57,110 @@ enum TransactionStatus {
   failed,
 }
 
-/// Static transaction data provider
+/// Maps live Transaction state to PaymentTransaction for the history screen.
+/// Automatically updates when new payments are made.
 final transactionHistoryProvider = Provider<List<PaymentTransaction>>((ref) {
-  final now = DateTime.now();
-  return [
-    // Today
-    PaymentTransaction(
-      id: 'TXN001',
-      title: 'Rahul Sharma',
-      subtitle: 'Money Transfer',
-      amount: 5000,
-      dateTime: now.subtract(const Duration(hours: 2)),
-      type: TransactionType.sent,
-      upiId: 'rahul.sharma@ybl',
-      referenceId: 'UPI/402815623548',
-      icon: Icons.person,
-      color: Colors.blue,
-    ),
-    PaymentTransaction(
-      id: 'TXN002',
-      title: 'Cashback Received',
-      subtitle: 'Bill Payment Reward',
-      amount: 50,
-      dateTime: now.subtract(const Duration(hours: 4)),
-      type: TransactionType.cashback,
-      referenceId: 'CBK/402815623549',
-      icon: Icons.card_giftcard,
-      color: Colors.green,
-    ),
-    PaymentTransaction(
-      id: 'TXN003',
-      title: 'Amazon Pay',
-      subtitle: 'Shopping',
-      amount: 2499,
-      dateTime: now.subtract(const Duration(hours: 6)),
-      type: TransactionType.sent,
-      upiId: 'amazon@apl',
-      referenceId: 'UPI/402815623550',
-      icon: Icons.shopping_bag,
-      color: Colors.orange,
-    ),
-    // Yesterday
-    PaymentTransaction(
-      id: 'TXN004',
-      title: 'Jio Prepaid',
-      subtitle: 'Mobile Recharge',
-      amount: 599,
-      dateTime: now.subtract(const Duration(days: 1, hours: 10)),
-      type: TransactionType.recharge,
-      referenceId: 'RCH/402815623551',
-      icon: Icons.phone_android,
-      color: Colors.blue.shade700,
-    ),
-    PaymentTransaction(
-      id: 'TXN005',
-      title: 'Priya Mehta',
-      subtitle: 'Money Received',
-      amount: 12000,
-      dateTime: now.subtract(const Duration(days: 1, hours: 14)),
-      type: TransactionType.received,
-      upiId: 'priya.mehta@paytm',
-      referenceId: 'UPI/402815623552',
-      icon: Icons.person,
-      color: Colors.purple,
-    ),
-    PaymentTransaction(
-      id: 'TXN006',
-      title: 'Swiggy',
-      subtitle: 'Food Order',
-      amount: 456,
-      dateTime: now.subtract(const Duration(days: 1, hours: 20)),
-      type: TransactionType.sent,
-      upiId: 'swiggy@ybl',
-      referenceId: 'UPI/402815623553',
-      icon: Icons.restaurant,
-      color: Colors.deepOrange,
-    ),
-    // 2 days ago
-    PaymentTransaction(
-      id: 'TXN007',
-      title: 'BESCOM',
-      subtitle: 'Electricity Bill',
-      amount: 2340,
-      dateTime: now.subtract(const Duration(days: 2, hours: 9)),
-      type: TransactionType.billPayment,
-      referenceId: 'BILL/402815623554',
-      icon: Icons.bolt,
-      color: Colors.amber,
-    ),
-    PaymentTransaction(
-      id: 'TXN008',
-      title: 'Netflix',
-      subtitle: 'Subscription',
-      amount: 649,
-      dateTime: now.subtract(const Duration(days: 2, hours: 15)),
-      type: TransactionType.sent,
-      upiId: 'netflix@axisbank',
-      referenceId: 'UPI/402815623555',
-      icon: Icons.movie,
-      color: Colors.red,
-    ),
-    // 3 days ago
-    PaymentTransaction(
-      id: 'TXN009',
-      title: 'Amit Kumar',
-      subtitle: 'Money Transfer',
-      amount: 1500,
-      dateTime: now.subtract(const Duration(days: 3, hours: 11)),
-      type: TransactionType.sent,
-      upiId: 'amit.k@oksbi',
-      referenceId: 'UPI/402815623556',
-      icon: Icons.person,
-      color: Colors.teal,
-    ),
-    PaymentTransaction(
-      id: 'TXN010',
-      title: 'Salary Credit',
-      subtitle: 'HDFC Bank',
-      amount: 85000,
-      dateTime: now.subtract(const Duration(days: 3, hours: 6)),
-      type: TransactionType.received,
-      bankAccount: 'HDFC •• 1234',
-      referenceId: 'NEFT/402815623557',
-      icon: Icons.account_balance,
-      color: Colors.indigo,
-    ),
-    // 5 days ago
-    PaymentTransaction(
-      id: 'TXN011',
-      title: 'Uber',
-      subtitle: 'Cab Ride',
-      amount: 234,
-      dateTime: now.subtract(const Duration(days: 5, hours: 18)),
-      type: TransactionType.sent,
-      upiId: 'uber@axisbank',
-      referenceId: 'UPI/402815623558',
-      icon: Icons.local_taxi,
-      color: Colors.black87,
-    ),
-    PaymentTransaction(
-      id: 'TXN012',
-      title: 'Tata Sky DTH',
-      subtitle: 'DTH Recharge',
-      amount: 450,
-      dateTime: now.subtract(const Duration(days: 5, hours: 10)),
-      type: TransactionType.recharge,
-      referenceId: 'RCH/402815623559',
-      icon: Icons.tv,
-      color: Colors.blue.shade800,
-    ),
-    // Last week
-    PaymentTransaction(
-      id: 'TXN013',
-      title: 'Sneha Patel',
-      subtitle: 'Money Received',
-      amount: 3500,
-      dateTime: now.subtract(const Duration(days: 7, hours: 14)),
-      type: TransactionType.received,
-      upiId: 'sneha.p@ybl',
-      referenceId: 'UPI/402815623560',
-      icon: Icons.person,
-      color: Colors.pink,
-    ),
-    PaymentTransaction(
-      id: 'TXN014',
-      title: 'BigBasket',
-      subtitle: 'Groceries',
-      amount: 1876,
-      dateTime: now.subtract(const Duration(days: 8, hours: 11)),
-      type: TransactionType.sent,
-      upiId: 'bigbasket@ybl',
-      referenceId: 'UPI/402815623561',
-      icon: Icons.shopping_cart,
-      color: Colors.green.shade700,
-    ),
-    PaymentTransaction(
-      id: 'TXN015',
-      title: 'Airtel Broadband',
-      subtitle: 'Internet Bill',
-      amount: 999,
-      dateTime: now.subtract(const Duration(days: 10, hours: 9)),
-      type: TransactionType.billPayment,
-      referenceId: 'BILL/402815623562',
-      icon: Icons.wifi,
-      color: Colors.red.shade600,
-    ),
-    // 2 weeks ago
-    PaymentTransaction(
-      id: 'TXN016',
-      title: 'Flipkart',
-      subtitle: 'Electronics Purchase',
-      amount: 15999,
-      dateTime: now.subtract(const Duration(days: 12, hours: 16)),
-      type: TransactionType.sent,
-      upiId: 'flipkart@axl',
-      referenceId: 'UPI/402815623563',
-      icon: Icons.shopping_bag,
-      color: Colors.blue.shade600,
-    ),
-    PaymentTransaction(
-      id: 'TXN017',
-      title: 'LIC Premium',
-      subtitle: 'Insurance',
-      amount: 8500,
-      dateTime: now.subtract(const Duration(days: 15, hours: 10)),
-      type: TransactionType.billPayment,
-      referenceId: 'BILL/402815623564',
-      icon: Icons.security,
-      color: Colors.blue.shade900,
-    ),
-    PaymentTransaction(
-      id: 'TXN018',
-      title: 'Vikram Reddy',
-      subtitle: 'Money Transfer',
-      amount: 25000,
-      dateTime: now.subtract(const Duration(days: 18, hours: 14)),
-      type: TransactionType.sent,
-      upiId: 'vikram.r@icici',
-      referenceId: 'UPI/402815623565',
-      icon: Icons.person,
-      color: Colors.cyan,
-    ),
-    // Last month
-    PaymentTransaction(
-      id: 'TXN019',
-      title: 'Credit Card Bill',
-      subtitle: 'HDFC Credit Card',
-      amount: 45678,
-      dateTime: now.subtract(const Duration(days: 25, hours: 11)),
-      type: TransactionType.billPayment,
-      referenceId: 'BILL/402815623566',
-      icon: Icons.credit_card,
-      color: Colors.red.shade800,
-    ),
-    PaymentTransaction(
-      id: 'TXN020',
-      title: 'Rent Payment',
-      subtitle: 'Bank Transfer',
-      amount: 35000,
-      dateTime: now.subtract(const Duration(days: 28, hours: 9)),
-      type: TransactionType.bankTransfer,
-      bankAccount: 'ICICI •• 5678',
-      referenceId: 'NEFT/402815623567',
-      icon: Icons.home,
-      color: Colors.brown,
-    ),
-  ];
+  final state = ref.watch(txn_state.transactionStateProvider);
+  return state.transactions.map((t) => _mapTransaction(t)).toList();
 });
+
+/// Icon / color mapping from transaction category/type
+PaymentTransaction _mapTransaction(txn_state.Transaction t) {
+  TransactionType type;
+  switch (t.type) {
+    case txn_state.TransactionType.upiTransfer:
+    case txn_state.TransactionType.bankTransfer:
+      type = t.isDebit ? TransactionType.sent : TransactionType.received;
+      break;
+    case txn_state.TransactionType.billPayment:
+      type = TransactionType.billPayment;
+      break;
+    case txn_state.TransactionType.recharge:
+      type = TransactionType.recharge;
+      break;
+    case txn_state.TransactionType.income:
+      type = TransactionType.received;
+      break;
+    case txn_state.TransactionType.refund:
+      type = TransactionType.cashback;
+      break;
+  }
+
+  TransactionStatus status;
+  switch (t.status) {
+    case txn_state.TransactionStatus.success:
+      status = TransactionStatus.success;
+      break;
+    case txn_state.TransactionStatus.pending:
+      status = TransactionStatus.pending;
+      break;
+    case txn_state.TransactionStatus.failed:
+      status = TransactionStatus.failed;
+      break;
+  }
+
+  final cat = (t.category ?? '').toLowerCase();
+  IconData icon;
+  Color color;
+  if (cat.contains('food') || cat.contains('dining') || cat.contains('restaurant')) {
+    icon = Icons.restaurant;
+    color = Colors.deepOrange;
+  } else if (cat.contains('shopping')) {
+    icon = Icons.shopping_bag;
+    color = ESUNColors.primary;
+  } else if (cat.contains('groceries') || cat.contains('grocery')) {
+    icon = Icons.shopping_cart;
+    color = ESUNColors.primary;
+  } else if (cat.contains('entertainment') || cat.contains('movie')) {
+    icon = Icons.movie;
+    color = ESUNColors.primary;
+  } else if (cat.contains('recharge') || cat.contains('telecom')) {
+    icon = Icons.phone_android;
+    color = ESUNColors.primary;
+  } else if (cat.contains('electricity') || cat.contains('utility') || cat.contains('bill')) {
+    icon = Icons.bolt;
+    color = ESUNColors.primary;
+  } else if (cat.contains('fuel') || cat.contains('transport') || cat.contains('cab')) {
+    icon = Icons.local_taxi;
+    color = Colors.black87;
+  } else if (cat.contains('salary') || cat.contains('income')) {
+    icon = Icons.account_balance;
+    color = ESUNColors.primary;
+  } else if (cat.contains('insurance')) {
+    icon = Icons.security;
+    color = ESUNColors.primary;
+  } else if (cat.contains('rent') || cat.contains('home')) {
+    icon = Icons.home;
+    color = ESUNColors.primary;
+  } else if (cat.contains('subscription')) {
+    icon = Icons.subscriptions;
+    color = ESUNColors.primary;
+  } else if (!t.isDebit) {
+    icon = Icons.card_giftcard;
+    color = ESUNColors.success;
+  } else if (t.recipientName != null && t.recipientName!.isNotEmpty) {
+    icon = Icons.person;
+    color = ESUNColors.primary;
+  } else {
+    icon = Icons.payment;
+    color = ESUNColors.primary;
+  }
+
+  return PaymentTransaction(
+    id: t.id,
+    title: t.recipientName ?? t.title,
+    subtitle: t.subtitle ?? t.category ?? 'Transaction',
+    amount: t.amount,
+    dateTime: t.timestamp,
+    type: type,
+    status: status,
+    upiId: t.recipientUpi,
+    bankAccount: t.recipientAccount ?? t.sourceAccount,
+    referenceId: t.transactionRef,
+    icon: icon,
+    color: color,
+  );
+}
 
 class PaymentHistoryScreen extends ConsumerStatefulWidget {
   const PaymentHistoryScreen({super.key});
@@ -414,7 +272,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           // Search and Filters
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             child: Column(
               children: [
                 // Search Bar
@@ -475,8 +333,8 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
 
           // Summary Card
           Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(ESUNSpacing.lg),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [ESUNColors.primary, Color(0xFF3D5CB8)],
@@ -614,7 +472,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           ? const BorderRadius.vertical(bottom: Radius.circular(16))
           : null,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         decoration: BoxDecoration(
           border: isLast
               ? null
@@ -623,7 +481,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: txn.color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -657,18 +515,18 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                 Text(
                   '${txn.isCredit ? '+' : '-'}${_currencyFormat.format(txn.amount)}',
                   style: ESUNTypography.bodyMedium.copyWith(
-                    color: txn.isCredit ? Colors.green : Colors.black87,
+                    color: txn.isCredit ? ESUNColors.success : Colors.black87,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (txn.status != TransactionStatus.success)
                   Container(
                     margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: ESUNSpacing.tagInsets,
                     decoration: BoxDecoration(
                       color: txn.status == TransactionStatus.pending
-                          ? Colors.orange.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
+                          ? ESUNColors.warning.withOpacity(0.1)
+                          : ESUNColors.error.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -676,8 +534,8 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                       style: TextStyle(
                         fontSize: 10,
                         color: txn.status == TransactionStatus.pending
-                            ? Colors.orange
-                            : Colors.red,
+                            ? ESUNColors.warning
+                            : ESUNColors.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -714,15 +572,15 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(ESUNSpacing.xxl),
                 child: Column(
                   children: [
                     // Status Icon
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(ESUNSpacing.xl),
                       decoration: BoxDecoration(
                         color: txn.isCredit
-                            ? Colors.green.withOpacity(0.1)
+                            ? ESUNColors.success.withOpacity(0.1)
                             : txn.color.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
@@ -732,7 +590,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                             : (txn.status == TransactionStatus.pending
                                 ? Icons.hourglass_empty
                                 : Icons.close),
-                        color: txn.isCredit ? Colors.green : txn.color,
+                        color: txn.isCredit ? ESUNColors.success : txn.color,
                         size: 36,
                       ),
                     ),
@@ -742,7 +600,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                       '${txn.isCredit ? '+' : '-'}${_currencyFormat.format(txn.amount)}',
                       style: ESUNTypography.headlineLarge.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: txn.isCredit ? Colors.green : Colors.black87,
+                        color: txn.isCredit ? ESUNColors.success : Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -751,10 +609,10 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: txn.status == TransactionStatus.success
-                            ? Colors.green.withOpacity(0.1)
+                            ? ESUNColors.success.withOpacity(0.1)
                             : (txn.status == TransactionStatus.pending
-                                ? Colors.orange.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1)),
+                                ? ESUNColors.warning.withOpacity(0.1)
+                                : ESUNColors.error.withOpacity(0.1)),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -763,10 +621,10 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                             : (txn.status == TransactionStatus.pending ? 'Pending' : 'Failed'),
                         style: TextStyle(
                           color: txn.status == TransactionStatus.success
-                              ? Colors.green
+                              ? ESUNColors.success
                               : (txn.status == TransactionStatus.pending
-                                  ? Colors.orange
-                                  : Colors.red),
+                                  ? ESUNColors.warning
+                                  : ESUNColors.error),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -775,7 +633,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                     // Details Card
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(ESUNSpacing.xl),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade50,
                         borderRadius: BorderRadius.circular(16),
@@ -896,7 +754,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ESUNSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -932,7 +790,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ESUNSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -54,6 +54,7 @@ dependencies:
   # Speech & AI
   speech_to_text: ^7.3.0
   flutter_tts: ^3.8.5
+  audioplayers: ^6.1.0
   
   # Camera & QR
   camera: ^0.10.5+9

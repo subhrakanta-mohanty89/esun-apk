@@ -48,7 +48,7 @@ abstract class ESUNColors {
   static const Color onSurfaceVariant = Color(0xFF475569);
   
   // Background Colors - ESUN Blue theme
-  static const Color background = Color(0xFFF5F7FB);
+  static const Color background = Color(0xFFF7F8FC);
   static const Color backgroundElevated = Color(0xFFFFFFFF);
   static const Color onBackground = Color(0xFF0F172A);
   
@@ -165,7 +165,7 @@ abstract class ESUNColors {
   static const LinearGradient heroCardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF2E4A9A), Color(0xFF4A62B8)],
+    colors: [Color(0xFF1E3A8A), Color(0xFF3B5EC9), Color(0xFF4A6FD4)],
   );
   
   static const LinearGradient neonGradient = LinearGradient(
@@ -178,6 +178,32 @@ abstract class ESUNColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFFFF6B6B), Color(0xFFFFA07A)],
+  );
+  
+  // Advisor-specific gradients
+  static const LinearGradient advisorGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+  );
+  
+  static const LinearGradient strongHealthGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF10B981), Color(0xFF059669), Color(0xFF047857)],
+  );
+  
+  static const LinearGradient weakHealthGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706), Color(0xFFB45309)],
+  );
+  
+  // Input area gradient (subtle lift)
+  static const LinearGradient inputAreaGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0x00FFFFFF), Color(0xFFF7F8FC)],
   );
   
   // Scrim & Overlay
@@ -229,6 +255,11 @@ abstract class ESUNSpacing {
   static const EdgeInsets cardInsets = EdgeInsets.all(16.0);
   static const EdgeInsets listInsets = EdgeInsets.symmetric(horizontal: 16.0);
   static const EdgeInsets buttonInsets = EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0);
+  
+  // Badge / Chip / Tag Insets — standardized on 4px grid
+  static const EdgeInsets tagInsets = EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0);
+  static const EdgeInsets badgeInsets = EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0);
+  static const EdgeInsets chipInsets = EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0);
 }
 
 /// Border Radius Scale

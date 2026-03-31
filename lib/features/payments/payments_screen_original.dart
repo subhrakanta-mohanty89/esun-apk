@@ -190,7 +190,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: ESUNColors.primary.withOpacity(0.1),
                     borderRadius: ESUNRadius.smRadius,
@@ -277,7 +277,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: ESUNColors.surfaceVariant,
               shape: BoxShape.circle,
@@ -497,7 +497,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: ESUNRadius.smRadius,
@@ -594,7 +594,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: item.color.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -726,11 +726,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(ESUNSpacing.lg),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(ESUNSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
@@ -861,7 +861,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         ),
                         child: const Text('Transfer Now', style: TextStyle(fontSize: 16)),
                       ),
@@ -927,11 +927,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(ESUNSpacing.lg),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(ESUNSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
@@ -977,7 +977,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(ESUNSpacing.md),
                             decoration: BoxDecoration(
                               color: Colors.green.withOpacity(0.1),
                               shape: BoxShape.circle,
@@ -1037,7 +1037,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         ),
                         child: const Text('Transfer', style: TextStyle(fontSize: 16)),
                       ),

@@ -6,6 +6,7 @@ abstract class AppRoutes {
   // Root
   static const String splash = '/splash';
   static const String onboarding = '/onboarding/details';  // Go directly to registration
+  static const String onboardingIntro = '/onboarding';  // First-install intro screens
   static const String onboardingDetails = '/onboarding/details';
   static const String onboardingVerify = '/onboarding/verify';
   static const String featureIntro = '/feature-intro';

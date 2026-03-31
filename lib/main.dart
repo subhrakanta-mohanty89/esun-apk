@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'app.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/services/permission_service.dart';
+import 'core/cache/cache_first_provider.dart';
 
 Future<void> main() async {
   // Ensure Flutter bindings are initialized
@@ -22,6 +23,9 @@ Future<void> main() async {
   await Hive.openBox(HiveBoxes.cache);
   await Hive.openBox(HiveBoxes.preferences);
   await Hive.openBox(HiveBoxes.offlineQueue);
+  
+  // Initialize cache-first data layer
+  await HiveCache.init();
   
   // Request essential permissions (non-blocking)
   _requestPermissions();

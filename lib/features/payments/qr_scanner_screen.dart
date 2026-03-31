@@ -195,7 +195,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
         content: Text(message),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(ESUNSpacing.lg),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
@@ -215,7 +215,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ESUNSpacing.xxl),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -241,7 +241,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(ESUNSpacing.lg),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(12),
@@ -262,7 +262,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ESUNColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -315,7 +315,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
         content: Text('Initiating payment to ${upiData.pn ?? upiData.pa}'),
         backgroundColor: ESUNColors.primary,
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(ESUNSpacing.lg),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
@@ -403,12 +403,12 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
   Widget _buildPermissionDeniedView() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(ESUNSpacing.xxl),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -693,7 +693,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15),
               shape: BoxShape.circle,
@@ -726,7 +726,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(ESUNSpacing.xxl),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -745,7 +745,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
           const SizedBox(height: 16),
           // Success Icon
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: ESUNColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -765,7 +765,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
           // Payee Details
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(ESUNSpacing.xl),
             decoration: BoxDecoration(
               color: Colors.grey.shade50,
               borderRadius: BorderRadius.circular(16),
@@ -842,7 +842,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onCancel,
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -859,7 +859,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ESUNColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

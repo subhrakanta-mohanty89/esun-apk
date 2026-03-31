@@ -190,7 +190,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                 icon: const Icon(Icons.search),
                 label: const Text('Find Best Loans'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                 ),
               ),
             ),
@@ -388,7 +388,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   spacing: 6,
                   runSpacing: 6,
                   children: rec.features.map((f) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.fullRadius,
@@ -456,7 +456,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.teal.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,
@@ -770,7 +770,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
         ),
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(ESUNSpacing.lg, 0, ESUNSpacing.lg, ESUNSpacing.lg),
             child: Text(
               faq.answer,
               style: ESUNTypography.bodySmall.copyWith(
@@ -900,7 +900,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: Colors.amber.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -933,7 +933,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: ESUNSpacing.badgeInsets,
             decoration: BoxDecoration(
               color: ESUNColors.success.withOpacity(0.1),
               borderRadius: ESUNRadius.fullRadius,
@@ -1053,7 +1053,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                     _applyForLoan(context, rec);
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                   ),
                   child: const Text('Apply Now'),
                 ),
@@ -1285,7 +1285,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: ESUNRadius.fullRadius,
@@ -1468,7 +1468,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: ESUNColors.primary.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -1525,7 +1525,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: getLoanColor(loan.type).withOpacity(0.1),
                   borderRadius: ESUNRadius.smRadius,
@@ -1745,7 +1745,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.purple.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,

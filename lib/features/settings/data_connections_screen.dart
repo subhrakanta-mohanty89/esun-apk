@@ -198,7 +198,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: ESUNColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -344,7 +344,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(ESUNSpacing.sm),
             decoration: BoxDecoration(
               color: ESUNColors.primary.withOpacity(0.1),
               borderRadius: ESUNRadius.smRadius,
@@ -377,7 +377,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: ESUNSpacing.badgeInsets,
             decoration: BoxDecoration(
               color: account.isActive 
                   ? ESUNColors.success.withOpacity(0.1)
@@ -538,7 +538,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: _getStatusColor(connection.status).withOpacity(0.1),
                     borderRadius: ESUNRadius.smRadius,
@@ -822,7 +822,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(ESUNSpacing.sm),
               decoration: BoxDecoration(
                 color: effectiveIconColor.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,
@@ -867,7 +867,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: ESUNColors.success.withOpacity(0.15),
               shape: BoxShape.circle,

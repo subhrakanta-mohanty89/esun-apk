@@ -148,7 +148,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: _pages[currentIndex].gradient[0],
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                       shape: RoundedRectangleBorder(
                         borderRadius: ESUNRadius.lgRadius,
                       ),

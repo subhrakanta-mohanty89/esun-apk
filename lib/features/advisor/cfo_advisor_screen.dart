@@ -3,13 +3,19 @@
 /// AI-powered financial advisor that analyzes your bank statement
 /// and provides data-driven advice based on 12 financial rules.
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import '../../theme/theme.dart';
+import '../../state/aa_data_state.dart';
+import '../../core/network/api_service.dart';
 import 'cfo_service.dart';
 
 class CFOAdvisorScreen extends ConsumerStatefulWidget {
@@ -28,10 +34,17 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
   bool _isListening = false;
   bool _speechAvailable = false;
 
-  // Text-to-speech
+  // Suggestion chips toggle
+  bool _suggestionsExpanded = false;
+
+  // Text-to-speech (device fallback)
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
   String? _speakingMessageId;
+  
+  // Sarvam AI TTS (Indian male voice — primary)
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _useSarvam = true; // Try Sarvam first, fall back to device TTS
   
   // Language selection
   String _selectedLanguage = 'English';
@@ -96,13 +109,58 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
     ],
   };
   
-  List<String> get _quickSuggestions => _multilingualSuggestions[_selectedLanguage] ?? _multilingualSuggestions['English']!;
+  // Health-profile-aware English suggestions
+  final List<String> _strongProfileSuggestions = [
+    'How can I optimize my investments?',
+    'Suggest tax-saving strategies',
+    'Should I increase my SIP amount?',
+    'Is my insurance cover sufficient?',
+    'What mutual funds should I consider?',
+    'Analyze my spending behavior',
+    'Should I prepay any loans?',
+    'Where am I overspending?',
+  ];
+  
+  final List<String> _weakProfileSuggestions = [
+    'What is lowering my health score?',
+    'Help me create a budget plan',
+    'How do I build an emergency fund?',
+    'Which debts should I pay off first?',
+    'Where can I save money?',
+    'Do I need life insurance?',
+    'What are my next steps to improve?',
+    'Is my spending under control?',
+  ];
+  
+  List<String> get _quickSuggestions {
+    if (_selectedLanguage != 'English') {
+      return _multilingualSuggestions[_selectedLanguage] ?? _multilingualSuggestions['English']!;
+    }
+    final aaData = ref.read(aaDataProvider);
+    if (aaData.healthScore >= 65) {
+      return _strongProfileSuggestions;
+    }
+    return _weakProfileSuggestions;
+  }
 
   @override
   void initState() {
     super.initState();
     _initSpeech();
     _initTts();
+    _initAudioPlayer();
+    // Sync financial health score to the chat notifier for personalized responses
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncHealthData();
+    });
+  }
+  
+  void _syncHealthData() {
+    final aaData = ref.read(aaDataProvider);
+    ref.read(cfoChatProvider.notifier).updateHealthData(
+      aaData.healthScore,
+      aaData.healthLabel,
+    );
   }
 
   Future<void> _initSpeech() async {
@@ -121,14 +179,67 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
 
   Future<void> _initTts() async {
     await _tts.setLanguage(_languageLocales[_selectedLanguage] ?? 'en-IN');
-    await _tts.setSpeechRate(0.5);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
+    // Tuned for natural, pleasant, smooth conversational speech
+    await _tts.setSpeechRate(0.45); // Smooth, easy-to-follow pace — not rushed
+    await _tts.setVolume(0.9);      // Comfortable level — not harsh on ears
+    await _tts.setPitch(1.0);       // Natural pitch — avoid deep/robotic tone
+
+    // Try to select a high-quality voice for natural speech
+    try {
+      final voices = await _tts.getVoices;
+      if (voices is List) {
+        final voiceList = List<Map<Object?, Object?>>.from(voices.cast<Map>());
+        Map<Object?, Object?>? selectedVoice;
+        
+        // Priority: enhanced/premium voices > standard voices
+        // Preference: Indian English > any English
+        for (final v in voiceList) {
+          final name = (v['name'] ?? '').toString().toLowerCase();
+          final locale = (v['locale'] ?? '').toString().toLowerCase();
+          
+          // Skip low-quality/compact voices
+          if (name.contains('compact') || name.contains('legacy')) continue;
+          
+          // Prefer enhanced voices (iOS has "enhanced" and "premium" voices)
+          final isEnhanced = name.contains('enhanced') || name.contains('premium') || name.contains('neural');
+          
+          if (locale.contains('en') && locale.contains('in')) {
+            // Indian English voice — best match
+            if (isEnhanced || selectedVoice == null) {
+              selectedVoice = v;
+              if (isEnhanced) break; // Premium Indian English — perfect
+            }
+          } else if (locale.contains('en') && selectedVoice == null) {
+            selectedVoice = v;
+          }
+        }
+        if (selectedVoice != null) {
+          await _tts.setVoice({
+            'name': selectedVoice['name'].toString(),
+            'locale': selectedVoice['locale'].toString(),
+          });
+        }
+      }
+    } catch (_) {
+      // Fallback to default voice with tuned pitch/rate
+    }
+
     _tts.setCompletionHandler(() {
       if (mounted) setState(() {
         _isSpeaking = false;
         _speakingMessageId = null;
       });
+    });
+  }
+  
+  void _initAudioPlayer() {
+    _audioPlayer.onPlayerComplete.listen((_) {
+      if (mounted) {
+        setState(() {
+          _isSpeaking = false;
+          _speakingMessageId = null;
+        });
+      }
     });
   }
   
@@ -168,8 +279,48 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
     setState(() => _isListening = false);
   }
 
+  /// Preprocess text for natural, pleasant speech output
+  String _prepareTextForSpeech(String text) {
+    var cleaned = text;
+    // Remove markdown formatting
+    cleaned = cleaned.replaceAll(RegExp(r'\*\*(.+?)\*\*'), r'\1'); // bold
+    cleaned = cleaned.replaceAll(RegExp(r'\*(.+?)\*'), r'\1'); // italic
+    cleaned = cleaned.replaceAll(RegExp(r'_(.+?)_'), r'\1'); // underscore italic
+    cleaned = cleaned.replaceAll(RegExp(r'#{1,6}\s*'), ''); // headers
+    cleaned = cleaned.replaceAll(RegExp(r'`(.+?)`'), r'\1'); // inline code
+    cleaned = cleaned.replaceAll(RegExp(r'\[(.+?)\]\(.+?\)'), r'\1'); // links
+    // Clean bullet points
+    cleaned = cleaned.replaceAll(RegExp(r'^[\-•]\s*', multiLine: true), '');
+    // Strip emoji (surrogate pairs)
+    cleaned = cleaned.replaceAll(RegExp(r'[\u{1F600}-\u{1F9FF}]', unicode: true), '');
+    
+    // Make symbols speakable
+    cleaned = cleaned.replaceAll('₹', 'rupees ');
+    cleaned = cleaned.replaceAll('%', ' percent');
+    cleaned = cleaned.replaceAll('&', ' and ');
+    
+    // Expand common financial abbreviations for natural speech
+    cleaned = cleaned.replaceAll(RegExp(r'\bSIP\b'), 'S.I.P.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bEMI\b'), 'E.M.I.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bFD\b'), 'F.D.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bRD\b'), 'R.D.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bNPS\b'), 'N.P.S.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bPPF\b'), 'P.P.F.');
+    cleaned = cleaned.replaceAll(RegExp(r'\bELSS\b'), 'E.L.S.S.');
+    
+    // Insert natural pauses — paragraph breaks become sentence pauses
+    cleaned = cleaned.replaceAll(RegExp(r'\n{3,}'), '. ');
+    cleaned = cleaned.replaceAll(RegExp(r'\n{2}'), '. ');
+    cleaned = cleaned.replaceAll('\n', ', ');
+    // Collapse whitespace
+    cleaned = cleaned.replaceAll(RegExp(r'\s{2,}'), ' ');
+    return cleaned.trim();
+  }
+
   Future<void> _speakMessage(CFOMessage message) async {
+    // Stop if currently speaking the same message
     if (_isSpeaking && _speakingMessageId == message.content) {
+      await _audioPlayer.stop();
       await _tts.stop();
       setState(() {
         _isSpeaking = false;
@@ -177,11 +328,35 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
       });
       return;
     }
+    
     setState(() {
       _isSpeaking = true;
       _speakingMessageId = message.content;
     });
-    await _tts.speak(message.content);
+    
+    // Try Sarvam AI TTS first (Indian male voice)
+    if (_useSarvam) {
+      try {
+        final cfoService = ref.read(cfoServiceProvider);
+        final audioBase64 = await cfoService.textToSpeech(
+          _prepareTextForSpeech(message.content),
+          language: _selectedLanguage.toLowerCase(),
+        );
+        
+        if (audioBase64 != null && audioBase64.isNotEmpty) {
+          final bytes = base64Decode(audioBase64);
+          await _audioPlayer.play(
+            BytesSource(Uint8List.fromList(bytes), mimeType: 'audio/wav'),
+          );
+          return; // Success — don't fall through
+        }
+      } catch (_) {
+        // Fall through to device TTS
+      }
+    }
+    
+    // Fallback to device TTS
+    await _tts.speak(_prepareTextForSpeech(message.content));
   }
 
   @override
@@ -190,6 +365,7 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
     _scrollController.dispose();
     _speech.stop();
     _tts.stop();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -383,6 +559,22 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(cfoChatProvider);
+    // Use .select() to only rebuild when health data changes, not all AA data
+    final healthScore = ref.watch(aaDataProvider.select((data) => data.healthScore));
+    final healthLabel = ref.watch(aaDataProvider.select((data) => data.healthLabel));
+    final healthColor = healthScore >= 65
+        ? ESUNColors.success
+        : healthScore >= 50
+            ? ESUNColors.warning
+            : Colors.red;
+
+    // Keep health data in sync with chat notifier
+    ref.listen(aaDataProvider.select((data) => (data.healthScore, data.healthLabel)), (_, next) {
+      ref.read(cfoChatProvider.notifier).updateHealthData(
+        next.$1,
+        next.$2,
+      );
+    });
 
     // Auto-scroll when new messages arrive
     if (chatState.messages.isNotEmpty) {
@@ -391,29 +583,52 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF10B981), Color(0xFF059669)],
+                  colors: [healthColor.withOpacity(0.8), healthColor],
                 ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: healthColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.account_balance, color: Colors.white, size: 20),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
             ),
             const SizedBox(width: ESUNSpacing.sm),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('KANTHA'),
-                Text(
-                  'Your Financial Coach',
-                  style: ESUNTypography.labelSmall.copyWith(
-                    color: ESUNColors.textSecondary,
-                  ),
+                const Text('KANTA'),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: healthColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Health $healthScore · $healthLabel',
+                      style: ESUNTypography.labelSmall.copyWith(
+                        color: healthColor,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -453,8 +668,12 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
                   await ref.read(cfoChatProvider.notifier).resetConversation();
                   break;
                 case 'refresh':
-                  await ref.read(cfoServiceProvider).refreshData();
-                  await ref.read(cfoChatProvider.notifier).loadSummary();
+                  // Clear local cache, then parallel refresh
+                  ref.read(cacheInterceptorProvider).clear();
+                  await Future.wait([
+                    ref.read(cfoServiceProvider).refreshData(),
+                    ref.read(cfoChatProvider.notifier).loadSummary(),
+                  ]);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Data refreshed')),
@@ -490,6 +709,55 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
       ),
       body: Column(
         children: [
+          // Health profile banner
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: ESUNSpacing.md, vertical: ESUNSpacing.xs),
+            padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: 10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  healthColor.withOpacity(0.12),
+                  healthColor.withOpacity(0.04),
+                ],
+              ),
+              borderRadius: ESUNRadius.lgRadius,
+              border: Border.all(color: healthColor.withOpacity(0.15)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: healthColor.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    healthScore >= 65 ? Icons.trending_up_rounded : Icons.support_agent_rounded,
+                    size: 16,
+                    color: healthColor,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    healthScore >= 80
+                        ? 'Wealth Builder — Portfolio optimization & long-term growth'
+                        : healthScore >= 65
+                            ? 'Growth Mode — Investment growth & surplus optimization'
+                            : healthScore >= 50
+                                ? 'Recovery Mode — Building savings & improving habits'
+                                : 'Stability Mode — Reducing spending & creating safety nets',
+                    style: ESUNTypography.labelSmall.copyWith(
+                      color: healthColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Chat messages
           Expanded(
             child: ListView.builder(
@@ -505,102 +773,174 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
             ),
           ),
 
-          // Quick suggestions
+          // Quick suggestions — collapsible chips
           if (chatState.messages.length <= 2)
             Container(
-              height: 44,
-              margin: const EdgeInsets.symmetric(horizontal: ESUNSpacing.md),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _quickSuggestions.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ActionChip(
-                      label: Text(_quickSuggestions[index]),
-                      backgroundColor: ESUNColors.primary.withOpacity(0.1),
-                      labelStyle: ESUNTypography.labelMedium.copyWith(
-                        color: ESUNColors.primary,
-                      ),
-                      onPressed: () => _sendMessage(_quickSuggestions[index]),
+              padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.md, vertical: ESUNSpacing.xs),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => _suggestionsExpanded = !_suggestionsExpanded),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Suggestions',
+                          style: ESUNTypography.labelSmall.copyWith(
+                            color: ESUNColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        AnimatedRotation(
+                          turns: _suggestionsExpanded ? 0.5 : 0.0,
+                          duration: const Duration(milliseconds: 200),
+                          child: Icon(
+                            Icons.expand_more,
+                            size: 18,
+                            color: ESUNColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: (_suggestionsExpanded
+                            ? _quickSuggestions
+                            : _quickSuggestions.take(2).toList())
+                        .map((suggestion) {
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _sendMessage(suggestion),
+                          borderRadius: ESUNRadius.fullRadius,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: ESUNColors.primary.withOpacity(0.06),
+                              borderRadius: ESUNRadius.fullRadius,
+                              border: Border.all(color: ESUNColors.primary.withOpacity(0.18)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  healthScore >= 65 ? Icons.rocket_launch_outlined : Icons.lightbulb_outline,
+                                  size: 14,
+                                  color: ESUNColors.primary,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  suggestion,
+                                  style: ESUNTypography.labelSmall.copyWith(
+                                    color: ESUNColors.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ),
 
           // Input area
           Container(
             padding: EdgeInsets.only(
-              left: ESUNSpacing.lg,
-              right: ESUNSpacing.lg,
+              left: ESUNSpacing.md,
+              right: ESUNSpacing.md,
               top: ESUNSpacing.md,
               bottom: MediaQuery.of(context).padding.bottom + ESUNSpacing.md,
             ),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
+              border: Border(
+                top: BorderSide(
+                  color: ESUNColors.divider.withOpacity(0.5),
+                  width: 0.5,
                 ),
-              ],
+              ),
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Ask about your finances...',
-                      filled: true,
-                      fillColor: ESUNColors.surfaceVariant,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: ESUNSpacing.lg,
-                        vertical: ESUNSpacing.md,
-                      ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ESUNColors.surfaceVariant.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: ESUNColors.border.withOpacity(0.3)),
                     ),
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: _sendMessage,
-                    enabled: !chatState.isLoading,
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Ask about your finances...',
+                        hintStyle: ESUNTypography.bodyMedium.copyWith(
+                          color: ESUNColors.textTertiary,
+                        ),
+                        filled: false,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: ESUNSpacing.lg,
+                          vertical: ESUNSpacing.md,
+                        ),
+                      ),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: _sendMessage,
+                      enabled: !chatState.isLoading,
+                    ),
                   ),
                 ),
                 const SizedBox(width: ESUNSpacing.sm),
                 // Mic button for speech-to-text
                 Container(
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
                     color: _isListening ? Colors.red : ESUNColors.surfaceVariant,
                     shape: BoxShape.circle,
+                    border: _isListening ? null : Border.all(color: ESUNColors.border.withOpacity(0.3)),
                   ),
                   child: IconButton(
                     onPressed: chatState.isLoading
                         ? null
                         : (_isListening ? _stopListening : _startListening),
                     icon: Icon(
-                      _isListening ? Icons.stop : Icons.mic,
-                      color: _isListening ? Colors.white : ESUNColors.primary,
+                      _isListening ? Icons.stop : Icons.mic_outlined,
+                      color: _isListening ? Colors.white : ESUNColors.textSecondary,
+                      size: 20,
                     ),
+                    padding: EdgeInsets.zero,
                     tooltip: _isListening ? 'Stop listening' : 'Speak',
                   ),
                 ),
                 const SizedBox(width: ESUNSpacing.xs),
                 Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF10B981), Color(0xFF059669)],
-                    ),
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    gradient: ESUNColors.primaryGradient,
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: ESUNColors.primary.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: IconButton(
                     onPressed: chatState.isLoading 
                         ? null 
                         : () => _sendMessage(_messageController.text),
-                    icon: const Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                    padding: EdgeInsets.zero,
                   ),
                 ),
               ],
@@ -612,41 +952,73 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
   }
 
   Widget _buildMessageBubble(CFOMessage message) {
+    final aaData = ref.read(aaDataProvider);
+    final profileColor = aaData.healthScore >= 65
+        ? const Color(0xFF10B981)
+        : const Color(0xFFF59E0B);
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: ESUNSpacing.md),
+      padding: const EdgeInsets.only(bottom: ESUNSpacing.lg),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!message.isUser)
             Container(
-              width: 32,
-              height: 32,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: const BoxDecoration(
+              width: 34,
+              height: 34,
+              margin: const EdgeInsets.only(right: 10, top: 2),
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF10B981), Color(0xFF059669)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [profileColor, profileColor.withOpacity(0.7)],
                 ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: profileColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.account_balance, color: Colors.white, size: 16),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
             ),
           Flexible(
             child: Column(
               crossAxisAlignment: message.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(ESUNSpacing.md),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: message.isUser
-                        ? ESUNColors.primary
-                        : ESUNColors.surfaceVariant,
+                    gradient: message.isUser
+                        ? const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF2E4A9A), Color(0xFF3B5EC9)],
+                          )
+                        : null,
+                    color: message.isUser ? null : Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16),
-                      topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(message.isUser ? 16 : 4),
-                      bottomRight: Radius.circular(message.isUser ? 4 : 16),
+                      topLeft: const Radius.circular(20),
+                      topRight: const Radius.circular(20),
+                      bottomLeft: Radius.circular(message.isUser ? 20 : 6),
+                      bottomRight: Radius.circular(message.isUser ? 6 : 20),
                     ),
+                    border: message.isUser ? null : Border.all(
+                      color: ESUNColors.divider.withOpacity(0.6),
+                      width: 0.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: message.isUser
+                            ? ESUNColors.primary.withOpacity(0.15)
+                            : Colors.black.withOpacity(0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: message.isUser
                       ? Text(
@@ -689,36 +1061,61 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
                           selectable: true,
                         ),
                 ),
-                // TTS button for AI messages
+                // TTS button + timestamp for AI messages
                 if (!message.isUser)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
-                    child: InkWell(
-                      onTap: () => _speakMessage(message),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _isSpeaking && _speakingMessageId == message.content
-                                  ? Icons.stop_circle_outlined
-                                  : Icons.volume_up_outlined,
-                              size: 16,
-                              color: ESUNColors.textSecondary,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                          onTap: () => _speakMessage(message),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: ESUNSpacing.badgeInsets,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _isSpeaking && _speakingMessageId == message.content
+                                      ? Icons.stop_circle_outlined
+                                      : Icons.volume_up_outlined,
+                                  size: 16,
+                                  color: ESUNColors.textSecondary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _isSpeaking && _speakingMessageId == message.content
+                                      ? 'Stop'
+                                      : 'Listen',
+                                  style: ESUNTypography.labelSmall.copyWith(
+                                    color: ESUNColors.textSecondary,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _isSpeaking && _speakingMessageId == message.content
-                                  ? 'Stop'
-                                  : 'Listen',
-                              style: ESUNTypography.labelSmall.copyWith(
-                                color: ESUNColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _formatTimestamp(message.timestamp),
+                          style: ESUNTypography.labelSmall.copyWith(
+                            color: ESUNColors.textTertiary,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // Timestamp for user messages
+                if (message.isUser)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      _formatTimestamp(message.timestamp),
+                      style: ESUNTypography.labelSmall.copyWith(
+                        color: ESUNColors.textTertiary,
+                        fontSize: 10,
                       ),
                     ),
                   ),
@@ -727,11 +1124,11 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
           ),
           if (message.isUser)
             Container(
-              width: 32,
-              height: 32,
-              margin: const EdgeInsets.only(left: 8),
+              width: 34,
+              height: 34,
+              margin: const EdgeInsets.only(left: 10, top: 2),
               decoration: BoxDecoration(
-                color: ESUNColors.primary.withOpacity(0.2),
+                color: ESUNColors.primary.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.person, color: ESUNColors.primary, size: 16),
@@ -741,7 +1138,19 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
     );
   }
 
+  String _formatTimestamp(DateTime time) {
+    final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final amPm = time.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $amPm';
+  }
+
   Widget _buildTypingIndicator() {
+    final aaData = ref.read(aaDataProvider);
+    final profileColor = aaData.healthScore >= 65
+        ? const Color(0xFF10B981)
+        : const Color(0xFFF59E0B);
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: ESUNSpacing.md),
       child: Row(
@@ -751,13 +1160,13 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
             width: 32,
             height: 32,
             margin: const EdgeInsets.only(right: 8),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF10B981), Color(0xFF059669)],
+                colors: [profileColor.withOpacity(0.8), profileColor],
               ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.account_balance, color: Colors.white, size: 16),
+            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
           ),
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.md),

@@ -259,7 +259,7 @@ class ConnectionErrorBanner extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: ESUNColors.error.withOpacity(0.2),
                   shape: BoxShape.circle,

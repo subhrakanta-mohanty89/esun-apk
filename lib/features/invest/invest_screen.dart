@@ -120,7 +120,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: ESUNRadius.fullRadius,
@@ -276,7 +276,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: ESUNColors.success.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
@@ -411,7 +411,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: ESUNColors.primary.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
@@ -552,7 +552,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: ESUNSpacing.tagInsets,
                     decoration: BoxDecoration(
                       color: ESUNColors.success,
                       borderRadius: ESUNRadius.fullRadius,
@@ -618,7 +618,7 @@ class InvestScreen extends ConsumerWidget {
               borderRadius: ESUNRadius.smRadius,
               child: logoUrl != null
                   ? Padding(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(ESUNSpacing.sm),
                       child: Image.network(
                         logoUrl,
                         fit: BoxFit.contain,
@@ -771,7 +771,7 @@ class InvestScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                   child: logoUrl != null
                       ? Padding(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(ESUNSpacing.xs),
                           child: Image.network(
                             logoUrl,
                             fit: BoxFit.contain,
@@ -814,7 +814,7 @@ class InvestScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: ESUNSpacing.tagInsets,
             decoration: BoxDecoration(
               color: ipo.statusColor.withOpacity(0.1),
               borderRadius: ESUNRadius.fullRadius,
@@ -947,7 +947,7 @@ class InvestScreen extends ConsumerWidget {
               borderRadius: ESUNRadius.smRadius,
               child: logoUrl != null
                   ? Padding(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(ESUNSpacing.sm),
                       child: Image.network(
                         logoUrl,
                         fit: BoxFit.contain,
@@ -996,7 +996,7 @@ class InvestScreen extends ConsumerWidget {
           ),
           if (broker.isConnected)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: ESUNSpacing.chipInsets,
               decoration: BoxDecoration(
                 color: ESUNColors.success.withOpacity(0.1),
                 borderRadius: ESUNRadius.fullRadius,
@@ -1019,7 +1019,7 @@ class InvestScreen extends ConsumerWidget {
             OutlinedButton(
               onPressed: () => _connectBroker(context, broker),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
               ),
               child: const Text('Connect'),
             ),
@@ -1080,7 +1080,7 @@ class InvestScreen extends ConsumerWidget {
   Widget _buildBrokerOption(BuildContext context, String name, IconData icon) {
     return ListTile(
       leading: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(ESUNSpacing.md),
         decoration: BoxDecoration(
           color: ESUNColors.primary.withOpacity(0.1),
           borderRadius: ESUNRadius.smRadius,
@@ -1131,7 +1131,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: ESUNRadius.fullRadius,
@@ -1303,7 +1303,7 @@ class InvestScreen extends ConsumerWidget {
           ),
           const SizedBox(height: ESUNSpacing.sm),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: ESUNSpacing.tagInsets,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: ESUNRadius.fullRadius,
@@ -1433,7 +1433,7 @@ class InvestScreen extends ConsumerWidget {
               borderRadius: ESUNRadius.smRadius,
               child: logoUrl != null
                   ? Padding(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(ESUNSpacing.sm),
                       child: Image.network(
                         logoUrl,
                         fit: BoxFit.contain,
@@ -1528,7 +1528,7 @@ class InvestScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: ESUNSpacing.chipInsets,
                   decoration: BoxDecoration(
                     color: ESUNColors.primary.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
@@ -1761,7 +1761,7 @@ class InvestScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: ESUNRadius.smRadius,
@@ -1770,7 +1770,7 @@ class InvestScreen extends ConsumerWidget {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: Colors.amber.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -1831,7 +1831,7 @@ class InvestScreen extends ConsumerWidget {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
@@ -1842,12 +1842,12 @@ class InvestScreen extends ConsumerWidget {
               Expanded(
                 child: ListView(
                   controller: controller,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(ESUNSpacing.xl),
                   children: [
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -1865,7 +1865,7 @@ class InvestScreen extends ConsumerWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: ESUNSpacing.chipInsets,
                           decoration: BoxDecoration(
                             color: Colors.amber.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -1894,7 +1894,7 @@ class InvestScreen extends ConsumerWidget {
                               );
                             },
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                               side: BorderSide(color: color),
                             ),
                             child: Text('Start SIP', style: TextStyle(color: color)),
@@ -1911,7 +1911,7 @@ class InvestScreen extends ConsumerWidget {
                             },
                             style: FilledButton.styleFrom(
                               backgroundColor: color,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                             ),
                             child: const Text('Invest Now', style: TextStyle(color: Colors.white)),
                           ),
@@ -1930,7 +1930,7 @@ class InvestScreen extends ConsumerWidget {
   
   Widget _buildFundStatRow(String label, String value, Color valueColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1979,7 +1979,7 @@ class InvestScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: cat.color.withOpacity(0.1),
                       borderRadius: ESUNRadius.smRadius,
@@ -2058,7 +2058,7 @@ class InvestScreen extends ConsumerWidget {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
@@ -2067,11 +2067,11 @@ class InvestScreen extends ConsumerWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(ESUNSpacing.lg),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
                       decoration: BoxDecoration(
                         color: color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
@@ -2086,7 +2086,7 @@ class InvestScreen extends ConsumerWidget {
               Expanded(
                 child: ListView.builder(
                   controller: controller,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
                   itemCount: funds.length,
                   itemBuilder: (context, index) {
                     final fund = funds[index];
@@ -2100,7 +2100,7 @@ class InvestScreen extends ConsumerWidget {
                         leading: Container(
                           width: 44,
                           height: 44,
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(ESUNSpacing.sm),
                           decoration: BoxDecoration(
                             color: fund.color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -2174,7 +2174,7 @@ class InvestScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
@@ -2183,7 +2183,7 @@ class InvestScreen extends ConsumerWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     child: TextField(
                       controller: searchController,
                       autofocus: true,
@@ -2203,7 +2203,7 @@ class InvestScreen extends ConsumerWidget {
                   Expanded(
                     child: ListView.builder(
                       controller: controller,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
                       itemCount: filteredFunds.length,
                       itemBuilder: (context, index) {
                         final fund = filteredFunds[index];
@@ -2213,7 +2213,7 @@ class InvestScreen extends ConsumerWidget {
                             _showFundDetails(context, fund.id, fund.name, fund.category, fund.returns, fund.rating, fund.color);
                           },
                           leading: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(ESUNSpacing.sm),
                             decoration: BoxDecoration(
                               color: fund.color.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -2353,7 +2353,7 @@ class _PortfolioSliderWidgetState extends ConsumerState<_PortfolioSliderWidget> 
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: ESUNRadius.fullRadius,
@@ -2502,7 +2502,7 @@ class _PortfolioSliderWidgetState extends ConsumerState<_PortfolioSliderWidget> 
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: ESUNRadius.fullRadius,
@@ -2799,7 +2799,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(ESUNSpacing.sm),
                     decoration: BoxDecoration(
                       color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: ESUNRadius.smRadius,
@@ -2816,7 +2816,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: ESUNColors.success.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -2923,7 +2923,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(ESUNSpacing.xs),
                     decoration: BoxDecoration(
                       color: item.color.withOpacity(0.1),
                       borderRadius: ESUNRadius.smRadius,
@@ -2932,7 +2932,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: ESUNSpacing.tagInsets,
                     decoration: BoxDecoration(
                       color: item.color.withOpacity(0.1),
                       borderRadius: ESUNRadius.fullRadius,

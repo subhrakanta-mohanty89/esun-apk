@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 import '../../theme/theme.dart';
 import '../../routes/app_routes.dart';
@@ -16,6 +17,8 @@ import '../../state/app_state.dart';
 import '../../state/aa_data_state.dart';
 import '../../state/transaction_state.dart';
 import '../../core/analytics/analytics_service.dart';
+import '../payments/mobile_recharge_screen.dart';
+import '../../core/constants/brand_logos.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -117,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(ESUNSpacing.sm),
               decoration: BoxDecoration(
                 color: ESUNColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
@@ -217,7 +220,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: ESUNColors.primary.withValues(alpha: 0.1),
                 borderRadius: ESUNRadius.smRadius,
@@ -311,6 +314,177 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
   
+  /// Demo profile switcher — accessible via long-press on "Financial Health" title
+  void _showDemoProfileSwitcher() {
+    final currentProfile = ref.read(demoProfileProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(ESUNSpacing.xxl, ESUNSpacing.sm, ESUNSpacing.xxl, ESUNSpacing.xxl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: ESUNSpacing.xl),
+                  decoration: BoxDecoration(
+                    color: ESUNColors.divider,
+                    borderRadius: ESUNRadius.fullRadius,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
+                      decoration: BoxDecoration(
+                        color: ESUNColors.primary.withOpacity(0.1),
+                        borderRadius: ESUNRadius.smRadius,
+                      ),
+                      child: const Icon(Icons.swap_horiz_rounded, color: ESUNColors.primary, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Demo Profile Switcher', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w700)),
+                        Text('Two-device demonstration mode', style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary)),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: ESUNSpacing.xl),
+                // Strong Profile Card
+                _buildDemoProfileCard(
+                  ctx: ctx,
+                  profile: DemoProfile.strong,
+                  isActive: currentProfile == DemoProfile.strong || currentProfile == null,
+                  title: 'Device 1 — Strong Profile',
+                  subtitle: 'Score ~78 · Wealth building · Advanced recommendations',
+                  icon: Icons.trending_up_rounded,
+                  color: ESUNColors.success,
+                  details: [
+                    '₹1.85L monthly income · 49% savings rate',
+                    '₹45L+ assets · Diversified portfolio',
+                    'Manageable debt · Strong investments',
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Weak Profile Card
+                _buildDemoProfileCard(
+                  ctx: ctx,
+                  profile: DemoProfile.weak,
+                  isActive: currentProfile == DemoProfile.weak,
+                  title: 'Device 2 — Weak Profile',
+                  subtitle: 'Score ~32 · Recovery mode · Practical guidance',
+                  icon: Icons.support_agent_rounded,
+                  color: Colors.red,
+                  details: [
+                    '₹55K monthly income · 13% savings rate',
+                    '₹3.65L assets · No investments',
+                    'High-interest debt · No insurance',
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  
+  Widget _buildDemoProfileCard({
+    required BuildContext ctx,
+    required DemoProfile profile,
+    required bool isActive,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required List<String> details,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          switchDemoProfile(ref, profile);
+          Navigator.of(ctx).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Switched to ${profile == DemoProfile.strong ? "Strong" : "Weak"} profile'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        },
+        borderRadius: ESUNRadius.lgRadius,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(ESUNSpacing.lg),
+          decoration: BoxDecoration(
+            color: isActive ? color.withOpacity(0.06) : Colors.transparent,
+            borderRadius: ESUNRadius.lgRadius,
+            border: Border.all(
+              color: isActive ? color.withOpacity(0.3) : ESUNColors.divider,
+              width: isActive ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48, height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [color, color.withOpacity(0.7)],
+                  ),
+                  borderRadius: ESUNRadius.mdRadius,
+                ),
+                child: Icon(icon, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(title, style: ESUNTypography.labelLarge.copyWith(fontWeight: FontWeight.w700)),
+                        ),
+                        if (isActive)
+                          Container(
+                            padding: ESUNSpacing.badgeInsets,
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.15),
+                              borderRadius: ESUNRadius.fullRadius,
+                            ),
+                            child: Text('Active', style: ESUNTypography.labelSmall.copyWith(color: color, fontWeight: FontWeight.w600, fontSize: 10)),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: ESUNTypography.bodySmall.copyWith(color: color, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 6),
+                    ...details.map((d) => Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(d, style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textTertiary, height: 1.4)),
+                    )),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -331,20 +505,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Balance Card
                 _buildBalanceCard(context),
                 
-                // Quick Actions
-                _buildQuickActions(context),
-                
-                // Rewards Banner
-                _buildRewardsBanner(context),
+                // Financial Health Score
+                _buildHealthScore(context),
                 
                 // AI Insights Banner
                 _buildAIInsightsBanner(context),
                 
                 // Coach Kantha - Financial Tools
                 _buildCoachModules(context),
-                
-                // Financial Health Score
-                _buildHealthScore(context),
                 
                 // Linking Status Badge (shows when data not linked or has errors)
                 const LinkingStatusBadge(),
@@ -367,7 +535,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Promotions
                 _buildPromotions(context),
                 
-                const SizedBox(height: 72),
+                const SizedBox(height: ESUNSpacing.xxxl),
               ],
             ),
           ),
@@ -391,7 +559,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(ESUNSpacing.sm),
         child: GestureDetector(
           onTap: _showProfileSheet,
           child: CircleAvatar(
@@ -429,7 +597,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       flexibleSpace: FlexibleSpaceBar(
         background: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -539,7 +707,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(ESUNSpacing.sm),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: ESUNRadius.smRadius,
@@ -559,7 +727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               GestureDetector(
                 onTap: () => setState(() => _isBalanceHidden = !_isBalanceHidden),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: ESUNRadius.fullRadius,
@@ -598,7 +766,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: ESUNColors.success.withOpacity(0.3),
                   borderRadius: ESUNRadius.fullRadius,
@@ -623,7 +791,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: ESUNSpacing.md),
           // Income / Expense Row
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               borderRadius: ESUNRadius.mdRadius,
@@ -645,16 +813,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // Account Indicators
           Row(
             children: [
-              _buildAccountDot('HDFC', const Color(0xFF60A5FA)),
+              _buildAccountDot('HDFC', BrandLogos.banks['hdfc']!),
               const SizedBox(width: 8),
-              _buildAccountDot('ICICI', const Color(0xFFFBBF24)),
+              _buildAccountDot('ICICI', BrandLogos.banks['icici']!),
               const SizedBox(width: 8),
-              _buildAccountDot('SBI', const Color(0xFF34D399)),
+              _buildAccountDot('SBI', BrandLogos.banks['sbi']!),
               const Spacer(),
               GestureDetector(
                 onTap: () => _showAccountsSheet(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: ESUNRadius.fullRadius,
@@ -723,7 +891,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(ESUNSpacing.sm),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: ESUNRadius.smRadius,
@@ -743,7 +911,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: ESUNSpacing.badgeInsets,
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.3),
                           borderRadius: ESUNRadius.fullRadius,
@@ -767,7 +935,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       GestureDetector(
                         onTap: () => setState(() => _isNetWorthHidden = !_isNetWorthHidden),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: ESUNSpacing.badgeInsets,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
                             borderRadius: ESUNRadius.fullRadius,
@@ -825,7 +993,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: ESUNSpacing.md),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: ESUNRadius.mdRadius,
@@ -871,7 +1039,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   GestureDetector(
                     onTap: () => context.push(AppRoutes.invest),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: ESUNSpacing.badgeInsets,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: ESUNRadius.fullRadius,
@@ -1068,7 +1236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1E3A8A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1109,7 +1277,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: const Color(0xFFDCFCE7),
                   borderRadius: ESUNRadius.smRadius,
@@ -1194,7 +1362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: ESUNRadius.smRadius,
@@ -1321,7 +1489,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 icon: const Icon(Icons.add),
                 label: const Text('Add Bank Account'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                   shape: RoundedRectangleBorder(
                     borderRadius: ESUNRadius.mdRadius,
                   ),
@@ -1452,7 +1620,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     icon: const Icon(Icons.image_outlined),
                     label: const Text('Gallery'),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     ),
                   ),
                 ),
@@ -1463,7 +1631,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     icon: const Icon(Icons.flashlight_on_outlined),
                     label: const Text('Flash'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     ),
                   ),
                 ),
@@ -1543,7 +1711,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
               borderRadius: ESUNRadius.smRadius,
@@ -1575,114 +1743,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   void _showRechargeSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: const EdgeInsets.all(ESUNSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: ESUNSpacing.lg),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Text(
-              'Recharge & Pay',
-              style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: ESUNSpacing.lg),
-            Row(
-              children: [
-                _buildRechargeOption(Icons.phone_android_rounded, 'Mobile', const Color(0xFF10B981)),
-                const SizedBox(width: ESUNSpacing.md),
-                _buildRechargeOption(Icons.wifi_rounded, 'Broadband', const Color(0xFF2E4A9A)),
-                const SizedBox(width: ESUNSpacing.md),
-                _buildRechargeOption(Icons.tv_rounded, 'DTH', const Color(0xFFF59E0B)),
-                const SizedBox(width: ESUNSpacing.md),
-                _buildRechargeOption(Icons.local_gas_station_rounded, 'FASTag', const Color(0xFFEC4899)),
-              ],
-            ),
-            const SizedBox(height: ESUNSpacing.xl),
-            Text('Recent Recharges', style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: ESUNSpacing.md),
-            _buildRecentRecharge('+91 98765 43210', 'Jio Prepaid', '₹299'),
-            const SizedBox(height: ESUNSpacing.sm),
-            _buildRecentRecharge('+91 87654 32109', 'Airtel Prepaid', '₹199'),
-            const SizedBox(height: ESUNSpacing.lg),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildRechargeOption(IconData icon, String label, Color color) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {},
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: ESUNRadius.mdRadius,
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(height: ESUNSpacing.xs),
-              Text(label, style: ESUNTypography.labelSmall.copyWith(color: color, fontWeight: FontWeight.w500)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildRecentRecharge(String number, String operator, String amount) {
-    return Container(
-      padding: const EdgeInsets.all(ESUNSpacing.md),
-      decoration: BoxDecoration(
-        color: ESUNColors.surfaceVariant,
-        borderRadius: ESUNRadius.mdRadius,
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            backgroundColor: ESUNColors.primary,
-            radius: 18,
-            child: Icon(Icons.phone, color: Colors.white, size: 18),
-          ),
-          const SizedBox(width: ESUNSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(number, style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.w500)),
-                Text(operator, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              textStyle: ESUNTypography.labelSmall,
-            ),
-            child: Text(amount),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MobileRechargeScreen(),
       ),
     );
   }
@@ -1729,7 +1793,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 icon: const Icon(Icons.add),
                 label: const Text('Add New Card'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                 ),
               ),
             ),
@@ -1902,7 +1966,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: ESUNSpacing.chipInsets,
                     decoration: BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.fullRadius,
@@ -1974,7 +2038,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: ESUNRadius.smRadius,
@@ -2017,7 +2081,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(ESUNSpacing.sm),
           decoration: BoxDecoration(
             color: color.withOpacity(0.2),
             shape: BoxShape.circle,
@@ -2049,16 +2113,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
   
-  Widget _buildAccountDot(String label, Color color) {
+  Widget _buildAccountDot(String label, String logoUrl) {
     return Tooltip(
       message: label,
       child: Container(
-        width: 24,
-        height: 24,
+        width: 26,
+        height: 26,
         decoration: BoxDecoration(
-          color: color,
+          color: Colors.white,
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 2),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.network(
+          logoUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Center(
+            child: Text(label[0], style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+          ),
         ),
       ),
     );
@@ -2069,7 +2141,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onTap: () => context.push(AppRoutes.experts),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: ESUNSpacing.chipInsets,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF10B981), Color(0xFF059669)],
@@ -2105,145 +2177,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
   
-  Widget _buildQuickActions(BuildContext context) {
-    final actions = [
-      _QuickAction(Icons.send_rounded, 'Send', () => context.push('${AppRoutes.payments}/send'), const Color(0xFF2E4A9A)),
-      _QuickAction(Icons.qr_code_scanner_rounded, 'Scan', () => _showScanSheet(context), const Color(0xFF06B6D4)),
-      _QuickAction(Icons.account_balance_rounded, 'Bank', () => _showAccountsSheet(context), const Color(0xFF4A62B8)),
-      _QuickAction(Icons.receipt_long_rounded, 'Bills', () => _showBillsSheet(context), const Color(0xFFF59E0B)),
-      _QuickAction(Icons.phone_android_rounded, 'Recharge', () => _showRechargeSheet(context), const Color(0xFF10B981)),
-      _QuickAction(Icons.credit_card_rounded, 'Cards', () => _showCardsSheet(context), const Color(0xFFEC4899)),
-      _QuickAction(Icons.savings_rounded, 'Goals', () => context.push(AppRoutes.goals), const Color(0xFF14B8A6)),
-      _QuickAction(Icons.card_giftcard_rounded, 'Rewards', () => context.push(AppRoutes.rewards), const Color(0xFF2E4A9A)),
-    ];
-    
-    return Padding(
-      padding: const EdgeInsets.only(left: ESUNSpacing.lg, right: ESUNSpacing.lg, top: ESUNSpacing.xs, bottom: 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Quick Actions',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: actions.sublist(0, 4).map((action) {
-              return Expanded(
-                child: FPQuickActionButton(
-                  icon: action.icon,
-                  label: action.label,
-                  onPressed: action.onTap,
-                  iconColor: action.color,
-                ),
-              );
-            }).toList(),
-          ),
-          Row(
-            children: actions.sublist(4).map((action) {
-              return Expanded(
-                child: FPQuickActionButton(
-                  icon: action.icon,
-                  label: action.label,
-                  onPressed: action.onTap,
-                  iconColor: action.color,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildRewardsBanner(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
-      child: GestureDetector(
-        onTap: () => context.push(AppRoutes.rewards),
-        child: Container(
-          padding: const EdgeInsets.all(ESUNSpacing.md),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF2E4A9A), Color(0xFF223474)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: ESUNRadius.lgRadius,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF2E4A9A).withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: ESUNRadius.mdRadius,
-                ),
-                child: const Icon(
-                  Icons.card_giftcard,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: ESUNSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Rewards & Cashback',
-                      style: ESUNTypography.titleSmall.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Spin to win, gift cards & more',
-                      style: ESUNTypography.bodySmall.copyWith(
-                        color: Colors.white.withOpacity(0.8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: ESUNRadius.fullRadius,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.monetization_on, color: Colors.amber, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      '19,546',
-                      style: ESUNTypography.labelMedium.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
   Widget _buildAIInsightsBanner(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
@@ -2260,12 +2193,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.psychology, color: Colors.white, size: 24),
+                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 24),
               ),
               const SizedBox(width: ESUNSpacing.md),
               Expanded(
@@ -2312,7 +2245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Row(
                     children: [
                       const Icon(
-                        Icons.school_outlined,
+                        Icons.auto_awesome,
                         color: ESUNColors.primary,
                         size: 20,
                       ),
@@ -2345,7 +2278,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisCount: 2,
             mainAxisSpacing: ESUNSpacing.sm,
             crossAxisSpacing: ESUNSpacing.sm,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.9,
             children: [
               _buildCoachModuleCard(
                 icon: Icons.calculate_outlined,
@@ -2359,13 +2292,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 title: 'Learn',
                 subtitle: 'Financial basics',
                 color: const Color(0xFF059669),
-                onTap: () {
-                  // TODO: Navigate to educational modules
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Educational modules coming soon!')),
-                  );
-                },
-                comingSoon: true,
+                onTap: () => context.push(AppRoutes.educationalModules),
               ),
               _buildCoachModuleCard(
                 icon: Icons.flag_outlined,
@@ -2415,7 +2342,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const Spacer(),
                 if (comingSoon)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: ESUNSpacing.tagInsets,
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.2),
                       borderRadius: ESUNRadius.fullRadius,
@@ -2467,100 +2394,259 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final debtVal = aaData.debtFactor;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.xs),
-      child: FPCard(
+      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.sm),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: ESUNRadius.lgRadius,
+          border: Border.all(color: scoreColor.withOpacity(0.12)),
+          boxShadow: [
+            BoxShadow(
+              color: scoreColor.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+              spreadRadius: -2,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Financial Health',
-                  style: ESUNTypography.titleMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+            // Header with gradient accent
+            Container(
+              padding: const EdgeInsets.fromLTRB(ESUNSpacing.lg, ESUNSpacing.lg, ESUNSpacing.lg, ESUNSpacing.md),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    scoreColor.withOpacity(0.06),
+                    scoreColor.withOpacity(0.02),
+                    Colors.transparent,
+                  ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: scoreColor.withOpacity(0.1),
-                    borderRadius: ESUNRadius.fullRadius,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.trending_up, color: scoreColor, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$score / 100',
-                        style: ESUNTypography.labelMedium.copyWith(
+                      Container(
+                        padding: const EdgeInsets.all(ESUNSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: scoreColor.withOpacity(0.1),
+                          borderRadius: ESUNRadius.smRadius,
+                        ),
+                        child: Icon(
+                          score >= 65 ? Icons.favorite_rounded : Icons.monitor_heart_outlined,
                           color: scoreColor,
-                          fontWeight: FontWeight.w600,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onLongPress: _showDemoProfileSwitcher,
+                        child: Text(
+                          'Financial Health',
+                          style: ESUNTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  Container(
+                    padding: ESUNSpacing.chipInsets,
+                    decoration: BoxDecoration(
+                      color: scoreColor.withOpacity(0.1),
+                      borderRadius: ESUNRadius.fullRadius,
+                      border: Border.all(color: scoreColor.withOpacity(0.2)),
+                    ),
+                    child: Text(
+                      '$score / 100',
+                      style: ESUNTypography.labelMedium.copyWith(
+                        color: scoreColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
+              child: Row(
+                children: [
+                  // Score Circle — gradient ring
+                  SizedBox(
+                    width: 110,
+                    height: 110,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 110,
+                          height: 110,
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0, end: scoreNorm),
+                            duration: const Duration(milliseconds: 1200),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, val, _) => CircularProgressIndicator(
+                              value: val,
+                              strokeWidth: 10,
+                              strokeCap: StrokeCap.round,
+                              backgroundColor: ESUNColors.surfaceVariant,
+                              valueColor: AlwaysStoppedAnimation(scoreColor),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '$score',
+                              style: ESUNTypography.headlineMedium.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: scoreColor,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            Container(
+                              padding: ESUNSpacing.tagInsets,
+                              decoration: BoxDecoration(
+                                color: scoreColor.withOpacity(0.1),
+                                borderRadius: ESUNRadius.fullRadius,
+                              ),
+                              child: Text(
+                                label,
+                                style: ESUNTypography.labelSmall.copyWith(
+                                  color: scoreColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: ESUNSpacing.xl),
+                  // Factor breakdown
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildHealthFactor('Savings', savingsVal, ESUNColors.success),
+                        const SizedBox(height: 10),
+                        _buildHealthFactor('Spending', spendingVal, spendingVal >= 0.5 ? ESUNColors.success : ESUNColors.warning),
+                        const SizedBox(height: 10),
+                        _buildHealthFactor('Investments', investVal, ESUNColors.primary),
+                        const SizedBox(height: 10),
+                        _buildHealthFactor('Debt', debtVal, debtVal >= 0.6 ? ESUNColors.success : Colors.red),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: ESUNSpacing.lg),
-            Row(
-              children: [
-                // Score Circle
-                SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        height: 100,
-                        child: CircularProgressIndicator(
-                          value: scoreNorm,
-                          strokeWidth: 10,
-                          backgroundColor: ESUNColors.surfaceVariant,
-                          valueColor: AlwaysStoppedAnimation(scoreColor),
+            // Personalized insight tip
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(ESUNSpacing.md),
+                decoration: BoxDecoration(
+                  color: scoreColor.withOpacity(0.05),
+                  borderRadius: ESUNRadius.mdRadius,
+                  border: Border.all(color: scoreColor.withOpacity(0.12)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(ESUNSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: scoreColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        score >= 65 ? Icons.trending_up_rounded : Icons.lightbulb_outline,
+                        color: scoreColor,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: ESUNSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        score >= 80
+                            ? 'Excellent! Consider diversifying into international funds or increasing SIP amounts.'
+                            : score >= 65
+                                ? 'Good shape! Ask Kanta about tax-saving strategies and goal-based investing.'
+                                : score >= 50
+                                    ? 'Room to improve. Start by building a 3-month emergency fund.'
+                                    : 'Let\'s fix this together. Talk to Kanta for a step-by-step recovery plan.',
+                        style: ESUNTypography.bodySmall.copyWith(
+                          color: ESUNColors.textSecondary,
+                          height: 1.5,
                         ),
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '$score',
-                            style: ESUNTypography.headlineMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: scoreColor,
-                            ),
-                          ),
-                          Text(
-                            label,
-                            style: ESUNTypography.labelSmall.copyWith(
-                              color: ESUNColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: ESUNSpacing.md),
+            // Talk to Kanta CTA
+            Padding(
+              padding: const EdgeInsets.fromLTRB(ESUNSpacing.lg, 0, ESUNSpacing.lg, ESUNSpacing.lg),
+              child: SizedBox(
+                width: double.infinity,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [scoreColor, scoreColor.withOpacity(0.85)],
+                    ),
+                    borderRadius: ESUNRadius.mdRadius,
+                    boxShadow: [
+                      BoxShadow(
+                        color: scoreColor.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: ESUNSpacing.xl),
-                // Factor breakdown
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildHealthFactor('Savings', savingsVal, ESUNColors.success),
-                      const SizedBox(height: 8),
-                      _buildHealthFactor('Spending', spendingVal, spendingVal >= 0.5 ? ESUNColors.success : ESUNColors.warning),
-                      const SizedBox(height: 8),
-                      _buildHealthFactor('Investments', investVal, ESUNColors.primary),
-                      const SizedBox(height: 8),
-                      _buildHealthFactor('Debt', debtVal, debtVal >= 0.6 ? ESUNColors.success : Colors.red),
-                    ],
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => context.push(AppRoutes.advisor),
+                      borderRadius: ESUNRadius.mdRadius,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.auto_awesome, size: 18, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text(
+                              score >= 65 ? 'Grow with Kanta' : 'Get Help from Kanta',
+                              style: ESUNTypography.labelLarge.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -2569,27 +2655,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
   
   Widget _buildHealthFactor(String label, double value, Color color) {
+    final percent = (value * 100).round();
     return Row(
       children: [
         Expanded(
-          flex: 2,
+          flex: 3,
           child: Text(
             label,
             style: ESUNTypography.labelSmall.copyWith(
               color: ESUNColors.textSecondary,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         Expanded(
-          flex: 3,
-          child: ClipRRect(
-            borderRadius: ESUNRadius.fullRadius,
-            child: LinearProgressIndicator(
-              value: value,
-              backgroundColor: ESUNColors.surfaceVariant,
-              valueColor: AlwaysStoppedAnimation(color),
-              minHeight: 6,
-            ),
+          flex: 4,
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: ESUNRadius.fullRadius,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: value),
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, _) => LinearProgressIndicator(
+                      value: val,
+                      backgroundColor: color.withOpacity(0.1),
+                      valueColor: AlwaysStoppedAnimation(color),
+                      minHeight: 6,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              SizedBox(
+                width: 28,
+                child: Text(
+                  '$percent',
+                  textAlign: TextAlign.right,
+                  style: ESUNTypography.labelSmall.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -2629,7 +2741,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: ESUNColors.primary.withOpacity(0.1),
                       shape: BoxShape.circle,
@@ -2677,7 +2789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: ESUNSpacing.chipInsets,
                     decoration: BoxDecoration(
                       color: ESUNColors.primary,
                       borderRadius: ESUNRadius.fullRadius,
@@ -2830,12 +2942,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildSpendingCategories(BuildContext context) {
     // Category data with colors
     final categories = [
-      _SpendingCategory('Payments', 223000, 52.35, Icons.credit_card_rounded, const Color(0xFFEF4444)),
-      _SpendingCategory('Credit Card Bill', 65574, 15.26, Icons.receipt_long_rounded, const Color(0xFF8B5CF6)),
-      _SpendingCategory('Investments', 33157, 7.77, Icons.trending_up_rounded, const Color(0xFF3B82F6)),
-      _SpendingCategory('Others', 27684, 6.49, Icons.more_horiz_rounded, const Color(0xFF6B7280)),
-      _SpendingCategory('Travel', 10847, 2.54, Icons.flight_takeoff_rounded, const Color(0xFF2E4A9A)),
-      _SpendingCategory('Shopping', 9009, 2.17, Icons.shopping_bag_rounded, const Color(0xFFF59E0B)),
+      _SpendingCategory('Payments', 223000, 52.35, Icons.credit_card_rounded, const Color(0xFF6366F1)),
+      _SpendingCategory('Credit Card Bill', 65574, 15.26, Icons.receipt_long_rounded, const Color(0xFFA855F7)),
+      _SpendingCategory('Investments', 33157, 7.77, Icons.trending_up_rounded, const Color(0xFF0EA5E9)),
+      _SpendingCategory('Others', 27684, 6.49, Icons.more_horiz_rounded, const Color(0xFF94A3B8)),
+      _SpendingCategory('Travel', 10847, 2.54, Icons.flight_takeoff_rounded, const Color(0xFF14B8A6)),
+      _SpendingCategory('Shopping', 9009, 2.17, Icons.shopping_bag_rounded, const Color(0xFFF97316)),
       _SpendingCategory('Food & Beverage', 8515, 2.01, Icons.restaurant_rounded, const Color(0xFFEC4899)),
     ];
     
@@ -2853,7 +2965,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(ESUNSpacing.sm),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF2E4A9A), const Color(0xFF3B82F6)],
@@ -2881,17 +2993,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           
           // Colorful Bar Chart
           Container(
-            height: 24,
+            height: 28,
             decoration: BoxDecoration(
-              borderRadius: ESUNRadius.smRadius,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: Row(
-              children: categories.map((cat) {
+              children: categories.asMap().entries.map((entry) {
+                final i = entry.key;
+                final cat = entry.value;
                 return Expanded(
                   flex: (cat.percentage * 10).round(),
                   child: Container(
-                    color: cat.color,
+                    margin: EdgeInsets.only(right: i < categories.length - 1 ? 1.5 : 0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          cat.color,
+                          cat.color.withOpacity(0.75),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               }).toList(),
@@ -2915,11 +3046,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           // Icon
           Container(
-            width: 40,
-            height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: category.color.withOpacity(0.15),
-              borderRadius: ESUNRadius.smRadius,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  category.color.withOpacity(0.2),
+                  category.color.withOpacity(0.08),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: category.color.withOpacity(0.15)),
             ),
             child: Icon(category.icon, color: category.color, size: 20),
           ),
@@ -3006,56 +3145,202 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildMonthlyOverview(BuildContext context) {
+    final now = DateTime.now();
+    final currentMonth = now.month; // 1-12
+    
+    // Monthly data up to current month (income, expense)
+    final monthlyData = <Map<String, dynamic>>[
+      {'month': 'Jan', 'income': 185000.0, 'expense': 82000.0},
+      {'month': 'Feb', 'income': 185000.0, 'expense': 78500.0},
+      {'month': 'Mar', 'income': 192000.0, 'expense': 95000.0},
+      {'month': 'Apr', 'income': 185000.0, 'expense': 88000.0},
+      {'month': 'May', 'income': 185000.0, 'expense': 72000.0},
+      {'month': 'Jun', 'income': 210000.0, 'expense': 91000.0},
+      {'month': 'Jul', 'income': 185000.0, 'expense': 86500.0},
+      {'month': 'Aug', 'income': 185000.0, 'expense': 79000.0},
+      {'month': 'Sep', 'income': 195000.0, 'expense': 93500.0},
+      {'month': 'Oct', 'income': 185000.0, 'expense': 84000.0},
+      {'month': 'Nov', 'income': 185000.0, 'expense': 88500.0},
+      {'month': 'Dec', 'income': 225000.0, 'expense': 120000.0},
+    ];
+    
+    final visibleData = monthlyData.sublist(0, currentMonth);
+    final maxVal = visibleData.fold<double>(0, (m, d) {
+      final inc = d['income'] as double;
+      final exp = d['expense'] as double;
+      return inc > m ? inc : (exp > m ? exp : m);
+    });
+    
+    // Current month stats
+    final curData = visibleData.last;
+    final curIncome = curData['income'] as double;
+    final curExpense = curData['expense'] as double;
+    final curSaved = curIncome - curExpense;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
       child: FPCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'This Month',
-              style: ESUNTypography.titleMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: ESUNSpacing.lg),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: _buildStatColumn(
-                    'Income',
-                    '₹1,20,000',
-                    Icons.arrow_upward,
-                    ESUNColors.success,
-                  ),
+                Text(
+                  'Yearly Overview ${now.year}',
+                  style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Container(
-                  width: 1,
-                  height: 50,
-                  color: ESUNColors.border,
-                ),
-                Expanded(
-                  child: _buildStatColumn(
-                    'Expenses',
-                    '₹45,800',
-                    Icons.arrow_downward,
-                    ESUNColors.error,
+                  padding: ESUNSpacing.badgeInsets,
+                  decoration: BoxDecoration(
+                    color: ESUNColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-                Container(
-                  width: 1,
-                  height: 50,
-                  color: ESUNColors.border,
-                ),
-                Expanded(
-                  child: _buildStatColumn(
-                    'Saved',
-                    '₹74,200',
-                    Icons.savings,
-                    ESUNColors.primary,
+                  child: Text(
+                    'Up to ${curData['month']}',
+                    style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.primary, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: ESUNSpacing.md),
+            // Legend
+            Row(
+              children: [
+                Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(3))),
+                const SizedBox(width: 4),
+                Text('Income', style: ESUNTypography.labelSmall),
+                const SizedBox(width: 16),
+                Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(3))),
+                const SizedBox(width: 4),
+                Text('Expense', style: ESUNTypography.labelSmall),
+              ],
+            ),
+            const SizedBox(height: ESUNSpacing.md),
+            // Bar Chart
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: maxVal * 1.15,
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipRoundedRadius: 8,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final d = visibleData[group.x.toInt()];
+                        final label = rodIndex == 0 ? 'Income' : 'Expense';
+                        final val = rodIndex == 0 ? d['income'] as double : d['expense'] as double;
+                        return BarTooltipItem(
+                          '$label\n₹${(val / 1000).toStringAsFixed(0)}K',
+                          ESUNTypography.labelSmall.copyWith(color: Colors.white),
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            '₹${(value / 1000).toStringAsFixed(0)}K',
+                            style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textTertiary, fontSize: 9),
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final idx = value.toInt();
+                          if (idx >= 0 && idx < visibleData.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                visibleData[idx]['month'] as String,
+                                style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textTertiary, fontSize: 9),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxVal / 4,
+                    getDrawingHorizontalLine: (value) => FlLine(color: ESUNColors.border.withOpacity(0.5), strokeWidth: 0.5),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: List.generate(visibleData.length, (i) {
+                    final d = visibleData[i];
+                    return BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: d['income'] as double,
+                          color: const Color(0xFF10B981),
+                          width: visibleData.length > 6 ? 6 : 10,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+                        ),
+                        BarChartRodData(
+                          toY: d['expense'] as double,
+                          color: const Color(0xFFEF4444),
+                          width: visibleData.length > 6 ? 6 : 10,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            ),
+            const SizedBox(height: ESUNSpacing.lg),
+            // Current month summary row
+            Container(
+              padding: const EdgeInsets.all(ESUNSpacing.md),
+              decoration: BoxDecoration(
+                color: ESUNColors.primary.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildStatColumn(
+                      'Income',
+                      '₹${(curIncome / 1000).toStringAsFixed(0)}K',
+                      Icons.arrow_upward,
+                      ESUNColors.success,
+                    ),
+                  ),
+                  Container(width: 1, height: 50, color: ESUNColors.border),
+                  Expanded(
+                    child: _buildStatColumn(
+                      'Expenses',
+                      '₹${(curExpense / 1000).toStringAsFixed(0)}K',
+                      Icons.arrow_downward,
+                      ESUNColors.error,
+                    ),
+                  ),
+                  Container(width: 1, height: 50, color: ESUNColors.border),
+                  Expanded(
+                    child: _buildStatColumn(
+                      'Saved',
+                      '₹${(curSaved / 1000).toStringAsFixed(0)}K',
+                      Icons.savings,
+                      ESUNColors.primary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -3166,7 +3451,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   shape: BoxShape.circle,
@@ -3265,7 +3550,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: ESUNColors.primary,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                            padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.xxl),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -3502,15 +3787,6 @@ class _SideItem extends StatelessWidget {
       ),
     );
   }
-}
-
-class _QuickAction {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color color;
-  
-  _QuickAction(this.icon, this.label, this.onTap, this.color);
 }
 
 class _SpendingCategory {

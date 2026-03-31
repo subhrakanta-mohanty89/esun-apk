@@ -175,7 +175,7 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: notification.color.withOpacity(0.1),
                 shape: BoxShape.circle,

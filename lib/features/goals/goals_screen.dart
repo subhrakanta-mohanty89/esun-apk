@@ -207,7 +207,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: goal.color.withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,
@@ -401,7 +401,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: ESUNColors.success.withOpacity(0.1),
                       shape: BoxShape.circle,

@@ -16,9 +16,11 @@ import '../../shared/widgets/qr_sheet.dart';
 import '../../routes/app_routes.dart';
 import '../../state/aa_data_state.dart';
 import '../../core/utils/utils.dart';
-import 'payment_history_screen.dart';
+import 'payment_history_screen.dart' hide TransactionType;
 import 'bill_payment_screen.dart';
 import 'send_money_screen.dart';
+import 'mobile_recharge_screen.dart';
+import 'electricity_provider_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../state/transaction_state.dart';
 
@@ -65,7 +67,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     final txns = ref.watch(transactionStateProvider).transactions;
     final seen = <String>{};
     final people = <_RecentPerson>[];
-    final colors = [Colors.blue, Colors.purple, Colors.green, Colors.orange, Colors.teal];
+    final colors = [ESUNColors.primary, ESUNColors.primaryLight, ESUNColors.primary400, ESUNColors.primary300, ESUNColors.primary200];
     for (final t in txns) {
       if (t.recipientName != null && t.recipientName!.isNotEmpty && !seen.contains(t.recipientName)) {
         seen.add(t.recipientName!);
@@ -76,9 +78,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     }
     if (people.isEmpty) {
       return [
-        _RecentPerson('Rahul S', 'RS', '₹5,000', Colors.blue),
-        _RecentPerson('Priya M', 'PM', '₹2,500', Colors.purple),
-        _RecentPerson('Amit K', 'AK', '₹1,200', Colors.green),
+        _RecentPerson('Rahul S', 'RS', '₹5,000', ESUNColors.primary),
+        _RecentPerson('Priya M', 'PM', '₹2,500', ESUNColors.primaryLight),
+        _RecentPerson('Amit K', 'AK', '₹1,200', ESUNColors.primary400),
       ];
     }
     return people;
@@ -139,7 +141,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
         withPhoto: false,
       );
       
-      final colors = [Colors.blue, Colors.purple, Colors.green, Colors.orange, Colors.teal, Colors.pink, Colors.indigo];
+      if (!mounted) return;
+
+      final colors = [ESUNColors.primary, ESUNColors.primaryLight, ESUNColors.primary400, ESUNColors.primary300, ESUNColors.primary200, ESUNColors.primaryDark, ESUNColors.primary500];
       
       final mapped = list
           .where((c) => (c.displayName.isNotEmpty) || c.phones.isNotEmpty)
@@ -180,326 +184,306 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Scaffold(
-      backgroundColor: isDark ? ESUNColors.darkBackground : const Color(0xFFF5F7FA),
-      body: CustomScrollView(
-        slivers: [
-          // Custom App Bar with gradient
-          _buildSliverAppBar(context, isDark),
-          
-          // Main Content
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                // Search Bar
-                _buildSearchBar(context, isDark),
-                
-                // Scan & Pay Hero Section
-                _buildScanPayHero(context),
-                
-                // Quick Actions Grid
-                _buildQuickActionsGrid(context),
-                
-                // People Section
-                _buildPeopleSection(context),
-                
-                // Bills & Recharge
-                _buildBillsRechargeSection(context),
-                
-                // Business Payments
-                _buildBusinessSection(context),
-                
-                // Offers Banner
-                _buildOffersBanner(context),
-                
-                // Recent Transactions
-                _buildRecentTransactions(context),
-                
-                const SizedBox(height: 72),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSliverAppBar(BuildContext context, bool isDark) {
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: false,
-      pinned: true,
-      backgroundColor: ESUNColors.primary,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF1A3A7A),
-                Color(0xFF2E4A9A),
-                Color(0xFF3D5CB8),
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Pay',
-                        style: ESUNTypography.headlineLarge.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.verified, color: Colors.greenAccent, size: 14),
-                            const SizedBox(width: 4),
-                            Text(
-                              _upiId,
-                              style: ESUNTypography.labelSmall.copyWith(color: Colors.white),
-                            ),
-                            const SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: () {
-                                Clipboard.setData(ClipboardData(text: _upiId));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('UPI ID copied!'),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              child: const Icon(Icons.copy, color: Colors.white70, size: 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      _buildAppBarAction(
-                        Icons.qr_code_2_rounded,
-                        'QR',
-                        () => showQrBottomSheet(context, name: _name, upiId: _upiId, bankLabel: _bankLabel),
-                      ),
-                      const SizedBox(width: 12),
-                      _buildAppBarAction(Icons.history, 'History', () => _openHistory(context)),
-                      const SizedBox(width: 12),
-                      _buildAppBarAction(Icons.help_outline, 'Help', () => _showHelpSheet(context)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildAppBarAction(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          const SizedBox(height: 4),
-          Text(label, style: ESUNTypography.labelSmall.copyWith(color: Colors.white70, fontSize: 10)),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSearchBar(BuildContext context, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      decoration: BoxDecoration(
-        color: isDark ? ESUNColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _searchController,
-        onTap: () {},
-        onEditingComplete: () {},
-        decoration: InputDecoration(
-          hintText: 'Pay by name, phone, UPI ID, or bank',
-          hintStyle: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textTertiary),
-          prefixIcon: const Icon(Icons.search, color: ESUNColors.textTertiary),
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
+      backgroundColor: const Color(0xFF121212),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 1,
-                height: 24,
-                color: Colors.grey.withOpacity(0.3),
-              ),
-              IconButton(
-                icon: const Icon(Icons.mic, color: ESUNColors.primary),
-                onPressed: () => _showVoiceSearch(context),
-              ),
+              // Top Bar with Profile & Help
+              _buildTopBar(context),
+              
+              // Wallet Banner
+              _buildWalletBanner(context),
+              
+              // Money Transfers Section
+              _buildMoneyTransfersSection(context),
+              
+              // Quick Action Cards
+              _buildQuickActionCards(context),
+              
+              // Recharge & Bills Section
+              _buildRechargeBillsSection(context),
+              
+              // Loans Section
+              _buildLoansSection(context),
+              
+              // Offers & Rewards
+              _buildOffersBanner(context),
+              
+              // Recent Transactions
+              _buildRecentTransactions(context),
+              
+              const SizedBox(height: 80),
             ],
           ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
   }
   
-  Widget _buildScanPayHero(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Scan & Pay Button
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () {
-                context.push(AppRoutes.scanQr);
-              },
-              child: AnimatedBuilder(
-                animation: _scanPulseController,
-                builder: (context, child) {
-                  return Container(
-                    padding: const EdgeInsets.all(20),
+          // Profile Avatar with QR badge
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: ESUNColors.primary,
+                  child: Text(
+                    _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ESUNColors.primary.withOpacity(0.9 + _scanPulseController.value * 0.1),
-                          const Color(0xFF3D5CB8),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ESUNColors.primary.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      color: const Color(0xFF1E1E1E),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF121212), width: 1.5),
                     ),
+                    child: const Icon(Icons.qr_code, size: 12, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Help Icon
+          GestureDetector(
+            onTap: () => _showHelpSheet(context),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white24, width: 1.5),
+              ),
+              child: const Icon(Icons.help_outline, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildWalletBanner(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showBalanceSheet(context),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF2D1B69),
+              Color(0xFF462B8F),
+              Color(0xFF5B3BA5),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            // Top text
+            Text(
+              'Add up to ₹2 Lakh, scan any QR code',
+              style: ESUNTypography.bodySmall.copyWith(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Unlock Wallet benefits',
+              style: ESUNTypography.headlineSmall.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Top up CTA
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Top up now',
+                  style: ESUNTypography.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Colors.white24,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Wallet banner illustration image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/wallet_banner.png',
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback if image not found
+                  return SizedBox(
+                    height: 100,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(
-                            Icons.qr_code_scanner_rounded,
-                            color: Colors.white,
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Scan & Pay',
-                                style: ESUNTypography.titleMedium.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Pay any UPI QR code',
-                                style: ESUNTypography.labelSmall.copyWith(
-                                  color: Colors.white.withOpacity(0.8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+                        Icon(Icons.qr_code_scanner, color: Colors.white.withOpacity(0.7), size: 40),
+                        const SizedBox(width: 20),
+                        Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.5), size: 24),
+                        const SizedBox(width: 20),
+                        Icon(Icons.account_balance_wallet, color: Colors.white.withOpacity(0.7), size: 40),
                       ],
                     ),
                   );
                 },
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Check Balance
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showBalanceSheet(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildMoneyTransfersSection(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          // Header row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Money Transfers',
+                style: ESUNTypography.titleSmall.copyWith(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                child: Column(
+              ),
+              // Refer & Earn
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3D2A15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF7B5C2E), width: 0.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF4CAF50),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.account_balance_wallet, color: Colors.green, size: 24),
+                      child: const Icon(Icons.currency_rupee, color: Colors.white, size: 12),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Balance',
-                      style: ESUNTypography.labelSmall.copyWith(
+                    const SizedBox(width: 6),
+                    const Text(
+                      'Refer → ₹200',
+                      style: TextStyle(
+                        color: Color(0xFFE8B04A),
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Transfer Action Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildTransferAction(
+                Icons.phone_android,
+                'To Mobile\nNumber',
+                const Color(0xFF7C4DFF),
+                () => _showPayToPhone(context),
+              ),
+              _buildTransferAction(
+                Icons.account_balance,
+                'To Bank &\nSelf A/c',
+                const Color(0xFF7C4DFF),
+                () => _showBankTransferSheet(context),
+              ),
+              _buildTransferAction(
+                Icons.download_rounded,
+                'Receive\nMoney',
+                const Color(0xFF7C4DFF),
+                () => showQrBottomSheet(context, name: _name, upiId: _upiId, bankLabel: _bankLabel),
+              ),
+              _buildTransferAction(
+                Icons.currency_rupee,
+                'Check\nBalance',
+                const Color(0xFF7C4DFF),
+                () => _showBalanceSheet(context),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildTransferAction(IconData icon, String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: Icon(icon, color: Colors.white, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+              height: 1.3,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -512,10 +496,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     final totalBalance = accounts.fold<double>(0, (sum, a) => sum + a.balance);
     
     final accountColors = [
-      const Color(0xFF60A5FA),
-      const Color(0xFFFBBF24),
-      const Color(0xFF34D399),
-      const Color(0xFFA78BFA),
+      ESUNColors.primary,
+      ESUNColors.primaryLight,
+      ESUNColors.primary400,
+      ESUNColors.primary300,
     ];
     
     showModalBottomSheet(
@@ -530,7 +514,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           color: Theme.of(ctx).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -549,7 +533,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Text('Account Balances', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: ESUNColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
@@ -568,7 +552,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 final color = accountColors[i % accountColors.length];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
@@ -615,377 +599,285 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     );
   }
   
-  Widget _buildQuickActionsGrid(BuildContext context) {
-    final actions = [
-      _QuickPayAction(Icons.person_add_rounded, 'To Contact', Colors.blue, () => _showPayToContact(context)),
-      _QuickPayAction(Icons.phone_android_rounded, 'To Phone', Colors.green, () => _showPayToPhone(context)),
-      _QuickPayAction(Icons.account_balance_rounded, 'To Bank', Colors.purple, () => _showBankTransferSheet(context)),
-      _QuickPayAction(Icons.swap_horiz_rounded, 'Self Transfer', Colors.teal, () => _showSelfTransferSheet(context)),
+  Widget _buildQuickActionCards(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          // Save VISA Card
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showCreditCardPayment(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white10),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Center(
+                        child: Text('VISA', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Save VISA Card to pay faster',
+                        style: TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Start saving in Silver
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Silver savings coming soon!')),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white10),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade700,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.monetization_on, color: Colors.grey, size: 18),
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Start saving in pure Silver',
+                        style: TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildRechargeBillsSection(BuildContext context) {
+    final items = [
+      _BillItem(Icons.phone_android, 'Mobile\nRecharge', const Color(0xFF7C4DFF), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileRechargeScreen()))),
+      _BillItem(Icons.credit_card, 'Credit Card\nBill', const Color(0xFF42A5F5), () => _showCreditCardPayment(context)),
+      _BillItem(Icons.lightbulb_outline, 'Electricity\nBill', const Color(0xFFFFC107), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectricityProviderScreen()))),
+      _BillItem(Icons.calendar_today, 'Loan\nRepayment', const Color(0xFF8D6E63), () => _showBillPayment(context, 'Loan Repayment', Icons.calendar_today, const Color(0xFF8D6E63))),
     ];
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Money Transfer',
+            'Recharge & Bills',
             style: ESUNTypography.titleSmall.copyWith(
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: actions.map((action) => _buildQuickAction(action)).toList(),
+            children: items.map((item) => _buildBillAction(item)).toList(),
           ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildQuickAction(_QuickPayAction action) {
-    return GestureDetector(
-      onTap: action.onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: action.color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(action.icon, color: action.color, size: 26),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            action.label,
-            style: ESUNTypography.labelSmall.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildPeopleSection(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          const SizedBox(height: 16),
+          // Bottom row with Jio SIM and More
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'People',
-                style: ESUNTypography.titleSmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextButton(
-                onPressed: () => _showAllContacts(context),
-                child: const Text('View All'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          
-          // Recent People
-          if (_recentPeople.isNotEmpty) ...[
-            SizedBox(
-              height: 85,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _recentPeople.length + (_contactsGranted ? 0 : 1),
-                itemBuilder: (context, index) {
-                  if (!_contactsGranted && index == _recentPeople.length) {
-                    // Add contacts button
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: GestureDetector(
-                        onTap: () => _loadContacts(requestPermission: true),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.withOpacity(0.3), style: BorderStyle.solid),
-                              ),
-                              child: const Icon(Icons.person_add, color: Colors.grey, size: 24),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Add',
-                              style: ESUNTypography.labelSmall.copyWith(fontSize: 11),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileRechargeScreen())),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E1E),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Buy Jio SIM:Home Delivered',
+                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                          ),
                         ),
-                      ),
-                    );
-                  }
-                  
-                  final person = _recentPeople[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SendMoneyScreen(
-                              recipientName: person.name,
-                              recipientUpiId: '${person.name.toLowerCase().replaceAll(' ', '.')}@upi',
-                              avatarColor: person.color,
-                            ),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE53935),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  person.color,
-                                  person.color.withOpacity(0.7),
-                                ],
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                person.initials,
-                                style: ESUNTypography.titleSmall.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                          child: const Center(
+                            child: Text('Jio', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
                           ),
-                          const SizedBox(height: 6),
-                          SizedBox(
-                            width: 60,
-                            child: Text(
-                              person.name,
-                              style: ESUNTypography.labelSmall.copyWith(fontSize: 11),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Text(
-                            person.lastAmount,
-                            style: ESUNTypography.labelSmall.copyWith(
-                              fontSize: 10,
-                              color: ESUNColors.textTertiary,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
-          
-          // Contacts from phone
-          if (_contactsGranted && _contacts.isNotEmpty) ...[
-            const Divider(height: 24),
-            Text(
-              'From Contacts',
-              style: ESUNTypography.labelSmall.copyWith(
-                color: ESUNColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 75,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _contacts.length,
-                itemBuilder: (context, index) {
-                  final contact = _contacts[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SendMoneyScreen(
-                              recipientName: contact.name,
-                              recipientPhone: contact.phone,
-                              avatarColor: contact.color,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: contact.color.withOpacity(0.15),
-                            child: Text(
-                              contact.initial,
-                              style: ESUNTypography.titleSmall.copyWith(
-                                color: contact.color,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          SizedBox(
-                            width: 56,
-                            child: Text(
-                              contact.name.split(' ').first,
-                              style: ESUNTypography.labelSmall.copyWith(fontSize: 10),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildBillsRechargeSection(BuildContext context) {
-    final items = [
-      _BillItem(Icons.phone_android, 'Mobile', Colors.green, () => _showBillPayment(context, 'Mobile Recharge', Icons.phone_android, Colors.green)),
-      _BillItem(Icons.bolt, 'Electricity', Colors.amber, () => _showBillPayment(context, 'Electricity Bill', Icons.bolt, Colors.amber)),
-      _BillItem(Icons.tv, 'DTH', Colors.purple, () => _showBillPayment(context, 'DTH Recharge', Icons.tv, Colors.purple)),
-      _BillItem(Icons.wifi, 'Broadband', Colors.blue, () => _showBillPayment(context, 'Broadband Bill', Icons.wifi, Colors.blue)),
-      _BillItem(Icons.water_drop, 'Water', Colors.cyan, () => _showBillPayment(context, 'Water Bill', Icons.water_drop, Colors.cyan)),
-      _BillItem(Icons.local_gas_station, 'Gas Cylinder', Colors.orange, () => _showBillPayment(context, 'Gas Cylinder', Icons.local_gas_station, Colors.orange)),
-      _BillItem(Icons.credit_card, 'Credit Card', Colors.red, () => _showCreditCardPayment(context)),
-      _BillItem(Icons.more_horiz, 'More', Colors.grey, () => _showMoreBills(context)),
-    ];
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Bills & Recharge',
-                style: ESUNTypography.titleSmall.copyWith(
-                  fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '2 Due',
-                  style: ESUNTypography.labelSmall.copyWith(
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _showMoreBills(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E1E),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'More',
+                          style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(Icons.arrow_forward, color: Colors.grey.shade400, size: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 0.9,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildBillAction(_BillItem item) {
+    return GestureDetector(
+      onTap: item.onTap,
+      child: SizedBox(
+        width: 75,
+        child: Column(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Icon(item.icon, color: item.color, size: 26),
             ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
+            const SizedBox(height: 8),
+            Text(
+              item.label,
+              style: const TextStyle(
+                color: Colors.white60,
+                fontSize: 10.5,
+                height: 1.3,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildLoansSection(BuildContext context) {
+    final loanItems = [
+      {'icon': Icons.person, 'label': 'Personal\nLoan', 'color': const Color(0xFFFF7043)},
+      {'icon': Icons.bar_chart, 'label': 'Mutual\nFunds', 'color': const Color(0xFF66BB6A)},
+      {'icon': Icons.card_giftcard, 'label': 'Gold\nLoan', 'color': const Color(0xFFFFC107)},
+      {'icon': Icons.speed, 'label': 'Credit\nScore', 'color': const Color(0xFFEF5350)},
+    ];
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Loans',
+            style: ESUNTypography.titleSmall.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: loanItems.map((item) {
               return GestureDetector(
-                onTap: item.onTap,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: item.color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${(item['label'] as String).replaceAll('\n', ' ')} coming soon!')),
+                  );
+                },
+                child: SizedBox(
+                  width: 75,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.white10),
+                        ),
+                        child: Icon(item['icon'] as IconData, color: item['color'] as Color, size: 26),
                       ),
-                      child: Icon(item.icon, color: item.color, size: 22),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.label,
-                      style: ESUNTypography.labelSmall.copyWith(fontSize: 10),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        item['label'] as String,
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 10.5,
+                          height: 1.3,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                      ),
+                    ],
+                  ),
                 ),
               );
-            },
+            }).toList(),
           ),
         ],
       ),
@@ -993,112 +885,30 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   }
   
   Widget _buildBusinessSection(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Business Payments',
-            style: ESUNTypography.titleSmall.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildBusinessItem(
-                  Icons.store,
-                  'Pay Merchant',
-                  Colors.indigo,
-                  () => _showMerchantPayment(context),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildBusinessItem(
-                  Icons.receipt_long,
-                  'Pay Invoice',
-                  Colors.teal,
-                  () => _showInvoicePayment(context),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildBusinessItem(
-                  Icons.local_shipping,
-                  'Pay Vendor',
-                  Colors.orange,
-                  () => _showVendorPayment(context),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildBusinessItem(IconData icon, String label, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: ESUNTypography.labelSmall.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+    return const SizedBox.shrink();
   }
   
   Widget _buildOffersBanner(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF6B4EFF),
-            Color(0xFF9B6BFF),
+            Color(0xFF2D1B69),
+            Color(0xFF462B8F),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.local_offer, color: Colors.white, size: 24),
@@ -1118,14 +928,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 Text(
                   'On your first bill payment',
                   style: ESUNTypography.labelSmall.copyWith(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: ESUNSpacing.chipInsets,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
@@ -1133,7 +943,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
             child: Text(
               'Claim',
               style: ESUNTypography.labelSmall.copyWith(
-                color: const Color(0xFF6B4EFF),
+                color: const Color(0xFF462B8F),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1143,27 +953,52 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     );
   }
   
+  Widget _buildRewardsBanner(BuildContext context) {
+    return const SizedBox.shrink();
+  }
+  
   Widget _buildRecentTransactions(BuildContext context) {
-    final transactions = [
-      _Transaction('Rahul Sharma', 'Sent • Today, 2:30 PM', '₹5,000', Icons.person, Colors.blue, false),
-      _Transaction('Mobile Recharge', 'Jio • Yesterday', '₹599', Icons.phone_android, Colors.green, false),
-      _Transaction('Electricity Bill', 'BESCOM • 3 days ago', '₹2,340', Icons.bolt, Colors.amber, false),
-      _Transaction('Priya Mehta', 'Received • 5 days ago', '₹12,000', Icons.person, Colors.purple, true),
-    ];
+    final recentTransactions = ref.watch(recentTransactionsProvider);
+    
+    String getTimeAgo(DateTime dateTime) {
+      final now = DateTime.now();
+      final diff = now.difference(dateTime);
+      if (diff.inMinutes < 1) return 'just now';
+      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+      if (diff.inHours < 24) return '${diff.inHours}h ago';
+      if (diff.inDays < 7) return '${diff.inDays}d ago';
+      return '${(diff.inDays / 7).floor()}w ago';
+    }
+    
+    IconData getIcon(TransactionType type) {
+      switch (type) {
+        case TransactionType.billPayment: return Icons.receipt_long_rounded;
+        case TransactionType.upiTransfer: return Icons.send_rounded;
+        case TransactionType.bankTransfer: return Icons.account_balance_rounded;
+        case TransactionType.recharge: return Icons.smartphone_rounded;
+        case TransactionType.income: return Icons.account_balance_rounded;
+        case TransactionType.refund: return Icons.replay_rounded;
+      }
+    }
+    
+    Color getIconColor(TransactionType type, bool isDebit) {
+      if (!isDebit) return ESUNColors.success;
+      switch (type) {
+        case TransactionType.billPayment: return const Color(0xFF7C4DFF);
+        case TransactionType.upiTransfer: return const Color(0xFF7C4DFF);
+        case TransactionType.bankTransfer: return const Color(0xFF7C4DFF);
+        case TransactionType.recharge: return const Color(0xFF7C4DFF);
+        case TransactionType.income: return ESUNColors.success;
+        case TransactionType.refund: return ESUNColors.success;
+      }
+    }
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1174,58 +1009,74 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Text(
                 'Transaction History',
                 style: ESUNTypography.titleSmall.copyWith(
+                  color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              TextButton(
-                onPressed: () => _openHistory(context),
-                child: const Text('See All'),
+              GestureDetector(
+                onTap: () => _openHistory(context),
+                child: Text(
+                  'See All',
+                  style: ESUNTypography.labelSmall.copyWith(
+                    color: const Color(0xFF7C4DFF),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          ...transactions.map((txn) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: txn.color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(txn.icon, color: txn.color, size: 20),
+          if (recentTransactions.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(ESUNSpacing.xxl),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade600),
+                    const SizedBox(height: 8),
+                    Text('No transactions yet', style: ESUNTypography.bodyMedium.copyWith(color: Colors.white38)),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        txn.title,
-                        style: ESUNTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+              ),
+            )
+          else
+            ...recentTransactions.take(5).map((tx) {
+              final iconColor = getIconColor(tx.type, tx.isDebit);
+              final amountText = tx.isDebit ? '-₹${tx.amount.toStringAsFixed(0)}' : '+₹${tx.amount.toStringAsFixed(0)}';
+              final category = tx.category ?? (tx.isDebit ? 'Payment' : 'Income');
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
+                      decoration: BoxDecoration(
+                        color: iconColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Text(
-                        txn.subtitle,
-                        style: ESUNTypography.labelSmall.copyWith(
-                          color: ESUNColors.textTertiary,
-                        ),
+                      child: Icon(getIcon(tx.type), color: iconColor, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(tx.title, style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500, color: Colors.white)),
+                          Text('$category • ${getTimeAgo(tx.timestamp)}', style: ESUNTypography.labelSmall.copyWith(color: Colors.white38)),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      amountText,
+                      style: ESUNTypography.bodyMedium.copyWith(
+                        color: tx.isDebit ? ESUNColors.error : ESUNColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  txn.isCredit ? '+${txn.amount}' : '-${txn.amount}',
-                  style: ESUNTypography.bodyMedium.copyWith(
-                    color: txn.isCredit ? Colors.green : ESUNColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          )),
+              );
+            }),
         ],
       ),
     );
@@ -1244,95 +1095,40 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   }
   
   void _showPayToPhone(BuildContext context) {
-    final phoneController = TextEditingController();
-    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.phone_android, color: Colors.green),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Pay to Phone Number',
-                    style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ],
+      builder: (ctx) => _PayToPhoneSheet(
+        contacts: _contacts,
+        contactsGranted: _contactsGranted,
+        onLoadContacts: () => _loadContacts(requestPermission: true),
+        onSelectContact: (name, phone) {
+          Navigator.pop(ctx);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SendMoneyScreen(
+                recipientName: name,
+                recipientPhone: phone,
+                avatarColor: ESUNColors.primary,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: 'Enter 10-digit mobile number',
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.only(left: 16, right: 8),
-                    child: Text('+91', style: TextStyle(fontSize: 16)),
-                  ),
-                  prefixIconConstraints: const BoxConstraints(minWidth: 50),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  filled: true,
-                  fillColor: Colors.grey.withOpacity(0.05),
-                ),
+            ),
+          );
+        },
+        onContinueWithPhone: (phone) {
+          Navigator.pop(ctx);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SendMoneyScreen(
+                recipientName: 'Phone User',
+                recipientPhone: phone,
+                avatarColor: ESUNColors.primary,
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    if (phoneController.text.length < 10) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please enter a valid phone number')),
-                      );
-                      return;
-                    }
-                    Navigator.pop(ctx);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SendMoneyScreen(
-                          recipientName: 'Phone User',
-                          recipientPhone: phoneController.text,
-                          avatarColor: Colors.green,
-                        ),
-                      ),
-                    );
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: const Text('Continue', style: TextStyle(fontSize: 16)),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -1370,16 +1166,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(ESUNSpacing.xl),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(ESUNSpacing.md),
                         decoration: BoxDecoration(
-                          color: Colors.purple.withOpacity(0.1),
+                          color: ESUNColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(Icons.account_balance, color: Colors.purple),
+                        child: const Icon(Icons.account_balance, color: ESUNColors.primary),
                       ),
                       const SizedBox(width: 12),
                       Text('Bank Transfer', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
@@ -1447,13 +1243,13 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                                 payeeName: nameController.text.isNotEmpty ? nameController.text : 'Beneficiary',
                                 paymentType: '$transferMode Transfer',
                                 icon: Icons.account_balance,
-                                color: Colors.purple,
+                                color: ESUNColors.primary,
                               ),
                             ),
                           );
                         },
                         style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: const Text('Transfer Now', style: TextStyle(fontSize: 16)),
@@ -1505,7 +1301,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -1696,16 +1492,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.1),
+                        color: ESUNColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.swap_horiz, color: Colors.teal),
+                      child: const Icon(Icons.swap_horiz, color: ESUNColors.primary),
                     ),
                     const SizedBox(width: 12),
                     Text('Self Transfer', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
@@ -1728,12 +1524,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withOpacity(0.1),
+                            color: ESUNColors.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.swap_vert, color: Colors.teal),
+                          child: const Icon(Icons.swap_vert, color: ESUNColors.primary),
                         ),
                       ),
                     ),
@@ -1762,7 +1558,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                           context,
                           amount: amount,
                           payeeName: toAccount,
-                          color: Colors.teal,
+                          color: ESUNColors.primary,
                           onSuccess: () {
                             Navigator.pop(ctx);
                             Navigator.push(
@@ -1774,7 +1570,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                                   payeeName: toAccount,
                                   paymentType: 'Self Transfer',
                                   icon: Icons.swap_horiz,
-                                  color: Colors.teal,
+                                  color: ESUNColors.primary,
                                 ),
                               ),
                             );
@@ -1782,8 +1578,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                         );
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: ESUNColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       child: const Text('Transfer', style: TextStyle(fontSize: 16)),
@@ -1856,11 +1652,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(14),
@@ -1925,7 +1721,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 4),
       leading: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(ESUNSpacing.md),
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
@@ -1948,7 +1744,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(ESUNSpacing.xxl),
               decoration: BoxDecoration(
                 color: ESUNColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -2003,7 +1799,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 child: Row(
                   children: [
                     Text('All Contacts', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
@@ -2131,16 +1927,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.credit_card, color: Colors.red),
+                    child: const Icon(Icons.credit_card, color: ESUNColors.primary),
                   ),
                   const SizedBox(width: 12),
                   Text('Credit Card Bill', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
@@ -2151,9 +1947,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  _buildCreditCardItem('HDFC Credit Card', '•••• 4532', '₹45,678', 'Due: Mar 15', Colors.red.shade700),
-                  _buildCreditCardItem('ICICI Amazon Pay', '•••• 8901', '₹12,340', 'Due: Mar 18', Colors.orange.shade700),
-                  _buildCreditCardItem('SBI Card', '•••• 2345', '₹8,500', 'Due: Mar 20', Colors.blue.shade700),
+                  _buildCreditCardItem('HDFC Credit Card', '•••• 4532', '₹45,678', 'Due: Mar 15', ESUNColors.primary),
+                  _buildCreditCardItem('ICICI Amazon Pay', '•••• 8901', '₹12,340', 'Due: Mar 18', ESUNColors.primaryLight),
+                  _buildCreditCardItem('SBI Card', '•••• 2345', '₹8,500', 'Due: Mar 20', ESUNColors.primaryDark),
                 ],
               ),
             ),
@@ -2166,7 +1962,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   Widget _buildCreditCardItem(String name, String number, String amount, String due, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [color, color.withOpacity(0.8)],
@@ -2229,14 +2025,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
 
   void _showMoreBills(BuildContext context) {
     final moreBills = [
-      {'icon': Icons.apartment, 'label': 'Rent', 'color': Colors.brown},
-      {'icon': Icons.school, 'label': 'Education', 'color': Colors.indigo},
-      {'icon': Icons.local_hospital, 'label': 'Hospital', 'color': Colors.pink},
-      {'icon': Icons.directions_car, 'label': 'Challan', 'color': Colors.red},
-      {'icon': Icons.flight, 'label': 'Travel', 'color': Colors.cyan},
-      {'icon': Icons.movie, 'label': 'Entertainment', 'color': Colors.purple},
-      {'icon': Icons.shopping_cart, 'label': 'Shopping', 'color': Colors.green},
-      {'icon': Icons.fitness_center, 'label': 'Gym', 'color': Colors.orange},
+      {'icon': Icons.apartment, 'label': 'Rent', 'color': ESUNColors.primary},
+      {'icon': Icons.school, 'label': 'Education', 'color': ESUNColors.primary},
+      {'icon': Icons.local_hospital, 'label': 'Hospital', 'color': ESUNColors.primary},
+      {'icon': Icons.directions_car, 'label': 'Challan', 'color': ESUNColors.primary},
+      {'icon': Icons.flight, 'label': 'Travel', 'color': ESUNColors.primary},
+      {'icon': Icons.movie, 'label': 'Entertainment', 'color': ESUNColors.primary},
+      {'icon': Icons.shopping_cart, 'label': 'Shopping', 'color': ESUNColors.primary},
+      {'icon': Icons.fitness_center, 'label': 'Gym', 'color': ESUNColors.primary},
     ];
     
     showModalBottomSheet(
@@ -2261,12 +2057,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: Text('More Bills & Payments', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
                   childAspectRatio: 0.85,
@@ -2284,7 +2080,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(ESUNSpacing.lg),
                           decoration: BoxDecoration(
                             color: (bill['color'] as Color).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(16),
@@ -2324,7 +2120,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(ESUNSpacing.xxl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2332,12 +2128,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.withOpacity(0.1),
+                      color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.store, color: Colors.indigo),
+                    child: const Icon(Icons.store, color: ESUNColors.primary),
                   ),
                   const SizedBox(width: 12),
                   Text('Pay Merchant', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
@@ -2378,7 +2174,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                       icon: const Icon(Icons.qr_code_scanner),
                       label: const Text('Scan QR'),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                     ),
@@ -2404,14 +2200,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                               payeeName: merchantController.text,
                               paymentType: 'Merchant Payment',
                               icon: Icons.store,
-                              color: Colors.indigo,
+                              color: ESUNColors.primary,
                             ),
                           ),
                         );
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: Colors.indigo,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: ESUNColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       child: const Text('Pay'),
@@ -2441,7 +2237,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(ESUNSpacing.xxl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2449,12 +2245,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
-                      color: Colors.teal.withOpacity(0.1),
+                      color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.receipt_long, color: Colors.teal),
+                    child: const Icon(Icons.receipt_long, color: ESUNColors.primary),
                   ),
                   const SizedBox(width: 12),
                   Text('Pay Invoice', style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
@@ -2490,7 +2286,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                         builder: (_) => BillPaymentScreen(
                           billType: 'Invoice Payment',
                           icon: Icons.receipt_long,
-                          color: Colors.teal,
+                          color: ESUNColors.primary,
                           prefillNumber: invoiceController.text,
                           prefillAmount: '15000',
                         ),
@@ -2498,8 +2294,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     );
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: ESUNColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: const Text('Fetch Invoice'),
@@ -2536,16 +2332,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.local_shipping, color: Colors.orange),
+                    child: const Icon(Icons.local_shipping, color: ESUNColors.primary),
                   ),
                   const SizedBox(width: 12),
                   Text('Pay Vendor', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
@@ -2556,14 +2352,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  _buildVendorItem('ABC Supplies', 'Pending: ₹25,000', 'Due: Mar 12', Colors.orange),
-                  _buildVendorItem('XYZ Electronics', 'Pending: ₹15,500', 'Due: Mar 15', Colors.blue),
-                  _buildVendorItem('Office Mart', 'Pending: ₹8,200', 'Due: Mar 20', Colors.green),
+                  _buildVendorItem('ABC Supplies', 'Pending: ₹25,000', 'Due: Mar 12', ESUNColors.primary),
+                  _buildVendorItem('XYZ Electronics', 'Pending: ₹15,500', 'Due: Mar 15', ESUNColors.primaryLight),
+                  _buildVendorItem('Office Mart', 'Pending: ₹8,200', 'Due: Mar 20', ESUNColors.primary400),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -2574,7 +2370,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   icon: const Icon(Icons.add),
                   label: const Text('Add New Vendor'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
@@ -2589,7 +2385,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   Widget _buildVendorItem(String name, String amount, String due, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
@@ -2598,7 +2394,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -2648,6 +2444,329 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   }
 }
 
+// --- Pay to Phone Bottom Sheet Widget ---
+class _PayToPhoneSheet extends StatefulWidget {
+  final List<_PaymentContact> contacts;
+  final bool contactsGranted;
+  final VoidCallback onLoadContacts;
+  final void Function(String name, String phone) onSelectContact;
+  final void Function(String phone) onContinueWithPhone;
+
+  const _PayToPhoneSheet({
+    required this.contacts,
+    required this.contactsGranted,
+    required this.onLoadContacts,
+    required this.onSelectContact,
+    required this.onContinueWithPhone,
+  });
+
+  @override
+  State<_PayToPhoneSheet> createState() => _PayToPhoneSheetState();
+}
+
+class _PayToPhoneSheetState extends State<_PayToPhoneSheet> {
+  final _phoneController = TextEditingController();
+  final _focusNode = FocusNode();
+  List<_PaymentContact> _filtered = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = widget.contacts;
+    _phoneController.addListener(_onInputChanged);
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onInputChanged() {
+    final query = _phoneController.text.trim().toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filtered = widget.contacts;
+      } else {
+        _filtered = widget.contacts.where((c) {
+          return c.name.toLowerCase().contains(query) ||
+              c.phone.contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  bool get _isValidPhone {
+    final digits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+    return digits.length >= 10;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final maxHeight = MediaQuery.of(context).size.height * 0.85;
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      padding: EdgeInsets.only(bottom: bottomInset),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(ESUNSpacing.xl, ESUNSpacing.lg, ESUNSpacing.xl, 0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
+                  decoration: BoxDecoration(
+                    color: ESUNColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.phone_android, color: ESUNColors.primary, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Pay to Number',
+                    style: ESUNTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(ESUNSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.close, size: 18, color: Colors.grey.shade600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Search / phone input
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: _phoneController,
+              focusNode: _focusNode,
+              keyboardType: TextInputType.phone,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: 'Enter number or search contacts',
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 14, right: 8),
+                  child: Icon(Icons.search_rounded, color: Colors.grey.shade500, size: 22),
+                ),
+                prefixIconConstraints: const BoxConstraints(minWidth: 44),
+                suffixIcon: _phoneController.text.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () {
+                          _phoneController.clear();
+                          setState(() {});
+                        },
+                        child: Icon(Icons.cancel, size: 20, color: Colors.grey.shade400),
+                      )
+                    : null,
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                contentPadding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: ESUNColors.primary, width: 1.5),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Continue button when valid phone entered
+          if (_isValidPhone)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    final digits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+                    widget.onContinueWithPhone(digits.length > 10 ? digits.substring(digits.length - 10) : digits);
+                  },
+                  icon: const Icon(Icons.send_rounded, size: 18),
+                  label: Text('Pay to ${_phoneController.text}', style: const TextStyle(fontSize: 15)),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: ESUNColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+            ),
+
+          const Divider(height: 20),
+
+          // Contacts section
+          if (!widget.contactsGranted)
+            // Permission not granted - show prompt
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: InkWell(
+                onTap: widget.onLoadContacts,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.all(ESUNSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: ESUNColors.primary.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: ESUNColors.primary.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(ESUNSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: ESUNColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.contacts_rounded, color: ESUNColors.primary, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Allow Contact Access', style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 2),
+                            Text('Search & select from your contacts', style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textTertiary)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: ESUNColors.primary),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          else if (widget.contacts.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(ESUNSpacing.xxl),
+              child: Column(
+                children: [
+                  Icon(Icons.person_search_rounded, size: 40, color: Colors.grey.shade300),
+                  const SizedBox(height: 8),
+                  Text('No contacts found', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textTertiary)),
+                ],
+              ),
+            )
+          else ...[
+              // Section header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Icon(Icons.people_alt_rounded, size: 16, color: Colors.grey.shade500),
+                    const SizedBox(width: 6),
+                    Text(
+                      _phoneController.text.isEmpty ? 'Your Contacts' : '${_filtered.length} result${_filtered.length == 1 ? '' : 's'}',
+                      style: ESUNTypography.labelMedium.copyWith(
+                        color: ESUNColors.textTertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+
+              // Contact list
+              Flexible(
+                child: _filtered.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(ESUNSpacing.xxl),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.search_off_rounded, size: 36, color: Colors.grey.shade300),
+                            const SizedBox(height: 8),
+                            Text('No matching contacts', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textTertiary)),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        itemCount: _filtered.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1, indent: 64),
+                        itemBuilder: (context, index) {
+                          final c = _filtered[index];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            leading: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: c.color.withOpacity(0.15),
+                              child: Text(c.initial, style: TextStyle(color: c.color, fontWeight: FontWeight.w600, fontSize: 14)),
+                            ),
+                            title: Text(c.name, style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500)),
+                            subtitle: c.phone.isNotEmpty
+                                ? Text(c.phone, style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textTertiary))
+                                : null,
+                            trailing: Container(
+                              padding: ESUNSpacing.chipInsets,
+                              decoration: BoxDecoration(
+                                color: ESUNColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text('Pay', style: TextStyle(color: ESUNColors.primary, fontWeight: FontWeight.w600, fontSize: 13)),
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            onTap: () {
+                              if (c.phone.isNotEmpty) {
+                                widget.onSelectContact(c.name, c.phone);
+                              }
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+        ],
+      ),
+    );
+  }
+}
+
 // Data Classes
 class _PaymentContact {
   final String name;
@@ -2685,13 +2804,4 @@ class _BillItem {
   _BillItem(this.icon, this.label, this.color, this.onTap);
 }
 
-class _Transaction {
-  final String title;
-  final String subtitle;
-  final String amount;
-  final IconData icon;
-  final Color color;
-  final bool isCredit;
-  
-  _Transaction(this.title, this.subtitle, this.amount, this.icon, this.color, this.isCredit);
-}
+

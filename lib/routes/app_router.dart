@@ -12,6 +12,7 @@ import '../features/splash/splash_screen.dart';
 import '../features/onboarding/onboarding_identity.dart';
 import '../features/onboarding/onboarding_verify.dart';
 import '../features/onboarding/feature_intro_screen.dart';
+import '../features/onboarding/intro_screen.dart';
 import '../features/auth/auth_screens.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/reset_password_screen.dart';
@@ -39,6 +40,7 @@ import '../features/installation_flow/data_linking_screen.dart';
 import '../features/rewards/rewards_screen.dart';
 import '../features/calculators/calculators_screen.dart';
 import '../features/net_worth/net_worth_screen.dart';
+import '../features/learn/learn_screen.dart';
 import '../shared/widgets/remind_me_later_dialog.dart';
 import '../services/reminder_service.dart';
 
@@ -61,6 +63,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoading = authState.isLoading;
       final isInitial = authState.status == AuthStatus.initial;
       final isAuthenticated = authState.status == AuthStatus.authenticated;
+      final isSessionExpired = authState.status == AuthStatus.sessionExpired;
       final currentPath = state.uri.path;
       
       // Don't redirect during loading or initial state (auth check in progress)
@@ -70,24 +73,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (currentPath == AppRoutes.splash) return null;
       
       // Auth routes - login, registration, OTP verification, password reset
-      final isAuthRoute = currentPath == AppRoutes.login ||
-          currentPath == AppRoutes.otp ||
-          currentPath == AppRoutes.forgotPassword ||
-          currentPath == AppRoutes.resetPassword ||
-          currentPath == '/onboarding/details';
+      final authRoutes = <String>{
+        AppRoutes.login,
+        AppRoutes.otp,
+        AppRoutes.forgotPassword,
+        AppRoutes.resetPassword,
+        '/onboarding/details',
+        AppRoutes.onboardingVerify,
+      };
+      final isAuthRoute = authRoutes.contains(currentPath);
       
-      // Feature intro and verify are allowed for unauthenticated users
-      final isFeatureIntro = currentPath == AppRoutes.featureIntro;
-      final isVerifyScreen = currentPath == AppRoutes.onboardingVerify;
+      // Public routes allowed for all users
+      final isPublicRoute = currentPath == AppRoutes.featureIntro ||
+          currentPath == '/onboarding';
       
-      // Redirect to login if not authenticated and not on auth route, feature intro, or verify screen
-      if (!isAuthenticated && !isAuthRoute && !isFeatureIntro && !isVerifyScreen) {
+      // Session expired → force login
+      if (isSessionExpired && !isAuthRoute) {
         return AppRoutes.login;
       }
       
-      // Redirect to payments if authenticated and trying to access auth routes
-      // But NOT if on feature intro or verify screen (they handle their own navigation)
-      if (isAuthenticated && isAuthRoute && !isFeatureIntro && !isVerifyScreen) {
+      // Redirect to login if not authenticated and not on auth/public route
+      if (!isAuthenticated && !isAuthRoute && !isPublicRoute) {
+        return AppRoutes.login;
+      }
+      
+      // Redirect authenticated users away from auth routes
+      // GoRouter handles where they go when authState changes
+      if (isAuthenticated && isAuthRoute) {
+        // New users who haven't linked accounts get data-linking
+        if (!authState.aaConnected && !authState.isOnboarded) {
+          return AppRoutes.installationDataLinking;
+        }
         return AppRoutes.payments;
       }
       
@@ -98,6 +114,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      
+      // Onboarding Intro (first install)
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const FeatureIntroScreen(),
       ),
       
       // Installation Flow (New User Journey)
@@ -530,6 +552,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.calculators,
         builder: (context, state) => const CalculatorsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.educationalModules,
+        builder: (context, state) => const LearnScreen(),
       ),
       GoRoute(
         path: AppRoutes.reports,

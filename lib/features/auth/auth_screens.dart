@@ -173,37 +173,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       user: user,
       deviceId: deviceId,
     );
-    
-    if (mounted) {
-      // Navigate to main app - data linking can be done later from settings
-      // User can link accounts from the home screen prompt or settings
-      context.go(AppRoutes.payments);
-    }
+    // GoRouter redirect handles navigation when authState changes
   }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(ESUNSpacing.xl),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.xl),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: ESUNSpacing.xxl),
-                // Logo & Welcome
+                const SizedBox(height: ESUNSpacing.xxxl),
+                // Logo & Welcome — gradient background
                 Container(
-                  width: 72,
-                  height: 72,
+                  width: 68,
+                  height: 68,
                   decoration: BoxDecoration(
-                    color: ESUNColors.primary,
+                    gradient: ESUNColors.primaryGradient,
                     borderRadius: ESUNRadius.lgRadius,
+                    boxShadow: [
+                      BoxShadow(
+                        color: ESUNColors.primary.withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.account_balance_wallet_rounded,
-                    size: 36,
+                    size: 32,
                     color: Colors.white,
                   ),
                 ),
@@ -211,43 +213,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Welcome to ESUN',
                   style: ESUNTypography.headlineLarge.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: ESUNSpacing.sm),
+                const SizedBox(height: ESUNSpacing.xs),
                 Text(
-                  'Use your email or mobile to continue',
+                  'Your personal finance companion',
                   style: ESUNTypography.bodyLarge.copyWith(
                     color: ESUNColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: ESUNSpacing.lg),
-                // Login Mode Toggle
+                const SizedBox(height: ESUNSpacing.xxl),
+                // Login Mode Toggle — pill style
                 Container(
                   decoration: BoxDecoration(
-                    color: ESUNColors.neutral100,
-                    borderRadius: ESUNRadius.mdRadius,
+                    color: ESUNColors.surfaceVariant,
+                    borderRadius: ESUNRadius.lgRadius,
                   ),
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(ESUNSpacing.xs),
                   child: Row(
                     children: [
                       Expanded(
                         child: GestureDetector(
                           onTap: () => setState(() => _loginMode = LoginMode.otp),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.sm),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: _loginMode == LoginMode.otp ? Colors.white : Colors.transparent,
-                              borderRadius: ESUNRadius.smRadius,
+                              borderRadius: ESUNRadius.mdRadius,
                               boxShadow: _loginMode == LoginMode.otp
-                                  ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))]
+                                  ? [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))]
                                   : null,
                             ),
                             child: Center(
                               child: Text(
                                 'Login with OTP',
                                 style: ESUNTypography.labelMedium.copyWith(
-                                  color: _loginMode == LoginMode.otp ? ESUNColors.primary : ESUNColors.textSecondary,
+                                  color: _loginMode == LoginMode.otp ? ESUNColors.primary : ESUNColors.textTertiary,
                                   fontWeight: _loginMode == LoginMode.otp ? FontWeight.w600 : FontWeight.normal,
                                 ),
                               ),
@@ -258,20 +262,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () => setState(() => _loginMode = LoginMode.password),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.sm),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: _loginMode == LoginMode.password ? Colors.white : Colors.transparent,
-                              borderRadius: ESUNRadius.smRadius,
+                              borderRadius: ESUNRadius.mdRadius,
                               boxShadow: _loginMode == LoginMode.password
-                                  ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))]
+                                  ? [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))]
                                   : null,
                             ),
                             child: Center(
                               child: Text(
                                 'Login with Password',
                                 style: ESUNTypography.labelMedium.copyWith(
-                                  color: _loginMode == LoginMode.password ? ESUNColors.primary : ESUNColors.textSecondary,
+                                  color: _loginMode == LoginMode.password ? ESUNColors.primary : ESUNColors.textTertiary,
                                   fontWeight: _loginMode == LoginMode.password ? FontWeight.w600 : FontWeight.normal,
                                 ),
                               ),
@@ -282,7 +287,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: ESUNSpacing.xl),
+                const SizedBox(height: ESUNSpacing.xxl),
                 // Email or Phone Input
                 FPTextField(
                   controller: _identifierController,
@@ -339,25 +344,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ],
-                const SizedBox(height: ESUNSpacing.lg),
+                const SizedBox(height: ESUNSpacing.xxl),
                 // Continue Button
                 SizedBox(
                   width: double.infinity,
+                  height: 52,
                   child: FPButton(
                     label: _loginMode == LoginMode.otp ? 'Send OTP' : 'Login',
                     onPressed: _loginMode == LoginMode.otp ? _sendOtp : _loginWithPassword,
                     isLoading: _isLoading,
                   ),
                 ),
-                const SizedBox(height: ESUNSpacing.md),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => context.go(AppRoutes.onboarding),
-                    child: const Text("Don't have an account? Create one"),
-                  ),
+                const SizedBox(height: ESUNSpacing.lg),
+                // Divider with "or"
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: ESUNColors.divider)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
+                      child: Text(
+                        'or',
+                        style: ESUNTypography.bodySmall.copyWith(
+                          color: ESUNColors.textTertiary,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: ESUNColors.divider)),
+                  ],
                 ),
                 const SizedBox(height: ESUNSpacing.lg),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: () => context.go(AppRoutes.onboarding),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: ESUNColors.primary.withOpacity(0.3)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: ESUNRadius.mdRadius,
+                      ),
+                    ),
+                    child: Text(
+                      "Don't have an account? Create one",
+                      style: ESUNTypography.labelMedium.copyWith(
+                        color: ESUNColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: ESUNSpacing.xxl),
                 // Terms
                 Text.rich(
                   TextSpan(
@@ -385,7 +421,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const Spacer(),
+                const SizedBox(height: ESUNSpacing.xxl),
 
               ],
             ),
@@ -461,21 +497,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           otp: _otp,
         );
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
     if (ok) {
-      // Navigate immediately - state is already updated
-      if (mounted) {
-        // Check if user needs to connect bank accounts
-        final authState = ref.read(authStateProvider);
-        if (!authState.aaConnected) {
-          context.go(AppRoutes.installationDataLinking);
-        } else {
-          context.go(AppRoutes.payments);
-        }
-      }
-    } else {
-      final err = ref.read(authStateProvider).error ?? 'Invalid code';
+      // Keep loading overlay; GoRouter redirect navigates automatically
+      return;
+    }
+    setState(() => _isLoading = false);
+    final err = ref.read(authStateProvider).error ?? 'Invalid code';
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(err)),
       );
@@ -590,7 +619,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                               counterText: '',
                               filled: true,
                               fillColor: ESUNColors.surfaceVariant,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                              contentPadding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                               border: OutlineInputBorder(
                                 borderRadius: ESUNRadius.mdRadius,
                                 borderSide: BorderSide(
@@ -673,21 +702,41 @@ class BiometricUnlockScreen extends ConsumerStatefulWidget {
 }
 
 class _BiometricUnlockScreenState extends ConsumerState<BiometricUnlockScreen> {
+  bool _isAuthenticating = false;
+  String? _errorMessage;
+  
   @override
   void initState() {
     super.initState();
-    _authenticate();
+    // Trigger biometric prompt after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) => _authenticate());
   }
   
   Future<void> _authenticate() async {
+    if (!mounted || _isAuthenticating) return;
+    setState(() {
+      _isAuthenticating = true;
+      _errorMessage = null;
+    });
+    
+    await ref.read(authStateProvider.notifier).authenticateWithBiometrics();
+    
     if (!mounted) return;
     
-    ref.read(authStateProvider.notifier).authenticateWithBiometrics();
-    context.go(AppRoutes.payments);
+    final authState = ref.read(authStateProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      context.go(AppRoutes.payments);
+    } else {
+      setState(() {
+        _isAuthenticating = false;
+        _errorMessage = authState.error ?? 'Authentication failed. Tap to retry.';
+      });
+    }
   }
   
-  void _usePin() {
-    // TODO: Navigate to PIN entry
+  void _usePassword() {
+    // Fall back to login screen for password entry
+    context.go(AppRoutes.login);
   }
   
   @override
@@ -705,8 +754,19 @@ class _BiometricUnlockScreenState extends ConsumerState<BiometricUnlockScreen> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: ESUNColors.primary.withOpacity(0.1),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ESUNColors.primary.withOpacity(0.1),
+                      ESUNColors.primary.withOpacity(0.05),
+                    ],
+                  ),
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: ESUNColors.primary.withOpacity(0.15),
+                    width: 2,
+                  ),
                 ),
                 child: const Icon(
                   Icons.fingerprint,
@@ -731,15 +791,23 @@ class _BiometricUnlockScreenState extends ConsumerState<BiometricUnlockScreen> {
               const Spacer(),
               // Retry Button
               TextButton.icon(
-                onPressed: _authenticate,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Try Again'),
+                onPressed: _isAuthenticating ? null : _authenticate,
+                icon: const Icon(Icons.fingerprint),
+                label: Text(_isAuthenticating ? 'Authenticating...' : 'Try Again'),
               ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: ESUNSpacing.sm),
+                Text(
+                  _errorMessage!,
+                  style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.error),
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(height: ESUNSpacing.md),
-              // Use PIN
+              // Use Password
               TextButton(
-                onPressed: _usePin,
-                child: const Text('Use PIN Instead'),
+                onPressed: _usePassword,
+                child: const Text('Use Password Instead'),
               ),
               const SizedBox(height: ESUNSpacing.xl),
             ],

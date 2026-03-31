@@ -350,7 +350,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(ESUNSpacing.sm),
               decoration: BoxDecoration(
                 color: ESUNColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -452,7 +452,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
               ),
               suffixIcon: _isVerifyingVpa
                   ? const Padding(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(ESUNSpacing.md),
                       child: SizedBox(
                         width: 20,
                         height: 20,
@@ -612,7 +612,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.1),
                   shape: BoxShape.circle,

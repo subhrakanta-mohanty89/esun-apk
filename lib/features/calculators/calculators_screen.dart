@@ -360,7 +360,7 @@ class _CalculatorsScreenState extends ConsumerState<CalculatorsScreen> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: ESUNColors.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
@@ -414,7 +414,7 @@ class _CalculatorsScreenState extends ConsumerState<CalculatorsScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: ESUNRadius.mdRadius,
@@ -437,7 +437,7 @@ class _CalculatorsScreenState extends ConsumerState<CalculatorsScreen> {
                     if (badge != null) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: ESUNSpacing.tagInsets,
                         decoration: BoxDecoration(
                           color: color,
                           borderRadius: ESUNRadius.fullRadius,
@@ -569,7 +569,7 @@ class _EMICalculatorSheetState extends State<EMICalculatorSheet> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: const Color(0xFF2E4A9A).withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,
@@ -909,7 +909,7 @@ class _RetirementCalculatorSheetState extends State<RetirementCalculatorSheet> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: const Color(0xFF059669).withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,
@@ -1241,7 +1241,7 @@ class _EmergencyFundCalculatorSheetState extends State<EmergencyFundCalculatorSh
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF59E0B).withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,
@@ -1629,7 +1629,7 @@ class _SIPCalculatorSheetState extends State<SIPCalculatorSheet> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEC4899).withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../theme/design_tokens.dart';
 import 'persona_service.dart';
 
 /// Persona Comparison Screen
@@ -76,7 +77,7 @@ class _PersonaComparisonScreenState
 
   Widget _buildContent(BuildContext context, PersonaInsights insights) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -125,7 +126,7 @@ class _PersonaComparisonScreenState
     return Card(
       elevation: 2,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
@@ -137,7 +138,7 @@ class _PersonaComparisonScreenState
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
                 shape: BoxShape.circle,
@@ -197,7 +198,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -212,7 +213,7 @@ class _PersonaComparisonScreenState
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      ESUNSpacing.chipInsets,
                   decoration: BoxDecoration(
                     color: scoreColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -308,7 +309,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -464,7 +465,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -552,7 +553,7 @@ class _PersonaComparisonScreenState
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(ESUNSpacing.sm),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
@@ -608,7 +609,7 @@ class _PersonaComparisonScreenState
   Widget _buildNetWorthCard(BuildContext context, NetWorthBreakdown breakdown) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -623,7 +624,7 @@ class _PersonaComparisonScreenState
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      ESUNSpacing.chipInsets,
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -749,7 +750,7 @@ class _PersonaComparisonScreenState
       BuildContext context, List<String> suggestions) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -793,7 +794,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -893,7 +894,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -914,7 +915,7 @@ class _PersonaComparisonScreenState
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      ESUNSpacing.chipInsets,
                   decoration: BoxDecoration(
                     color: stressColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -987,7 +988,7 @@ class _PersonaComparisonScreenState
       BuildContext context, InterestBurden burden) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1008,7 +1009,7 @@ class _PersonaComparisonScreenState
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -1033,7 +1034,7 @@ class _PersonaComparisonScreenState
                 const SizedBox(width: 12),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -1069,7 +1070,7 @@ class _PersonaComparisonScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1087,7 +1088,7 @@ class _PersonaComparisonScreenState
             ),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.green.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -1177,7 +1178,7 @@ class _PersonaComparisonScreenState
       BuildContext context, PersonaInsights insights) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1234,7 +1235,7 @@ class _PersonaComparisonScreenState
   Widget _buildLoansSection(BuildContext context, PersonaInsights insights) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1247,7 +1248,7 @@ class _PersonaComparisonScreenState
             const SizedBox(height: 12),
             ...insights.loans.map((loan) => Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: BorderRadius.circular(8),

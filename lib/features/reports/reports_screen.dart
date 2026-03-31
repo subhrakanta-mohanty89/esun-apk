@@ -307,7 +307,7 @@ class ReportsScreen extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,
@@ -392,7 +392,7 @@ class ReportsScreen extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,

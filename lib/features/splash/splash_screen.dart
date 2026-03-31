@@ -1,6 +1,5 @@
-/// ESUN Splash Screen
-/// 
-/// Initial loading screen with branding and auth check.
+// Part of eSun Flutter App — splash
+/// Enhanced splash screen with elastic logo animation and tagline fade-in.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,10 +8,11 @@ import 'package:go_router/go_router.dart';
 import '../../theme/theme.dart';
 import '../../state/app_state.dart';
 import '../../routes/app_routes.dart';
+import '../../core/storage/secure_storage.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
-  
+
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
@@ -20,99 +20,105 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _slideAnimation;
-  
+  late Animation<double> _logoScale;
+  late Animation<double> _logoFade;
+  late Animation<double> _taglineFade;
+  late Animation<double> _shimmer;
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+
+    // Logo scales from 0.5 → 1.0 with elastic curve
+    _logoScale = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
       ),
     );
-    
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+
+    _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack),
+        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
       ),
     );
-    
-    _slideAnimation = Tween<double>(begin: 30.0, end: 0.0).animate(
+
+    // Tagline fades in at ~800ms (0.32 of 2500ms)
+    _taglineFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.3, 0.7, curve: Curves.easeOut),
+        curve: const Interval(0.32, 0.6, curve: Curves.easeOut),
       ),
     );
-    
+
+    // Shimmer effect cycles
+    _shimmer = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+
     _controller.forward();
     _initializeApp();
   }
-  
+
   Future<void> _initializeApp() async {
-    // Minimum splash display time for branding
-    await Future.delayed(const Duration(milliseconds: 300));
-    
+    // Minimum 2.5s splash display for branding
+    await Future.delayed(const Duration(milliseconds: 2500));
     if (!mounted) return;
-    
-    // Wait for auth state to finish loading
+
+    // Check onboarding status from Hive
+    final cache = ref.read(cacheStorageProvider);
+    final hasCompletedOnboarding =
+        cache.getPref<bool>(PrefKeys.onboardingComplete) ?? false;
+
+    if (!hasCompletedOnboarding) {
+      // First install → onboarding intro
+      if (mounted) context.go(AppRoutes.onboardingIntro);
+      return;
+    }
+
+    // Has seen onboarding — check for tokens
+    final storage = ref.read(secureStorageProvider);
+    final hasTokens = await storage.isLoggedIn();
+
+    if (!hasTokens) {
+      if (mounted) context.go(AppRoutes.login);
+      return;
+    }
+
+    // Has tokens → wait for _restoreSession to finish
     AuthState authState = ref.read(authStateProvider);
-    
-    // Poll until auth state is fully determined (max 10 seconds)
-    // This ensures we don't navigate until authentication is resolved
     int attempts = 0;
-    const maxAttempts = 30; // 3 seconds max
-    while ((authState.isLoading || authState.status == AuthStatus.initial) && attempts < maxAttempts) {
+    while ((authState.isLoading || authState.status == AuthStatus.initial) &&
+        attempts < 50) {
       await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       authState = ref.read(authStateProvider);
       attempts++;
     }
-    
+
     if (!mounted) return;
-    
-    // Safety check: if still loading after timeout, default to unauthenticated
-    if (authState.isLoading || authState.status == AuthStatus.initial) {
-      authState = const AuthState(status: AuthStatus.unauthenticated, isLoading: false);
-    }
-    
-    // Get app settings to check onboarding status
-    final appSettings = ref.read(appSettingsProvider);
-    
-    switch (authState.status) {
-      case AuthStatus.authenticated:
-        // Go directly to main app - data linking prompt shown on home screen
-        context.go(AppRoutes.payments);
-        break;
-      case AuthStatus.unauthenticated:
-      case AuthStatus.initial:
-      case AuthStatus.sessionExpired:
-        // Check if user has completed onboarding (seen feature intro screens)
-        if (!appSettings.hasCompletedOnboarding) {
-          // First time user - show feature intro screens
-          context.go(AppRoutes.featureIntro);
-        } else {
-          // Returning user - go to login screen
-          context.go(AppRoutes.login);
-        }
-        break;
+
+    if (authState.status == AuthStatus.authenticated) {
+      context.go(AppRoutes.payments);
+    } else {
+      context.go(AppRoutes.login);
     }
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,11 +143,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(flex: 2),
-                  // Logo
+                  // Logo with scale + shimmer
                   Transform.scale(
-                    scale: _scaleAnimation.value,
+                    scale: _logoScale.value,
                     child: Opacity(
-                      opacity: _fadeAnimation.value,
+                      opacity: _logoFade.value,
                       child: Container(
                         width: 120,
                         height: 120,
@@ -167,37 +173,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: ESUNSpacing.xl),
-                  // App Name
-                  Transform.translate(
-                    offset: Offset(0, _slideAnimation.value),
-                    child: Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: Column(
-                        children: [
-                          Text(
-                            'ESUN',
-                            style: ESUNTypography.displayMedium.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: ESUNSpacing.xs),
-                          Text(
-                            'Your Financial Companion',
-                            style: ESUNTypography.bodyLarge.copyWith(
-                              color: Colors.white.withOpacity(0.8),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
+                  // App name
+                  Opacity(
+                    opacity: _logoFade.value,
+                    child: Text(
+                      'ESUN',
+                      style: ESUNTypography.displayMedium.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: ESUNSpacing.xs),
+                  // Tagline fades in at 800ms
+                  Opacity(
+                    opacity: _taglineFade.value,
+                    child: Text(
+                      'Your Financial Companion',
+                      style: ESUNTypography.bodyLarge.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
                   const Spacer(flex: 2),
                   // Loading indicator
                   Opacity(
-                    opacity: _fadeAnimation.value,
+                    opacity: _taglineFade.value,
                     child: Column(
                       children: [
                         SizedBox(

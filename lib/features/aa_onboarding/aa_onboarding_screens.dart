@@ -1280,7 +1280,7 @@ class AAActivateTrackerScreen extends ConsumerWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(ESUNSpacing.xs),
                           decoration: BoxDecoration(
                             color: Colors.green.shade100,
                             shape: BoxShape.circle,
@@ -1476,7 +1476,7 @@ class _AAVerifyOtpScreenState extends ConsumerState<AAVerifyOtpScreen> {
                           TextButton(
                             onPressed: () => setState(() => _otp = '123456'),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: ESUNSpacing.chipInsets,
                               minimumSize: Size.zero,
                             ),
                             child: const Text('Auto-fill'),
@@ -3284,7 +3284,7 @@ class _AddMoreProvidersSheetState extends State<_AddMoreProvidersSheet> {
                   ),
                   trailing: isComingSoon
                       ? Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: ESUNSpacing.badgeInsets,
                           decoration: BoxDecoration(
                             color: ESUNColors.surface,
                             borderRadius: BorderRadius.circular(12),
@@ -4527,7 +4527,7 @@ class _AAConnectingScreenState extends ConsumerState<AAConnectingScreen>
                           ),
                         ),
                         child: Container(
-                          margin: const EdgeInsets.all(4),
+                          margin: const EdgeInsets.all(ESUNSpacing.xs),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Theme.of(context).scaffoldBackgroundColor,
@@ -4734,7 +4734,7 @@ class _AAFinalStepConsentScreenState
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -4755,10 +4755,10 @@ class _AAFinalStepConsentScreenState
                       ),
                       children: [
                         const TextSpan(text: 'Consent to share your ('),
-                        TextSpan(
-                          text: '9577765454@Finvu',
+                        const TextSpan(
+                          text: 'yourphone@Finvu',
                           style: TextStyle(
-                            color: const Color(0xFF009688),
+                            color: Color(0xFF009688),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -4877,7 +4877,7 @@ class _AAFinalStepConsentScreenState
                   
                   // Info banner
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFF8E1),
                       borderRadius: BorderRadius.circular(8),
@@ -4910,7 +4910,7 @@ class _AAFinalStepConsentScreenState
           
           // Bottom buttons
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(ESUNSpacing.xl),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -5020,7 +5020,7 @@ class _AAFinalStepConsentScreenState
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ESUNSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -5055,7 +5055,7 @@ class _AAFinalStepConsentScreenState
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                   side: const BorderSide(color: Color(0xFF009688)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -5199,7 +5199,7 @@ class _AAAnalyzingScreenState extends ConsumerState<AAAnalyzingScreen>
           Expanded(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(ESUNSpacing.xxl),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
                   decoration: BoxDecoration(
@@ -5327,7 +5327,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
               _buildConsolidatedHeader(),
               
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(ESUNSpacing.lg),
                 child: Column(
                   children: [
                     // Investment Tip Card
@@ -5385,7 +5385,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
   Widget _buildConsolidatedHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(ESUNSpacing.xl),
       decoration: const BoxDecoration(
         color: Color(0xFF009688),
         borderRadius: BorderRadius.only(
@@ -5453,7 +5453,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(ESUNSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -5521,7 +5521,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
 
   Widget _buildInvestmentTipCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -5539,7 +5539,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: const Color(0xFF009688).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -5622,7 +5622,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
 
   Widget _buildRecurringBillsCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -5640,7 +5640,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE3F2FD),
                   borderRadius: BorderRadius.circular(8),
@@ -5694,7 +5694,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
 
   Widget _buildExpenseModeSplitCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -5712,7 +5712,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(8),
@@ -5790,7 +5790,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -5808,7 +5808,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(ESUNSpacing.sm),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF3E5F5),
                   borderRadius: BorderRadius.circular(8),
@@ -6056,7 +6056,7 @@ Widget _buildFinvuProgressBar({required int currentStep}) {
 
 Widget _buildFinvuFooter() {
   return Container(
-    padding: const EdgeInsets.symmetric(vertical: 16),
+    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -6069,7 +6069,7 @@ Widget _buildFinvuFooter() {
         ),
         const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: ESUNSpacing.badgeInsets,
           decoration: BoxDecoration(
             color: const Color(0xFF009688),
             borderRadius: BorderRadius.circular(4),
@@ -6313,7 +6313,7 @@ class _RegulatoryProtectionBadge extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(ESUNSpacing.sm),
             decoration: BoxDecoration(
               color: ESUNColors.success.withOpacity(0.15),
               shape: BoxShape.circle,
@@ -6687,7 +6687,7 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
                   const SizedBox(width: 8),
                   // Mock logos
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -6696,7 +6696,7 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: Colors.green.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -6705,7 +6705,7 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -7987,7 +7987,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     child: GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
                       child: Container(
@@ -8042,7 +8042,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                 // Warning message box
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 24),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(ESUNSpacing.lg),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFEBEE),
                     borderRadius: BorderRadius.circular(8),
@@ -8081,7 +8081,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                 
                 // Buttons
                 Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(ESUNSpacing.xxl),
                   child: Column(
                     children: [
                       SizedBox(
@@ -8189,7 +8189,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                 Align(
                   alignment: Alignment.topRight,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     child: GestureDetector(
                       onTap: () {
                         ref.read(aaOnboardingProvider.notifier).reset();
@@ -8265,7 +8265,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                 // Info box
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 24),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(ESUNSpacing.lg),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -8283,7 +8283,7 @@ class _AADeclinedScreenState extends ConsumerState<AADeclinedScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Your selected accounts are saved by Finvu in your Account Aggregator profile 9577765454@Finvu.',
+                              'Your selected accounts are saved by Finvu in your Account Aggregator profile.',
                               style: ESUNTypography.bodySmall.copyWith(
                                 color: Colors.white.withOpacity(0.9),
                               ),
@@ -8442,7 +8442,7 @@ class AAFailureScreen extends ConsumerWidget {
               
               // Error details card
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(ESUNSpacing.lg),
                 decoration: BoxDecoration(
                   color: ESUNColors.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -8501,7 +8501,7 @@ class AAFailureScreen extends ConsumerWidget {
                     context.go(AppRoutes.payments);
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -8613,7 +8613,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
             ),
             const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: ESUNSpacing.badgeInsets,
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(12),
@@ -8642,7 +8642,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(ESUNSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -8665,7 +8665,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: ESUNSpacing.tagInsets,
                         decoration: BoxDecoration(
                           color: const Color(0xFF004C8F).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -8703,7 +8703,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                   
                   // Accounts Shared section
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -8714,7 +8714,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(ESUNSpacing.sm),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(8),
@@ -8790,7 +8790,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
                   
                   // Info banner
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     margin: const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFF8E1),
@@ -8824,7 +8824,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
           
           // Bottom buttons
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -8920,7 +8920,7 @@ class _AARenewConsentsScreenState extends ConsumerState<AARenewConsentsScreen> {
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

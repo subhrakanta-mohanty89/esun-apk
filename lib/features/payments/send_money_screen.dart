@@ -160,7 +160,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 decoration: BoxDecoration(
                   color: (widget.avatarColor ?? ESUNColors.primary).withOpacity(0.1),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -254,11 +254,11 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isFilled 
-                          ? (hasError ? Colors.red : (widget.avatarColor ?? ESUNColors.primary))
+                          ? (hasError ? ESUNColors.error : (widget.avatarColor ?? ESUNColors.primary))
                           : Colors.transparent,
                       border: Border.all(
                         color: hasError 
-                            ? Colors.red 
+                            ? ESUNColors.error 
                             : (isFilled 
                                 ? (widget.avatarColor ?? ESUNColors.primary) 
                                 : Colors.grey.shade300),
@@ -273,7 +273,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
                 const SizedBox(height: 12),
                 Text(
                   'Incorrect PIN. Please try again.',
-                  style: ESUNTypography.bodySmall.copyWith(color: Colors.red),
+                  style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.error),
                 ),
               ],
               
@@ -504,12 +504,12 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
                 if (widget.recipientUpiId != null)
                   Row(
                     children: [
-                      const Icon(Icons.verified, color: Colors.green, size: 14),
+                      const Icon(Icons.verified, color: ESUNColors.success, size: 14),
                       const SizedBox(width: 4),
                       Text(
                         widget.recipientUpiId!,
                         style: ESUNTypography.bodySmall.copyWith(
-                          color: Colors.green.shade700,
+                          color: ESUNColors.success,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -671,7 +671,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
   
   Widget _buildAccountSelector() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
@@ -690,7 +690,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: ESUNColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
@@ -745,7 +745,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
               return Text(
                 'Balance: ${selectedBalance.toINR()}',
                 style: ESUNTypography.labelSmall.copyWith(
-                  color: Colors.green,
+                  color: ESUNColors.success,
                   fontWeight: FontWeight.w600,
                 ),
               );
@@ -833,18 +833,18 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.1),
+        color: ESUNColors.success.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle, color: Colors.green, size: 12),
+          const Icon(Icons.check_circle, color: ESUNColors.success, size: 12),
           const SizedBox(width: 4),
           Text(
             text,
             style: ESUNTypography.labelSmall.copyWith(
-              color: Colors.green,
+              color: ESUNColors.success,
               fontWeight: FontWeight.w500,
               fontSize: 10,
             ),

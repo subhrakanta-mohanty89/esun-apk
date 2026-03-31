@@ -86,7 +86,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
                   right: 8,
                   top: 8,
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(ESUNSpacing.xs),
                     decoration: const BoxDecoration(
                       color: ESUNColors.primary,
                       shape: BoxShape.circle,
@@ -639,7 +639,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: Colors.amber.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -957,7 +957,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.1),
                         borderRadius: ESUNRadius.smRadius,
@@ -1214,7 +1214,7 @@ Widget _buildConsultTypeOption({
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: ESUNRadius.smRadius,
@@ -1426,7 +1426,7 @@ Widget _buildChatBubble(String text, bool isExpert, Color color) {
     alignment: isExpert ? Alignment.centerLeft : Alignment.centerRight,
     child: Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(ESUNSpacing.md),
       constraints: const BoxConstraints(maxWidth: 280),
       decoration: BoxDecoration(
         color: isExpert ? color.withOpacity(0.1) : ESUNColors.primary,
@@ -1498,7 +1498,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: ESUNRadius.smRadius,
@@ -1549,7 +1549,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                           onTap: () => setState(() => selectedDate = date),
                           child: Container(
                             width: 68,
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(ESUNSpacing.md),
                             decoration: BoxDecoration(
                               color: isSelected ? Colors.orange.withOpacity(0.12) : ESUNColors.surfaceVariant,
                               borderRadius: ESUNRadius.mdRadius,
@@ -1647,7 +1647,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                       label: const Text('Confirm Booking'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                       ),
                     ),
                   ),
@@ -1795,7 +1795,7 @@ void _showDateTimeBookingSheet(BuildContext context, _Expert expert, String type
                               onTap: () => setState(() => selectedDate = date),
                               child: Container(
                                 width: 68,
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(ESUNSpacing.md),
                                 decoration: BoxDecoration(
                                   color: isSelected ? ESUNColors.primary.withOpacity(0.12) : ESUNColors.surfaceVariant,
                                   borderRadius: ESUNRadius.mdRadius,

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../theme/theme.dart';
+import '../../state/transaction_state.dart';
 
 /// Chat messages provider
 final chatMessagesProvider = StateNotifierProvider<ChatMessagesNotifier, List<ChatMessage>>((ref) {
@@ -471,7 +472,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.psychology, color: Colors.white, size: 20),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
             ),
             const SizedBox(width: ESUNSpacing.sm),
             const Text('KANTA'),
@@ -574,6 +575,42 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           "• Mid & Small Cap - ₹5K/month SIP\n\n"
           "📈 Projected growth: ₹45L in 10 years\n\n"
           "Want me to help you start a SIP?";
+    } else if (lowerQuery.contains('transaction') || lowerQuery.contains('last payment') || lowerQuery.contains('recent') || lowerQuery.contains('history')) {
+      final txns = ref.read(transactionStateProvider).transactions;
+      if (txns.isEmpty) {
+        return "You don't have any transactions yet. Make a payment and I'll track it for you!";
+      }
+      final last = txns.first;
+      final bankName = (last.sourceAccount != null && last.sourceAccount!.isNotEmpty)
+          ? last.sourceAccount!
+          : 'HDFC Bank •• 1234';
+      final typeLabel = last.isDebit ? 'Paid' : 'Received';
+      final timeAgo = DateTime.now().difference(last.timestamp);
+      String timeStr;
+      if (timeAgo.inMinutes < 60) {
+        timeStr = '${timeAgo.inMinutes} minutes ago';
+      } else if (timeAgo.inHours < 24) {
+        timeStr = '${timeAgo.inHours} hours ago';
+      } else {
+        timeStr = '${timeAgo.inDays} days ago';
+      }
+      
+      // Build last 5 transactions list
+      final recentList = txns.take(5).map((t) {
+        final src = (t.sourceAccount != null && t.sourceAccount!.isNotEmpty) ? t.sourceAccount! : 'HDFC Bank';
+        final sign = t.isDebit ? '-' : '+';
+        return '• ${t.title} — $sign₹${t.amount.toStringAsFixed(0)} from $src';
+      }).join('\n');
+      
+      return "📝 **Your Last Transaction**\n\n"
+          "**$typeLabel:** ₹${last.amount.toStringAsFixed(0)}\n"
+          "**To:** ${last.recipientName ?? last.title}\n"
+          "**From:** $bankName\n"
+          "**Category:** ${last.category ?? 'Transfer'}\n"
+          "**When:** $timeStr\n"
+          "**Status:** ${last.status.name.toUpperCase()}\n\n"
+          "📋 **Recent Transactions:**\n$recentList\n\n"
+          "Would you like more details about any of these?";
     } else if (lowerQuery.contains('budget')) {
       return "📋 **Suggested Budget for Your Income (₹1.2L/month)**\n\n"
           "Essential Expenses (50%): ₹60,000\n"
@@ -627,7 +664,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.psychology, color: Colors.white, size: 20),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
             ),
             const SizedBox(width: ESUNSpacing.sm),
             Column(
@@ -738,7 +775,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.psychology, color: Colors.white, size: 16),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
             ),
             const SizedBox(width: ESUNSpacing.sm),
           ],
@@ -785,7 +822,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
               ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.psychology, color: Colors.white, size: 16),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
           ),
           const SizedBox(width: ESUNSpacing.sm),
           Container(

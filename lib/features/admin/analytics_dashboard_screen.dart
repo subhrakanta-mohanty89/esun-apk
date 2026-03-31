@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../theme/design_tokens.dart';
 import '../../core/analytics/analytics_api_service.dart';
 
 /// Dashboard data provider
@@ -92,7 +93,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         ref.invalidate(dashboardDataProvider);
       },
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         children: [
           // KPI Cards Row
           _buildKPISection(context, dashboard),
@@ -192,7 +193,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(ESUNSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -235,14 +236,14 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFF4A62B8), Color(0xFF2E4A9A)],
@@ -357,7 +358,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -367,7 +368,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(ESUNSpacing.sm),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFFED213A), Color(0xFF93291E)],
@@ -389,7 +390,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                   loading: () => const SizedBox(),
                   error: (_, __) => const SizedBox(),
                   data: (data) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: ESUNSpacing.chipInsets,
                     decoration: BoxDecoration(
                       gradient: data.isNotEmpty 
                         ? const LinearGradient(colors: [Color(0xFFED213A), Color(0xFF93291E)])
@@ -410,7 +411,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               error: (e, _) => Text('Error loading alerts: $e'),
               data: (data) => data.isEmpty
                 ? Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(ESUNSpacing.lg),
                     decoration: BoxDecoration(
                       color: const Color(0xFF38EF7D).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -455,7 +456,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(ESUNSpacing.sm),
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: gradientColors),
             borderRadius: BorderRadius.circular(8),
@@ -527,14 +528,14 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],

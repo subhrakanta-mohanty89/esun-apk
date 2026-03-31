@@ -71,7 +71,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             // Rewards
             _buildRewards(context),
             
-            const SizedBox(height: 72),
+            const SizedBox(height: ESUNSpacing.xxxl),
           ],
         ),
       ),
@@ -163,7 +163,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 1.1,
+              childAspectRatio: 1.35,
               crossAxisSpacing: ESUNSpacing.md,
               mainAxisSpacing: ESUNSpacing.md,
             ),
@@ -195,7 +195,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     color: product.color.withOpacity(0.1),
                     borderRadius: ESUNRadius.smRadius,
@@ -204,7 +204,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ),
                 if (product.isPopular)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: ESUNSpacing.tagInsets,
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: ESUNRadius.fullRadius,
@@ -267,7 +267,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(ESUNSpacing.sm),
                     decoration: BoxDecoration(
                       color: Colors.deepPurple.withOpacity(0.1),
                       borderRadius: ESUNRadius.smRadius,
@@ -284,7 +284,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: Colors.deepPurple.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -351,7 +351,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           Container(
             width: 48,
             height: 48,
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(ESUNSpacing.sm),
             decoration: BoxDecoration(
               color: getInsuranceColor(insurance.type).withOpacity(0.1),
               borderRadius: ESUNRadius.smRadius,
@@ -395,7 +395,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     if (isExpiringSoon || isExpired)
                       Container(
                         margin: const EdgeInsets.only(left: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: ESUNSpacing.tagInsets,
                         decoration: BoxDecoration(
                           color: isExpired ? ESUNColors.error : Colors.orange,
                           borderRadius: ESUNRadius.fullRadius,
@@ -556,7 +556,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: product.color.withOpacity(0.1),
                 borderRadius: ESUNRadius.smRadius,
@@ -591,7 +591,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
             const SizedBox(height: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: ESUNSpacing.tagInsets,
               decoration: BoxDecoration(
                 color: ESUNColors.success.withOpacity(0.1),
                 borderRadius: ESUNRadius.fullRadius,
@@ -741,7 +741,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: ESUNSpacing.tagInsets,
                         decoration: BoxDecoration(
                           color: course.color.withOpacity(0.1),
                           borderRadius: ESUNRadius.fullRadius,
@@ -821,7 +821,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: ESUNSpacing.badgeInsets,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: ESUNRadius.fullRadius,
@@ -855,7 +855,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: const Color(0xFF2E4A9A),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      padding: ESUNSpacing.buttonInsets,
                     ),
                     child: const Text('Invest Now'),
                   ),
@@ -916,7 +916,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: category.color.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -959,7 +959,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 1.6,
+              childAspectRatio: 2.0,
               crossAxisSpacing: ESUNSpacing.md,
               mainAxisSpacing: ESUNSpacing.md,
             ),
@@ -1084,7 +1084,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: Colors.blue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -1222,7 +1222,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         ),
                         child: const Text('Apply for Loan', style: TextStyle(fontSize: 16)),
                       ),
@@ -1320,7 +1320,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: Colors.green.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -1415,7 +1415,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                             children: [
                               Expanded(
                                 child: Container(
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(ESUNSpacing.md),
                                   decoration: BoxDecoration(
                                     color: taxOldRegime <= taxNewRegime ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12),
@@ -1434,7 +1434,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Container(
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(ESUNSpacing.md),
                                   decoration: BoxDecoration(
                                     color: taxNewRegime < taxOldRegime ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12),
@@ -1507,7 +1507,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(ESUNSpacing.md),
                       decoration: BoxDecoration(
                         color: Colors.purple.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -1537,7 +1537,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       Text('₹28,45,000', style: ESUNTypography.headlineMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: ESUNSpacing.badgeInsets,
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(12),
@@ -1596,7 +1596,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(ESUNSpacing.sm),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
@@ -1672,7 +1672,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -1802,7 +1802,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         ),
                         child: const Text('Start SIP', style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
@@ -1891,7 +1891,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               Icon(icon, color: Colors.white, size: 24),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: ESUNSpacing.badgeInsets,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: ESUNRadius.fullRadius,
@@ -1973,7 +1973,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(ESUNSpacing.md),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: ESUNRadius.smRadius,
@@ -2001,7 +2001,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: ESUNSpacing.chipInsets,
                 decoration: BoxDecoration(
                   color: Colors.amber.withOpacity(0.1),
                   borderRadius: ESUNRadius.fullRadius,
@@ -2102,7 +2102,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: ESUNRadius.mdRadius,
@@ -2127,7 +2127,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: ESUNRadius.mdRadius,

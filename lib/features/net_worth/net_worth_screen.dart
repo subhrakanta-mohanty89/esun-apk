@@ -121,7 +121,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(ESUNSpacing.md),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: ESUNRadius.smRadius,
@@ -139,7 +139,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: ESUNSpacing.chipInsets,
                 decoration: BoxDecoration(
                   color: isPositive ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
                   borderRadius: ESUNRadius.fullRadius,
@@ -182,7 +182,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
           ),
           const SizedBox(height: ESUNSpacing.lg),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               borderRadius: ESUNRadius.mdRadius,
@@ -209,6 +209,51 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
                     Icons.arrow_downward_rounded,
                     Colors.red.shade300,
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: ESUNSpacing.md),
+          // Monthly Income vs Expense
+          Container(
+            padding: const EdgeInsets.all(ESUNSpacing.md),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: ESUNRadius.mdRadius,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Monthly Income', style: ESUNTypography.bodySmall.copyWith(color: Colors.white70)),
+                    Text(
+                      _isAmountHidden ? '₹••••' : '₹${_formatAmount(snapshot.totalMonthlyIncome)}',
+                      style: ESUNTypography.bodyMedium.copyWith(color: Colors.greenAccent, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Monthly Expense', style: ESUNTypography.bodySmall.copyWith(color: Colors.white70)),
+                    Text(
+                      _isAmountHidden ? '₹••••' : '₹${_formatAmount(snapshot.totalMonthlyExpense)}',
+                      style: ESUNTypography.bodyMedium.copyWith(color: Colors.redAccent.shade100, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Savings Rate', style: ESUNTypography.bodySmall.copyWith(color: Colors.white70)),
+                    Text(
+                      '${snapshot.savingsRate.toStringAsFixed(1)}%',
+                      style: ESUNTypography.bodyMedium.copyWith(color: Colors.amberAccent, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -287,6 +332,20 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
           title: '',
           radius: 50,
         ),
+      if (breakdown.gold > 0)
+        PieChartSectionData(
+          value: breakdown.gold,
+          color: const Color(0xFFD97706),
+          title: '',
+          radius: 50,
+        ),
+      if (breakdown.others > 0)
+        PieChartSectionData(
+          value: breakdown.others,
+          color: const Color(0xFF8B5CF6),
+          title: '',
+          radius: 50,
+        ),
     ];
     
     return Container(
@@ -300,11 +359,27 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Asset Allocation',
-            style: ESUNTypography.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Portfolio Allocation',
+                style: ESUNTypography.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Container(
+                padding: ESUNSpacing.badgeInsets,
+                decoration: BoxDecoration(
+                  color: ESUNColors.success.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Total: ₹${_formatAmount(breakdown.total)}',
+                  style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.success, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: ESUNSpacing.lg),
           Row(
@@ -330,11 +405,61 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
                     _buildLegendItem('ETFs', const Color(0xFF10B981), breakdown.etfs),
                     _buildLegendItem('Bank Balance', const Color(0xFFF59E0B), breakdown.bankBalance),
                     _buildLegendItem('Fixed Deposits', const Color(0xFFEF4444), breakdown.fixedDeposits),
+                    _buildLegendItem('Gold', const Color(0xFFD97706), breakdown.gold),
+                    _buildLegendItem('PPF & Others', const Color(0xFF8B5CF6), breakdown.others),
                   ],
                 ),
               ),
             ],
           ),
+          const SizedBox(height: ESUNSpacing.md),
+          // Top Performers row
+          Container(
+            padding: const EdgeInsets.all(ESUNSpacing.md),
+            decoration: BoxDecoration(
+              color: ESUNColors.success.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: ESUNColors.success.withOpacity(0.15)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Top Performers', style: ESUNTypography.labelSmall.copyWith(fontWeight: FontWeight.w600, color: ESUNColors.success)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildPerformerChip('Stocks', '+35.0%', Colors.blue),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildPerformerChip('ETFs', '+13.0%', Colors.green),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildPerformerChip('MF', '+12.5%', Colors.purple),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildPerformerChip(String label, String change, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Text(label, style: ESUNTypography.labelSmall.copyWith(fontWeight: FontWeight.w600, color: color)),
+          Text(change, style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.success, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -1315,7 +1440,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
         if (breakdown.realEstate == 0 && breakdown.gold == 0 && breakdown.others == 0)
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(ESUNSpacing.xxl),
               child: Column(
                 children: [
                   Icon(

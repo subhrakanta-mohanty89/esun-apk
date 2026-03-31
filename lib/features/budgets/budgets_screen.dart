@@ -332,7 +332,7 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(ESUNSpacing.md),
                   decoration: BoxDecoration(
                     color: budget.color.withOpacity(0.1),
                     borderRadius: ESUNRadius.smRadius,
@@ -402,7 +402,7 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     color: Colors.amber.withOpacity(0.1),
                     shape: BoxShape.circle,

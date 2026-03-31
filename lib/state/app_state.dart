@@ -3,6 +3,7 @@
 /// Global application state providers using Riverpod.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -116,6 +117,7 @@ class AuthState {
 /// Helper class for token validation result
 class _TokenValidationResult {
   final bool isValid;
+  final bool isAuthError; // true only for 401/403 explicit rejections
   final String? userName;
   final bool aaConnected;
   final bool creditBureauConnected;
@@ -124,6 +126,7 @@ class _TokenValidationResult {
   
   const _TokenValidationResult({
     required this.isValid,
+    this.isAuthError = false,
     this.userName,
     this.aaConnected = false,
     this.creditBureauConnected = false,
@@ -136,60 +139,190 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   final Ref _ref;
   
   AuthStateNotifier(this._ref) : super(const AuthState()) {
-    _checkAuthStatus();
+    _restoreSession();
   }
-  
-  Future<void> _checkAuthStatus() async {
+
+  /// Decode a JWT payload and check the exp claim.
+  /// Returns true if the token is expired or cannot be decoded.
+  static bool _isJwtExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+      String payload = parts[1];
+      switch (payload.length % 4) {
+        case 2: payload += '=='; break;
+        case 3: payload += '='; break;
+      }
+      final decoded = utf8.decode(base64Url.decode(payload));
+      final json = jsonDecode(decoded) as Map<String, dynamic>;
+      final exp = json['exp'] as int?;
+      if (exp == null) return false;
+      return DateTime.now().millisecondsSinceEpoch ~/ 1000 >= exp;
+    } catch (_) {
+      return true;
+    }
+  }
+
+
+  /// Attempt to refresh the access token using the refresh token.
+  Future<bool> _refreshAccessToken(String refreshToken) async {
+    try {
+      final api = _ref.read(apiServiceProvider);
+      final result = await api.post<Map<String, dynamic>>(
+        '${ApiConfig.apiPrefix}/auth/refresh',
+        data: {'refresh_token': refreshToken},
+        skipAuth: true,
+      );
+      if (result.isSuccess && result.data != null) {
+        final body = result.data!;
+        if (body['success'] == true) {
+          final data = body['data'] as Map<String, dynamic>? ?? body;
+          final tokens = data['tokens'] as Map<String, dynamic>? ?? data;
+          final newAccessToken = tokens['access_token'] ?? data['access_token'];
+          final newRefreshToken = tokens['refresh_token'] ?? data['refresh_token'];
+          if (newAccessToken != null && newAccessToken.toString().isNotEmpty) {
+            final storage = _ref.read(secureStorageProvider);
+            await storage.saveTokens(
+              accessToken: newAccessToken.toString(),
+              refreshToken: (newRefreshToken ?? refreshToken).toString(),
+            );
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Restore a previous session from secure storage on cold start.
+  /// Uses JWT decode for fast local validation before server round-trip.
+  Future<void> _restoreSession() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
       final storage = _ref.read(secureStorageProvider);
-      final hasTokens = await storage.isLoggedIn();
+      final accessToken = await storage.getAccessToken();
+      final refreshToken = await storage.getRefreshToken();
+      final userId = await storage.getUserId();
       final isBiometricEnabled = await storage.isBiometricEnabled();
-      
-      if (hasTokens) {
-        // Tokens exist locally - validate with server
-        final validationResult = await _validateTokensWithServer();
-        
-        if (validationResult.isValid) {
-          final userId = await storage.getUserId();
-          state = state.copyWith(
-            status: AuthStatus.authenticated,
-            userId: userId,
-            userName: validationResult.userName,
-            isBiometricEnabled: isBiometricEnabled,
-            aaConnected: validationResult.aaConnected,
-            creditBureauConnected: validationResult.creditBureauConnected,
-            isOnboarded: validationResult.isOnboarded,
-            isLoading: false,
-          );
-        } else {
-          // Token validation failed - clear tokens and require re-login
-          await storage.clearAuthData();
+
+      // ── No tokens at all → unauthenticated ──
+      if (accessToken == null || accessToken.isEmpty) {
+        Future.microtask(() {
+          if (mounted) {
+            state = state.copyWith(
+              status: AuthStatus.unauthenticated,
+              isLoading: false,
+            );
+          }
+        });
+        return;
+      }
+
+      // ── Access token is still valid (JWT exp check) ──
+      if (!_isJwtExpired(accessToken)) {
+        // Fast path: trust local token, set authenticated immediately
+        Future.microtask(() {
+          if (mounted) {
+            state = state.copyWith(
+              status: AuthStatus.authenticated,
+              userId: userId,
+              isBiometricEnabled: isBiometricEnabled,
+              isLoading: false,
+            );
+          }
+        });
+        // Background server validation to sync user data
+        _validateTokensWithServer().then((result) {
+          if (!mounted) return;
+          if (result.isValid) {
+            state = state.copyWith(
+              userName: result.userName,
+              aaConnected: result.aaConnected,
+              creditBureauConnected: result.creditBureauConnected,
+              isOnboarded: result.isOnboarded,
+            );
+          } else if (result.isAuthError) {
+            // Server explicitly rejected — force re-login
+            storage.clearAuthData();
+            state = state.copyWith(
+              status: AuthStatus.unauthenticated,
+              isLoading: false,
+            );
+          }
+        });
+        return;
+      }
+
+      // ── Access token expired — try refresh ──
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        final refreshed = await _refreshAccessToken(refreshToken);
+        if (refreshed) {
+          Future.microtask(() {
+            if (mounted) {
+              state = state.copyWith(
+                status: AuthStatus.authenticated,
+                userId: userId,
+                isBiometricEnabled: isBiometricEnabled,
+                isLoading: false,
+              );
+            }
+          });
+          _validateTokensWithServer().then((result) {
+            if (!mounted) return;
+            if (result.isValid) {
+              state = state.copyWith(
+                userName: result.userName,
+                aaConnected: result.aaConnected,
+                creditBureauConnected: result.creditBureauConnected,
+                isOnboarded: result.isOnboarded,
+              );
+            }
+          });
+          return;
+        }
+      }
+
+      // ── Both tokens invalid → unauthenticated ──
+      await storage.clearAuthData();
+      Future.microtask(() {
+        if (mounted) {
           state = state.copyWith(
             status: AuthStatus.unauthenticated,
             isLoading: false,
-            error: validationResult.error,
           );
         }
-      } else {
-        state = state.copyWith(
-          status: AuthStatus.unauthenticated,
-          isLoading: false,
-        );
-      }
+      });
     } catch (e) {
-      // Clear any stored tokens on error for security
+      // On error, check if tokens exist and trust them
       try {
         final storage = _ref.read(secureStorageProvider);
-        await storage.clearAuthData();
+        final hasTokens = await storage.isLoggedIn();
+        if (hasTokens) {
+          final uid = await storage.getUserId();
+          Future.microtask(() {
+            if (mounted) {
+              state = state.copyWith(
+                status: AuthStatus.authenticated,
+                userId: uid,
+                isLoading: false,
+              );
+            }
+          });
+          return;
+        }
       } catch (_) {}
-      
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        isLoading: false,
-        error: e.toString(),
-      );
+      Future.microtask(() {
+        if (mounted) {
+          state = state.copyWith(
+            status: AuthStatus.unauthenticated,
+            isLoading: false,
+            error: e.toString(),
+          );
+        }
+      });
     }
   }
   
@@ -221,21 +354,24 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
           isOnboarded: user['onboarded'] == true || user['aa_connected'] == true || user['credit_bureau_connected'] == true,
         );
       } else {
-        // API call failed - check if it's an auth error
+        // API call failed - check if it's an auth error (401/403)
         final errorCode = result.error?.code;
         final isAuthError = errorCode == 'UNAUTHORIZED' || errorCode == 'FORBIDDEN';
         
         return _TokenValidationResult(
           isValid: false,
+          isAuthError: isAuthError,
           error: isAuthError 
               ? 'Session expired. Please login again.' 
-              : 'Unable to connect to server. Please check your connection.',
+              : 'Unable to connect to server.',
         );
       }
     } catch (e) {
+      // Network/connection error — NOT an auth error
       return _TokenValidationResult(
         isValid: false,
-        error: 'Connection error. Please try again.',
+        isAuthError: false,
+        error: 'Connection error.',
       );
     }
   }
@@ -264,22 +400,26 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         await storage.saveDeviceId(deviceId);
       }
       
-      // Extract onboarding status from user data
       final isOnboarded = user['onboarded'] == true;
       final aaConnected = user['aa_connected'] == true;
       final creditBureauConnected = user['credit_bureau_connected'] == true;
       final userName = user['full_name']?.toString();
       
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        userId: userId,
-        userName: userName,
-        isLoading: false,
-        isOnboarded: isOnboarded,
-        aaConnected: aaConnected,
-        creditBureauConnected: creditBureauConnected,
-        linkDataPopupDismissed: false,
-      );
+      // Update state via microtask so GoRouter redirect fires after current frame
+      Future.microtask(() {
+        if (mounted) {
+          state = state.copyWith(
+            status: AuthStatus.authenticated,
+            userId: userId,
+            userName: userName,
+            isLoading: false,
+            isOnboarded: isOnboarded,
+            aaConnected: aaConnected,
+            creditBureauConnected: creditBureauConnected,
+            linkDataPopupDismissed: false,
+          );
+        }
+      });
       
       return true;
     } catch (e) {
@@ -347,37 +487,39 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         return false;
       }
 
-      // Extract onboarding status from user data first for faster state update
       final isOnboarded = user?['onboarded'] == true;
       final aaConnected = user?['aa_connected'] == true;
       final creditBureauConnected = user?['credit_bureau_connected'] == true;
       final userName = user?['full_name']?.toString();
-      
-      // Update state immediately for faster UI response
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        userId: userId,
-        userName: userName,
-        isLoading: false,
-        isOnboarded: isOnboarded,
-        aaConnected: aaConnected,
-        creditBureauConnected: creditBureauConnected,
-        linkDataPopupDismissed: false,
-      );
 
-      // Save to storage in parallel (non-blocking for UI)
+      // Save tokens to secure storage FIRST to ensure persistence
       final storage = _ref.read(secureStorageProvider);
       final accessExpiresIn = tokens['expires_in'] ?? tokens['access_expires_in'];
-      
-      // Fire and forget storage operations for faster response
-      unawaited(Future.wait([
+
+      await Future.wait([
         storage.saveTokens(accessToken: accessToken, refreshToken: refreshToken),
         if (userId != null) storage.saveUserId(userId),
         if (deviceId != null) storage.saveDeviceId(deviceId),
-        if (accessExpiresIn is int) 
+        if (accessExpiresIn is int)
           storage.saveSessionExpiry(DateTime.now().add(Duration(seconds: accessExpiresIn))),
-      ]));
-      
+      ]);
+
+      // Update state via microtask so GoRouter redirect fires after current frame
+      Future.microtask(() {
+        if (mounted) {
+          state = state.copyWith(
+            status: AuthStatus.authenticated,
+            userId: userId,
+            userName: userName,
+            isLoading: false,
+            isOnboarded: isOnboarded,
+            aaConnected: aaConnected,
+            creditBureauConnected: creditBureauConnected,
+            linkDataPopupDismissed: false,
+          );
+        }
+      });
+
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -401,6 +543,10 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     try {
       final storage = _ref.read(secureStorageProvider);
       await storage.clearAuthData();
+      
+      // Also clear Hive user cache
+      final cache = _ref.read(cacheStorageProvider);
+      await cache.clearCache();
       
       state = const AuthState(status: AuthStatus.unauthenticated);
     } catch (e) {

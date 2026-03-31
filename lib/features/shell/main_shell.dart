@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../theme/theme.dart';
 import '../../routes/app_routes.dart';
 import '../../state/app_state.dart';
+import '../../core/storage/secure_storage.dart';
 
 /// Current navigation index provider
 final navigationIndexProvider = StateProvider<int>((ref) => 0);
@@ -26,7 +27,45 @@ class MainShell extends ConsumerStatefulWidget {
   ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends ConsumerState<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserver {
+  DateTime? _pausedAt;
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+  
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _pausedAt = DateTime.now();
+    } else if (state == AppLifecycleState.resumed && _pausedAt != null) {
+      final elapsed = DateTime.now().difference(_pausedAt!);
+      _pausedAt = null;
+      // If app was in background for more than 30 seconds, require biometric
+      if (elapsed.inSeconds > 30) {
+        _checkBiometricLock();
+      }
+    }
+  }
+  
+  Future<void> _checkBiometricLock() async {
+    final secureStorage = ref.read(secureStorageProvider);
+    final biometricEnabled = await secureStorage.isBiometricEnabled();
+    final appSettings = ref.read(appSettingsProvider);
+    
+    if (biometricEnabled && appSettings.biometricPromptEnabled && mounted) {
+      context.go(AppRoutes.biometricUnlock);
+    }
+  }
+  
   static const List<_NavItem> _navItems = [
     _NavItem(
       path: AppRoutes.home,
@@ -55,9 +94,9 @@ class _MainShellState extends ConsumerState<MainShell> {
     ),
     _NavItem(
       path: AppRoutes.advisor,
-      label: 'Advisor',
-      icon: Icons.psychology_outlined,
-      activeIcon: Icons.psychology,
+      label: 'Kantha',
+      icon: Icons.auto_awesome_outlined,
+      activeIcon: Icons.auto_awesome,
     ),
   ];
   
@@ -105,7 +144,7 @@ class _MainShellState extends ConsumerState<MainShell> {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(ESUNSpacing.sm),
               decoration: BoxDecoration(
                 color: ESUNColors.warning.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -176,24 +215,24 @@ class _MainShellState extends ConsumerState<MainShell> {
     
     return Scaffold(
       backgroundColor: isDark ? ESUNColors.darkBackground : ESUNColors.background,
-      extendBody: true,
       body: widget.child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? ESUNColors.darkSurface : ESUNColors.surface,
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0F000000),
-              blurRadius: 20,
-              offset: Offset(0, -4),
+          color: isDark ? ESUNColors.darkSurface : Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: const Color(0xFFF1F5F9),
+              width: 1,
             ),
-          ],
+          ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: ESUNSpacing.sm,
-              vertical: ESUNSpacing.sm,
+            padding: EdgeInsets.only(
+              left: ESUNSpacing.sm,
+              right: ESUNSpacing.sm,
+              top: ESUNSpacing.sm,
+              bottom: ESUNSpacing.sm + 8, // extra 8px bottom padding
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -331,27 +370,29 @@ class _NavBarItem extends StatelessWidget {
             children: [
               AnimatedContainer(
                 duration: ESUNAnimations.fast,
+                width: 48,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: ESUNSpacing.lg,
                   vertical: ESUNSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? selectedColor.withOpacity(0.1) 
+                  color: isSelected
+                      ? const Color(0xFFEEF2FF)
                       : Colors.transparent,
                   borderRadius: ESUNRadius.fullRadius,
                 ),
-                child: Icon(
-                  icon,
-                  size: ESUNIconSize.md,
-                  color: color,
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: ESUNIconSize.md,
+                    color: color,
+                  ),
                 ),
               ),
               const SizedBox(height: ESUNSpacing.xs),
               Text(
                 label,
                 style: ESUNTypography.labelSmall.copyWith(
-                  color: color,
+                  color: isSelected ? selectedColor : unselectedColor,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),

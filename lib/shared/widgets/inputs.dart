@@ -346,10 +346,12 @@ class _FPOtpFieldState extends State<FPOtpField> {
     final boxWidth = (availableWidth / widget.length).clamp(40.0, 52.0);
     final boxHeight = boxWidth * 1.15;
     final fontSize = boxWidth * 0.46;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(widget.length, (index) {
+        final hasValue = _controllers[index].text.isNotEmpty;
         return Container(
           width: boxWidth,
           height: boxHeight,
@@ -374,7 +376,10 @@ class _FPOtpFieldState extends State<FPOtpField> {
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              onChanged: (value) => _onChanged(index, value),
+              onChanged: (value) {
+                setState(() {});
+                _onChanged(index, value);
+              },
               decoration: InputDecoration(
                 counterText: '',
                 filled: true,
@@ -384,12 +389,24 @@ class _FPOtpFieldState extends State<FPOtpField> {
                 contentPadding: EdgeInsets.symmetric(vertical: boxHeight * 0.25),
                 border: OutlineInputBorder(
                   borderRadius: ESUNRadius.smRadius,
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(
+                    color: isDark ? Colors.white24 : Colors.black26,
+                    width: 1.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: ESUNRadius.smRadius,
+                  borderSide: BorderSide(
+                    color: hasValue
+                        ? primaryColor
+                        : (isDark ? Colors.white24 : Colors.black26),
+                    width: hasValue ? 2 : 1.5,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: ESUNRadius.smRadius,
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: primaryColor,
                     width: 2,
                   ),
                 ),

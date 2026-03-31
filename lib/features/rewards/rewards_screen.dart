@@ -296,7 +296,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                     clipBehavior: Clip.none,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(ESUNSpacing.md),
                         decoration: BoxDecoration(
                           color: action.color.withOpacity(0.15),
                           shape: BoxShape.circle,
@@ -308,7 +308,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                           right: -8,
                           top: -4,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: ESUNSpacing.tagInsets,
                             decoration: BoxDecoration(
                               color: action.color,
                               borderRadius: BorderRadius.circular(8),
@@ -365,7 +365,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: Colors.orange.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
@@ -507,7 +507,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(ESUNSpacing.sm),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -645,7 +645,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     color: offer.color.withOpacity(0.1),
                     borderRadius: ESUNRadius.smRadius,
@@ -701,7 +701,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: ESUNSpacing.badgeInsets,
                   decoration: BoxDecoration(
                     color: ESUNColors.primary.withOpacity(0.1),
                     borderRadius: ESUNRadius.fullRadius,
@@ -840,7 +840,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(ESUNSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
                 shape: BoxShape.circle,

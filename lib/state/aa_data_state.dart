@@ -125,13 +125,13 @@ class BankAccountData {
     'indusind bank': _faviconUrl('indusind.com'),
   };
   
-  // Mock data - matches seeded database values
+  // Mock data - matches Arjun Mehta seeded database values
   static List<BankAccountData> get mockList => [
-    BankAccountData(bankName: 'HDFC Bank', accountNumber: 'XXXX1234', accountType: 'SAVINGS', balance: 542350.75,
+    BankAccountData(bankName: 'HDFC Bank', accountNumber: 'XXXX1234', accountType: 'SAVINGS', balance: 485000.00,
       logoUrl: _faviconUrl('hdfcbank.com')),
-    BankAccountData(bankName: 'ICICI Bank', accountNumber: 'XXXX5678', accountType: 'SAVINGS', balance: 187500.00,
+    BankAccountData(bankName: 'ICICI Bank', accountNumber: 'XXXX5678', accountType: 'SAVINGS', balance: 220000.00,
       logoUrl: _faviconUrl('icicibank.com')),
-    BankAccountData(bankName: 'State Bank of India', accountNumber: 'XXXX9012', accountType: 'CURRENT', balance: 325000.00,
+    BankAccountData(bankName: 'SBI', accountNumber: 'XXXX9012', accountType: 'CURRENT', balance: 350000.00,
       logoUrl: _faviconUrl('sbi.co.in')),
   ];
 }
@@ -414,15 +414,15 @@ class LoanData {
   // Mock data - matches seeded database values
   static List<LoanData> get mockList => [
     LoanData(
-      id: '1', lenderName: 'SBI', loanType: 'HOME', accountNumber: 'HL****3847',
-      principalAmount: 2500000, outstandingAmount: 2500000, emiAmount: 25000,
-      interestRate: 8.5, tenure: 240, remainingTenure: 220,
+      id: '1', lenderName: 'HDFC Bank', loanType: 'HOME', accountNumber: 'HL****1234',
+      principalAmount: 4000000, outstandingAmount: 2200000, emiAmount: 28000,
+      interestRate: 8.35, tenure: 240, remainingTenure: 180,
       nextEmiDate: DateTime(2026, 4, 5), status: 'ACTIVE',
     ),
     LoanData(
-      id: '2', lenderName: 'ICICI Bank', loanType: 'CAR', accountNumber: 'CL****9281',
-      principalAmount: 485000, outstandingAmount: 450000, emiAmount: 17000,
-      interestRate: 9.2, tenure: 60, remainingTenure: 48,
+      id: '2', lenderName: 'ICICI Bank', loanType: 'CAR', accountNumber: 'CL****5678',
+      principalAmount: 600000, outstandingAmount: 320000, emiAmount: 8500,
+      interestRate: 8.90, tenure: 60, remainingTenure: 36,
       nextEmiDate: DateTime(2026, 4, 10), status: 'ACTIVE',
     ),
   ];
@@ -502,34 +502,27 @@ class InsuranceData {
     'reliance nippon': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://reliancenipponlife.com&size=128',
   };
   
-  // Mock data - matches seeded database values
+  // Mock data - matches Arjun Mehta seeded values
   static List<InsuranceData> get mockList => [
     InsuranceData(
       id: '1', provider: 'LIC of India', policyNumber: 'POL****5847',
-      type: 'TERM', sumAssured: 10000000, premiumAmount: 15000,
-      premiumFrequency: 'YEARLY', startDate: DateTime(2021, 6, 15),
-      expiryDate: DateTime(2051, 6, 15), status: 'ACTIVE',
+      type: 'TERM', sumAssured: 10000000, premiumAmount: 12000,
+      premiumFrequency: 'YEARLY', startDate: DateTime(2023, 1, 15),
+      expiryDate: DateTime(2053, 1, 15), status: 'ACTIVE',
       logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128',
     ),
     InsuranceData(
-      id: '2', provider: 'Max Life', policyNumber: 'POL****2938',
-      type: 'ULIP', sumAssured: 2500000, premiumAmount: 50000,
-      premiumFrequency: 'YEARLY', startDate: DateTime(2023, 3, 10),
-      expiryDate: DateTime(2043, 3, 10), status: 'ACTIVE',
-      logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128',
-    ),
-    InsuranceData(
-      id: '3', provider: 'HDFC ERGO', policyNumber: 'POL****8472',
-      type: 'HEALTH', sumAssured: 500000, premiumAmount: 12000,
-      premiumFrequency: 'YEARLY', startDate: DateTime(2024, 1, 1),
-      expiryDate: DateTime(2025, 1, 1), status: 'ACTIVE',
+      id: '2', provider: 'HDFC ERGO', policyNumber: 'POL****2938',
+      type: 'HEALTH', sumAssured: 500000, premiumAmount: 8500,
+      premiumFrequency: 'YEARLY', startDate: DateTime(2025, 4, 1),
+      expiryDate: DateTime(2026, 4, 1), status: 'ACTIVE',
       logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128',
     ),
     InsuranceData(
-      id: '4', provider: 'ICICI Lombard', policyNumber: 'POL****6183',
-      type: 'VEHICLE', sumAssured: 1200000, premiumAmount: 8000,
-      premiumFrequency: 'YEARLY', startDate: DateTime(2025, 9, 20),
-      expiryDate: DateTime(2026, 9, 20), status: 'ACTIVE',
+      id: '3', provider: 'ICICI Lombard', policyNumber: 'POL****8472',
+      type: 'VEHICLE', sumAssured: 800000, premiumAmount: 6000,
+      premiumFrequency: 'YEARLY', startDate: DateTime(2025, 10, 1),
+      expiryDate: DateTime(2026, 10, 1), status: 'ACTIVE',
       logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicilombard.com&size=128',
     ),
   ];
@@ -545,6 +538,7 @@ class FinancialSnapshot {
   final double savingsRate;
   final double netWorthChange; // Year-over-year change percentage
   final DateTime snapshotDate;
+  final int creditScore;
   
   FinancialSnapshot({
     required this.netWorth,
@@ -555,6 +549,7 @@ class FinancialSnapshot {
     required this.savingsRate,
     this.netWorthChange = 8.2,
     required this.snapshotDate,
+    this.creditScore = 780,
   });
   
   factory FinancialSnapshot.fromJson(Map<String, dynamic> json) {
@@ -586,6 +581,12 @@ class FinancialSnapshot {
     
     final savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0.0;
     
+    // Parse credit score from nested or flat format
+    final creditData = json['credit'] as Map<String, dynamic>?;
+    final creditScore = creditData != null
+        ? (creditData['score'] as num?)?.toInt() ?? 780
+        : (json['credit_score'] as num?)?.toInt() ?? 780;
+    
     return FinancialSnapshot(
       netWorth: (json['net_worth'] as num?)?.toDouble() ?? 0.0,
       totalAssets: totalAssets,
@@ -594,18 +595,19 @@ class FinancialSnapshot {
       totalMonthlyExpense: expense,
       savingsRate: savingsRate,
       snapshotDate: DateTime.tryParse(json['snapshot_date'] ?? '') ?? DateTime.now(),
+      creditScore: creditScore,
     );
   }
   
-  // Default mock data when AA is not linked - matches seeded database values
+  // Default mock data when AA is not linked - matches Arjun Mehta seeded values
   static FinancialSnapshot get mock => FinancialSnapshot(
-    netWorth: 1549850.75,
-    totalAssets: 4534850.75,
-    totalLiabilities: 2985000.00,
+    netWorth: 7200000.00,
+    totalAssets: 7600000.00,
+    totalLiabilities: 400000.00,
     totalMonthlyIncome: 185000.00,
-    totalMonthlyExpense: 95000.00,
-    savingsRate: 48.65,
-    netWorthChange: 8.2,
+    totalMonthlyExpense: 32000.00,
+    savingsRate: 64.9,
+    netWorthChange: 5.2,
     snapshotDate: DateTime.now(),
   );
 }
@@ -648,16 +650,16 @@ class AssetBreakdown {
     );
   }
   
-  // Default mock data - matches seeded database values
+  // Default mock data - matches Arjun Mehta seeded values
   static AssetBreakdown get mock => AssetBreakdown(
-    mutualFunds: 1250000,   // ₹12.5L in mutual funds
-    stocks: 875000,          // ₹8.75L in stocks
-    etfs: 225000,            // ₹2.25L in ETFs
-    bankBalance: 1054850.75, // ₹10.55L in bank accounts
-    fixedDeposits: 500000,   // ₹5L in FDs
+    mutualFunds: 2800000,   // ₹28L in mutual funds
+    stocks: 1500000,         // ₹15L in stocks
+    etfs: 500000,            // ₹5L in ETFs
+    bankBalance: 600000,    // ₹6L in bank accounts
+    fixedDeposits: 600000,   // ₹6L in FDs
     realEstate: 0,
-    gold: 180000,            // ₹1.8L in gold
-    others: 450000,          // ₹4.5L in PPF
+    gold: 400000,            // ₹4L in gold
+    others: 1200000,         // ₹12L in PPF/NPS
   );
 }
 
@@ -762,9 +764,9 @@ class AADataState {
 
   // ---- Financial Health Score (computed from live data) ----
   double get _monthlyIncome => snapshot?.totalMonthlyIncome ?? 185000;
-  double get _monthlyExpense => snapshot?.totalMonthlyExpense ?? 95000;
+  double get _monthlyExpense => snapshot?.totalMonthlyExpense ?? 32000;
   double get _totalEmi => loans.fold<double>(0, (s, l) => s + l.emiAmount);
-  int get creditScore => 780; // from snapshot / credit bureau
+  int get creditScore => snapshot?.creditScore ?? 780;
 
   String get creditLabel {
     if (creditScore >= 750) return 'Excellent';
@@ -830,39 +832,76 @@ class AADataNotifier extends StateNotifier<AADataState> {
   
   AADataNotifier(this._ref) : super(const AADataState());
   
+  /// Track whether local balance changes exist that shouldn't be overwritten
+  bool _hasLocalBalanceChanges = false;
+  
   ApiService get _api => _ref.read(apiServiceProvider);
   
-  /// Fetch all AA data from backend
+  /// Fetch all AA data from backend in two phases to avoid HTTP connection queuing.
+  /// Phase 1 loads above-the-fold data (snapshot + bank accounts).
+  /// Phase 2 loads the rest after phase 1 completes.
   Future<void> fetchAllData() async {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      // Fetch all data in parallel
-      final results = await Future.wait([
+      // Phase 1: Critical data for balance card (above-the-fold)
+      final phase1 = await Future.wait([
         _fetchSnapshot(),
-        _fetchLinkedAccounts(),
         _fetchBankAccounts(),
+      ]);
+
+      final snapshot = phase1[0] as FinancialSnapshot?;
+      final bankAccounts = phase1[1] as List<BankAccountData>;
+
+      // Update state immediately so the balance card renders fast
+      if (!_hasLocalBalanceChanges) {
+        state = state.copyWith(
+          snapshot: snapshot,
+          bankAccounts: bankAccounts,
+        );
+      }
+
+      // Phase 2: Secondary data (below-the-fold)
+      final phase2 = await Future.wait([
+        _fetchLinkedAccounts(),
         _fetchInvestments(),
         _fetchLoans(),
         _fetchInsurances(),
       ]);
-      
-      state = state.copyWith(
-        isLoading: false,
-        isLoaded: true,
-        lastUpdated: DateTime.now(),
-        snapshot: results[0] as FinancialSnapshot?,
-        linkedAccounts: results[1] as List<AALinkedAccount>,
-        bankAccounts: results[2] as List<BankAccountData>,
-        investments: results[3] as List<InvestmentHolding>,
-        loans: results[4] as List<LoanData>,
-        insurances: results[5] as List<InsuranceData>,
-        assetBreakdown: _calculateAssetBreakdown(
-          results[2] as List<BankAccountData>,
-          results[3] as List<InvestmentHolding>,
-          results[4] as List<LoanData>,
-        ),
-      );
+
+      final linkedAccounts = phase2[0] as List<AALinkedAccount>;
+      final investments = phase2[1] as List<InvestmentHolding>;
+      final loans = phase2[2] as List<LoanData>;
+      final insurances = phase2[3] as List<InsuranceData>;
+
+      if (_hasLocalBalanceChanges) {
+        state = state.copyWith(
+          isLoading: false,
+          isLoaded: true,
+          lastUpdated: DateTime.now(),
+          linkedAccounts: linkedAccounts,
+          investments: investments,
+          loans: loans,
+          insurances: insurances,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          isLoaded: true,
+          lastUpdated: DateTime.now(),
+          snapshot: snapshot,
+          linkedAccounts: linkedAccounts,
+          bankAccounts: bankAccounts,
+          investments: investments,
+          loans: loans,
+          insurances: insurances,
+          assetBreakdown: _calculateAssetBreakdown(
+            bankAccounts,
+            investments,
+            loans,
+          ),
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -980,7 +1019,8 @@ class AADataNotifier extends StateNotifier<AADataState> {
     );
   }
   
-  /// Load mock data for demo/testing — uses same 3 banks as mockList
+  /// Load mock data for demo/testing — STRONG profile (default)
+  /// High income, good savings, diversified investments, manageable debt
   void loadMockData() {
     state = state.copyWith(
       isLoading: false,
@@ -993,6 +1033,84 @@ class AADataNotifier extends StateNotifier<AADataState> {
       fixedDeposits: FixedDepositData.mockList,
       loans: LoanData.mockList,
       insurances: InsuranceData.mockList,
+    );
+  }
+  
+  /// Load STRONG financial profile for demo Device 1
+  /// Score ~75-85: High savings, good investments, manageable loans
+  void loadStrongProfileData() {
+    loadMockData(); // Default mock is already strong
+  }
+  
+  /// Load WEAK financial profile for demo Device 2
+  /// Score ~30-42: Low savings, overspending, high debt, minimal investments
+  void loadWeakProfileData() {
+    state = state.copyWith(
+      isLoading: false,
+      isLoaded: true,
+      lastUpdated: DateTime.now(),
+      snapshot: FinancialSnapshot(
+        netWorth: -397500.0,
+        totalAssets: 27500.0,
+        totalLiabilities: 425000.0,
+        totalMonthlyIncome: 45000.0,
+        totalMonthlyExpense: 42000.0,
+        savingsRate: -20.0,
+        netWorthChange: -8.5,
+        snapshotDate: DateTime.now(),
+      ),
+      assetBreakdown: AssetBreakdown(
+        mutualFunds: 15000,
+        stocks: 0,
+        etfs: 0,
+        bankBalance: 12500,
+        fixedDeposits: 0,
+        realEstate: 0,
+        gold: 0,
+        others: 0,
+      ),
+      bankAccounts: [
+        BankAccountData(
+          bankName: 'Axis Bank',
+          accountNumber: 'XXXX4521',
+          accountType: 'SAVINGS',
+          balance: 12500.0,
+          logoUrl: BankAccountData._faviconUrl('axisbank.com'),
+        ),
+      ],
+      investments: [
+        InvestmentHolding(
+          id: 'w1', name: 'Parag Parikh Flexi Cap', type: 'mutual_fund',
+          symbol: 'PPFCF', exchange: null, quantity: 25.0, avgBuyPrice: 600.0,
+          currentValue: 15000, returns: 0, returnsPercentage: 0.0,
+        ),
+      ],
+      fixedDeposits: [], // No FDs
+      loans: [
+        LoanData(
+          id: 'w1', lenderName: 'Bajaj Finance', loanType: 'PERSONAL',
+          accountNumber: 'PL****4821',
+          principalAmount: 350000, outstandingAmount: 280000, emiAmount: 8500,
+          interestRate: 18.0, tenure: 36, remainingTenure: 28,
+          nextEmiDate: DateTime(2026, 4, 5), status: 'ACTIVE',
+        ),
+        LoanData(
+          id: 'w2', lenderName: 'Axis Bank', loanType: 'CREDIT_CARD',
+          accountNumber: 'CC****9034',
+          principalAmount: 150000, outstandingAmount: 145000, emiAmount: 3500,
+          interestRate: 42.0, tenure: 24, remainingTenure: 20,
+          nextEmiDate: DateTime(2026, 4, 10), status: 'ACTIVE',
+        ),
+      ],
+      insurances: [
+        InsuranceData(
+          id: 'w1', provider: 'Star Health',
+          policyNumber: 'POL****7890', type: 'HEALTH',
+          sumAssured: 300000, premiumAmount: 5000,
+          premiumFrequency: 'YEARLY', startDate: DateTime(2024, 9, 1),
+          expiryDate: DateTime(2025, 9, 1), status: 'LAPSED',
+        ),
+      ],
     );
   }
   
@@ -1064,6 +1182,7 @@ class AADataNotifier extends StateNotifier<AADataState> {
       others: currentAssets.others,
     );
 
+    _hasLocalBalanceChanges = true;
     state = state.copyWith(
       bankAccounts: updatedAccounts,
       snapshot: updatedSnapshot,
@@ -1148,6 +1267,7 @@ class AADataNotifier extends StateNotifier<AADataState> {
       others: currentAssets.others,
     );
 
+    _hasLocalBalanceChanges = true;
     state = state.copyWith(
       bankAccounts: updatedAccounts,
       snapshot: updatedSnapshot,
@@ -1215,28 +1335,52 @@ final aaDataProvider = StateNotifierProvider<AADataNotifier, AADataState>((ref) 
   return notifier;
 });
 
-// Computed providers for specific screens
+// Computed providers for specific screens — use .select() to avoid full-state rebuilds
 final bankAccountsProvider = Provider<List<BankAccountData>>((ref) {
-  return ref.watch(aaDataProvider).bankAccounts;
+  return ref.watch(aaDataProvider.select((data) => data.bankAccounts));
 });
 
 final investmentsProvider = Provider<List<InvestmentHolding>>((ref) {
-  return ref.watch(aaDataProvider).investments;
+  return ref.watch(aaDataProvider.select((data) => data.investments));
 });
 
 final loansProvider = Provider<List<LoanData>>((ref) {
-  return ref.watch(aaDataProvider).loans;
+  return ref.watch(aaDataProvider.select((data) => data.loans));
 });
 
 final insurancesProvider = Provider<List<InsuranceData>>((ref) {
-  return ref.watch(aaDataProvider).insurances;
+  return ref.watch(aaDataProvider.select((data) => data.insurances));
 });
 
 final netWorthProvider = Provider<double>((ref) {
-  final aaData = ref.watch(aaDataProvider);
-  return aaData.snapshot?.netWorth ?? aaData.calculatedNetWorth;
+  final snapshot = ref.watch(aaDataProvider.select((data) => data.snapshot));
+  final calcNetWorth = ref.watch(aaDataProvider.select((data) => data.calculatedNetWorth));
+  return snapshot?.netWorth ?? calcNetWorth;
 });
 
 final assetBreakdownProvider = Provider<AssetBreakdown>((ref) {
-  return ref.watch(aaDataProvider).assetBreakdown ?? AssetBreakdown.mock;
+  return ref.watch(aaDataProvider.select((data) => data.assetBreakdown)) ?? AssetBreakdown.mock;
 });
+
+// ============================================================================
+// Demo Profile Switcher (for two-device demonstration)
+// ============================================================================
+
+/// Current demo profile — null means using real/default data
+enum DemoProfile { strong, weak }
+
+final demoProfileProvider = StateProvider<DemoProfile?>((ref) => null);
+
+/// Switch demo profile and reload AA data with appropriate mock data
+void switchDemoProfile(WidgetRef ref, DemoProfile profile) {
+  ref.read(demoProfileProvider.notifier).state = profile;
+  final notifier = ref.read(aaDataProvider.notifier);
+  switch (profile) {
+    case DemoProfile.strong:
+      notifier.loadStrongProfileData();
+      break;
+    case DemoProfile.weak:
+      notifier.loadWeakProfileData();
+      break;
+  }
+}

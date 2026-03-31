@@ -5,6 +5,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,8 +48,20 @@ class ApiConfig {
   ];
 }
 
+/// Shared cache interceptor instance (accessible for cache invalidation)
+final cacheInterceptorProvider = Provider<CacheInterceptor>((ref) {
+  return CacheInterceptor(ttlSeconds: 120);
+});
+
+/// Request deduplication — prevents duplicate in-flight requests
+final _deduplicationInterceptorProvider = Provider<DeduplicationInterceptor>((ref) {
+  return DeduplicationInterceptor();
+});
+
 /// Dio client provider
 final dioProvider = Provider<Dio>((ref) {
+  final cacheInterceptor = ref.watch(cacheInterceptorProvider);
+  final dedupInterceptor = ref.watch(_deduplicationInterceptorProvider);
   final dio = Dio(BaseOptions(
     baseUrl: ApiConfig.baseUrl,
     connectTimeout: ApiConfig.connectTimeout,
@@ -56,20 +70,24 @@ final dioProvider = Provider<Dio>((ref) {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'Accept-Encoding': 'gzip, deflate',
     },
   ));
   
-  // Add interceptors
+  // Add interceptors — order matters: timing, dedup, cache, auth, retry, error, logger
   dio.interceptors.addAll([
+    TimingInterceptor(),
+    dedupInterceptor,
+    cacheInterceptor,
     AuthInterceptor(ref),
     RetryInterceptor(dio),
     ErrorInterceptor(),
     if (kDebugMode)
       PrettyDioLogger(
-        requestHeader: true,
+        requestHeader: false,
         requestBody: true,
         responseHeader: false,
-        responseBody: true,
+        responseBody: false,  // Reduced — avoid logging large AI responses
         error: true,
         compact: true,
       ),
@@ -104,7 +122,17 @@ class AuthInterceptor extends Interceptor {
       final token = await storage.getAccessToken();
       
       if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
+        // Proactive refresh: if access token expires within 60 seconds, refresh it
+        if (_isJwtExpiringSoon(token, thresholdSeconds: 60)) {
+          final refreshed = await _proactiveRefresh(storage);
+          if (refreshed != null) {
+            options.headers['Authorization'] = 'Bearer $refreshed';
+          } else {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+        } else {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
       }
       
       // Add device info
@@ -143,11 +171,16 @@ class AuthInterceptor extends Interceptor {
             data: {'refresh_token': refreshToken},
           );
           
-          if (response.statusCode == 200) {
-            final newToken = response.data['access_token'];
-            final newRefreshToken = response.data['refresh_token'];
+          if (response.statusCode == 200 && response.data != null) {
+            // Parse nested response: { success, data: { tokens: { access_token, refresh_token } } }
+            final respData = response.data is Map ? response.data as Map<String, dynamic> : <String, dynamic>{};
+            final body = respData['data'] as Map<String, dynamic>? ?? respData;
+            final tokens = body['tokens'] as Map<String, dynamic>? ?? body;
+            final newToken = tokens['access_token']?.toString();
+            final newRefreshToken = (tokens['refresh_token'] ?? refreshToken).toString();
             debugPrint('🔐 Token refresh successful');
             
+            if (newToken != null && newToken.isNotEmpty) {
             await storage.saveTokens(
               accessToken: newToken,
               refreshToken: newRefreshToken,
@@ -157,9 +190,9 @@ class AuthInterceptor extends Interceptor {
             err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
             final retryResponse = await dio.fetch(err.requestOptions);
             return handler.resolve(retryResponse);
-          } else {
-            debugPrint('🔐 Token refresh failed with status: ${response.statusCode}');
+            }
           }
+          debugPrint('🔐 Token refresh failed or no token in response');
         }
         
         // No refresh token or refresh failed - trigger session expiry
@@ -178,24 +211,17 @@ class AuthInterceptor extends Interceptor {
   void _triggerSessionExpiry() {
     debugPrint('🔐 _triggerSessionExpiry called');
     try {
-      // Clear auth data and trigger session expiry
       final storage = _ref.read(secureStorageProvider);
       storage.clearAuthData();
-      debugPrint('🔐 Auth data cleared');
       
-      // Update auth state
       final authNotifier = _ref.read(authStateProvider.notifier);
       authNotifier.handleSessionExpiry();
-      debugPrint('🔐 Auth state set to sessionExpired');
       
-      // Force navigation to login screen using microtask to avoid context issues
       Future.microtask(() {
         try {
           final context = rootNavigatorKey.currentContext;
-          debugPrint('🔐 Navigator context available: ${context != null}');
           if (context != null) {
             GoRouter.of(context).go(AppRoutes.login);
-            debugPrint('🔐 Navigation to login triggered');
           }
         } catch (e) {
           debugPrint('🔐 Session expiry navigation error: $e');
@@ -203,6 +229,57 @@ class AuthInterceptor extends Interceptor {
       });
     } catch (e) {
       debugPrint('🔐 Session expiry error: $e');
+    }
+  }
+
+  /// Check if a JWT token is expiring within [thresholdSeconds].
+  static bool _isJwtExpiringSoon(String token, {int thresholdSeconds = 60}) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+      String payload = parts[1];
+      switch (payload.length % 4) {
+        case 2: payload += '=='; break;
+        case 3: payload += '='; break;
+      }
+      final decoded = utf8.decode(base64Url.decode(payload));
+      final json = jsonDecode(decoded) as Map<String, dynamic>;
+      final exp = json['exp'] as int?;
+      if (exp == null) return false;
+      return DateTime.now().millisecondsSinceEpoch ~/ 1000 >= (exp - thresholdSeconds);
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Proactively refresh the access token before it expires.
+  /// Returns the new token on success, null on failure.
+  Future<String?> _proactiveRefresh(SecureStorageService storage) async {
+    try {
+      final refreshToken = await storage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) return null;
+      final dio = Dio();
+      final response = await dio.post(
+        '${ApiConfig.baseUrl}${ApiConfig.apiPrefix}/auth/refresh',
+        data: {'refresh_token': refreshToken},
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data is Map ? response.data as Map<String, dynamic> : <String, dynamic>{};
+        final body = data['data'] as Map<String, dynamic>? ?? data;
+        final tokens = body['tokens'] as Map<String, dynamic>? ?? body;
+        final newToken = tokens['access_token']?.toString();
+        final newRefresh = tokens['refresh_token']?.toString();
+        if (newToken != null && newToken.isNotEmpty) {
+          await storage.saveTokens(
+            accessToken: newToken,
+            refreshToken: newRefresh ?? refreshToken,
+          );
+          return newToken;
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }
@@ -263,6 +340,105 @@ class ErrorInterceptor extends Interceptor {
     // Analytics logging would go here
     debugPrint('API Error: ${err.requestOptions.path} - ${err.message}');
   }
+}
+
+/// Performance Timing Interceptor — logs request duration for every API call
+class TimingInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.extra['_startTime'] = DateTime.now().millisecondsSinceEpoch;
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    final start = response.requestOptions.extra['_startTime'] as int?;
+    if (start != null) {
+      final elapsed = DateTime.now().millisecondsSinceEpoch - start;
+      final path = response.requestOptions.path;
+      final serverTime = response.headers.value('X-Response-Time') ?? '?';
+      debugPrint('⏱️ API $path → ${response.statusCode} in ${elapsed}ms (server: $serverTime)');
+      if (elapsed > 2000) {
+        debugPrint('🐌 SLOW API CALL: $path took ${elapsed}ms — investigate!');
+      }
+    }
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final start = err.requestOptions.extra['_startTime'] as int?;
+    if (start != null) {
+      final elapsed = DateTime.now().millisecondsSinceEpoch - start;
+      debugPrint('⏱️ API ${err.requestOptions.path} → ERROR in ${elapsed}ms: ${err.type}');
+    }
+    handler.next(err);
+  }
+}
+
+/// In-Memory GET Response Cache Interceptor
+/// Caches GET responses for [ttlSeconds] to avoid redundant network calls.
+class CacheInterceptor extends Interceptor {
+  final int ttlSeconds;
+  final Map<String, _CacheEntry> _cache = {};
+
+  CacheInterceptor({this.ttlSeconds = 120});
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // Only cache GET requests
+    if (options.method.toUpperCase() != 'GET') {
+      return handler.next(options);
+    }
+    // Skip cache if explicitly requested
+    if (options.extra['skipCache'] == true) {
+      return handler.next(options);
+    }
+
+    final key = '${options.path}?${options.queryParameters}';
+    final entry = _cache[key];
+    if (entry != null && !entry.isExpired) {
+      debugPrint('📦 Cache HIT: ${options.path}');
+      return handler.resolve(
+        Response(
+          requestOptions: options,
+          data: entry.data,
+          statusCode: 200,
+          headers: Headers.fromMap({'X-Cache': ['HIT']}),
+        ),
+      );
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (response.requestOptions.method.toUpperCase() == 'GET' &&
+        response.statusCode == 200) {
+      final key =
+          '${response.requestOptions.path}?${response.requestOptions.queryParameters}';
+      _cache[key] = _CacheEntry(
+        data: response.data,
+        expiry: DateTime.now().add(Duration(seconds: ttlSeconds)),
+      );
+    }
+    handler.next(response);
+  }
+
+  /// Invalidate all cached entries (call after data refresh)
+  void clear() {
+    _cache.clear();
+    debugPrint('📦 Cache CLEARED');
+  }
+}
+
+class _CacheEntry {
+  final dynamic data;
+  final DateTime expiry;
+
+  _CacheEntry({required this.data, required this.expiry});
+
+  bool get isExpired => DateTime.now().isAfter(expiry);
 }
 
 /// Certificate Pinning (for production)
@@ -586,6 +762,108 @@ class ApiService {
              data['errors']?.toString();
     }
     return null;
+  }
+}
+
+/// Deduplication interceptor — collapses identical in-flight GET requests
+/// into a single network call. Prevents fetching /summary 3 times
+/// when 3 widgets mount simultaneously.
+class DeduplicationInterceptor extends Interceptor {
+  final Map<String, Completer<Response>> _inFlight = {};
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (options.method.toUpperCase() != 'GET') {
+      return handler.next(options);
+    }
+
+    final key = '${options.method}:${options.uri}';
+    if (_inFlight.containsKey(key)) {
+      debugPrint('[Dedup] Reusing in-flight request: ${options.path}');
+      try {
+        final response = await _inFlight[key]!.future;
+        return handler.resolve(Response(
+          requestOptions: options,
+          data: response.data,
+          statusCode: response.statusCode,
+          headers: response.headers,
+        ));
+      } catch (e) {
+        return handler.reject(
+          DioException(requestOptions: options, error: e),
+        );
+      }
+    }
+
+    _inFlight[key] = Completer<Response>();
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    final key = '${response.requestOptions.method}:${response.requestOptions.uri}';
+    if (_inFlight.containsKey(key) && !_inFlight[key]!.isCompleted) {
+      _inFlight[key]!.complete(response);
+    }
+    _inFlight.remove(key);
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final key = '${err.requestOptions.method}:${err.requestOptions.uri}';
+    if (_inFlight.containsKey(key) && !_inFlight[key]!.isCompleted) {
+      _inFlight[key]!.completeError(err);
+    }
+    _inFlight.remove(key);
+    handler.next(err);
+  }
+}
+
+/// SSE (Server-Sent Events) streaming support for AI chat
+/// Returns a Stream of text chunks as they arrive from the server.
+Stream<String> streamChatResponse(
+  Dio dio, {
+  required String path,
+  required Map<String, dynamic> data,
+}) async* {
+  final response = await dio.post<ResponseBody>(
+    path,
+    data: data,
+    options: Options(
+      responseType: ResponseType.stream,
+      headers: {'Accept': 'text/event-stream'},
+    ),
+  );
+
+  final stream = response.data?.stream;
+  if (stream == null) return;
+
+  String buffer = '';
+  await for (final chunk in stream) {
+    buffer += utf8.decode(chunk);
+    // Parse SSE lines: "data: ..."
+    while (buffer.contains('\n')) {
+      final lineEnd = buffer.indexOf('\n');
+      final line = buffer.substring(0, lineEnd).trim();
+      buffer = buffer.substring(lineEnd + 1);
+
+      if (line.startsWith('data: ')) {
+        final payload = line.substring(6);
+        if (payload == '[DONE]') return;
+        try {
+          final json = jsonDecode(payload) as Map<String, dynamic>;
+          final text = json['chunk'] ?? json['text'] ?? json['content'] ?? '';
+          if (text.toString().isNotEmpty) yield text.toString();
+        } catch (_) {
+          // Raw text chunk
+          if (payload.isNotEmpty) yield payload;
+        }
+      }
+    }
   }
 }
 

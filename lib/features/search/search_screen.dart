@@ -159,7 +159,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       padding: const EdgeInsets.only(bottom: ESUNSpacing.sm),
       child: ListTile(
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(ESUNSpacing.md),
           decoration: BoxDecoration(
             color: ESUNColors.primary.withOpacity(0.1),
             borderRadius: ESUNRadius.smRadius,
@@ -189,7 +189,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -234,7 +234,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       padding: const EdgeInsets.only(bottom: ESUNSpacing.sm),
       child: ListTile(
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(ESUNSpacing.md),
           decoration: BoxDecoration(
             color: result.color.withOpacity(0.1),
             borderRadius: ESUNRadius.smRadius,

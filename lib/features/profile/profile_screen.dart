@@ -78,7 +78,7 @@ class ProfileScreen extends ConsumerWidget {
                 bottom: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(ESUNSpacing.sm),
                   decoration: BoxDecoration(
                     color: ESUNColors.primary,
                     shape: BoxShape.circle,
@@ -105,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: ESUNSpacing.chipInsets,
             decoration: BoxDecoration(
               color: Colors.amber.withOpacity(0.1),
               borderRadius: ESUNRadius.fullRadius,
@@ -285,7 +285,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: ESUNColors.error),
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
           ),
         ),
       ),

@@ -227,7 +227,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(ESUNSpacing.xl),
                 decoration: BoxDecoration(
                   color: widget.color.withOpacity(0.1),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -266,7 +266,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(ESUNSpacing.md),
                           decoration: BoxDecoration(
                             color: widget.color.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -312,11 +312,11 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isFilled 
-                          ? (hasError ? Colors.red : widget.color)
+                          ? (hasError ? ESUNColors.error : widget.color)
                           : Colors.transparent,
                       border: Border.all(
                         color: hasError 
-                            ? Colors.red 
+                            ? ESUNColors.error 
                             : (isFilled ? widget.color : Colors.grey.shade300),
                         width: 2,
                       ),
@@ -329,7 +329,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
                 const SizedBox(height: 12),
                 Text(
                   'Incorrect PIN. Please try again.',
-                  style: ESUNTypography.bodySmall.copyWith(color: Colors.red),
+                  style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.error),
                 ),
               ],
               
@@ -462,7 +462,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(ESUNSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -511,7 +511,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
   
   Widget _buildBillHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(ESUNSpacing.xl),
       decoration: BoxDecoration(
         color: widget.color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
@@ -519,7 +519,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(ESUNSpacing.lg),
             decoration: BoxDecoration(
               color: widget.color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(14),
@@ -620,7 +620,7 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
             : const Icon(Icons.search),
         label: Text(_isFetching ? 'Fetching...' : 'Fetch Bill'),
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -633,22 +633,22 @@ class _BillPaymentScreenState extends ConsumerState<BillPaymentScreen> {
   
   Widget _buildBillDetailsCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.05),
+        color: ESUNColors.success.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.withOpacity(0.3)),
+        border: Border.all(color: ESUNColors.success.withOpacity(0.3)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 20),
+              const Icon(Icons.check_circle, color: ESUNColors.success, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Bill Found',
                 style: ESUNTypography.titleSmall.copyWith(
-                  color: Colors.green,
+                  color: ESUNColors.success,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -890,7 +890,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
           children: [
             // App Bar
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(ESUNSpacing.lg),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -987,8 +987,8 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
             
             // Transaction Details Card
             Container(
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(ESUNSpacing.xl),
+              padding: const EdgeInsets.all(ESUNSpacing.xl),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
@@ -1055,7 +1055,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
                       onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
                       style: FilledButton.styleFrom(
                         backgroundColor: widget.color,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

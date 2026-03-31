@@ -2,6 +2,8 @@
 /// 
 /// Service for calling the CFO AI chatbot API endpoints.
 
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 
@@ -110,23 +112,72 @@ class FinancialSummary {
 class CFOChatNotifier extends StateNotifier<CFOChatState> {
   final CFOService _service;
   String? _sessionId;
+  int _healthScore = 0;
+  String _healthLabel = 'Fair';
 
   CFOChatNotifier(this._service) : super(const CFOChatState()) {
     _initializeChat();
   }
 
+  /// Update health data from AA state for personalized responses
+  void updateHealthData(int score, String label) {
+    _healthScore = score;
+    _healthLabel = label;
+  }
+
+  /// Whether the user has a strong financial profile (score >= 65)
+  bool get isStrongProfile => _healthScore >= 65;
+
   Future<void> _initializeChat() async {
-    // Add static welcome message with multilingual support
+    // Personalized welcome based on health profile
+    final String profileHint;
+    final String capabilities;
+    if (_healthScore >= 80) {
+      profileHint = "Your finances look excellent! Let's explore wealth-building and advanced strategies together.";
+      capabilities = "**What I can do for you:**\n"
+          "- Optimize your investment portfolio & suggest rebalancing\n"
+          "- Plan long-term goals (retirement, FIRE, child education)\n"
+          "- Recommend SIP step-ups & tax-saving strategies\n"
+          "- Evaluate surplus utilization (liquid funds, sweep-in FD)\n"
+          "- Assess insurance adequacy & advanced planning\n"
+          "- Give pros & cons for every recommendation";
+    } else if (_healthScore >= 65) {
+      profileHint = "You're doing well financially! I can help you grow your wealth and plan for bigger goals.";
+      capabilities = "**What I can do for you:**\n"
+          "- Grow your investments with smart SIP recommendations\n"
+          "- Review portfolio allocation & suggest optimization\n"
+          "- Plan long-term financial milestones\n"
+          "- Find better use for idle bank surplus\n"
+          "- Evaluate insurance & loan prepayment options\n"
+          "- Give pros & cons for every recommendation";
+    } else if (_healthScore >= 50) {
+      profileHint = "Your finances need some attention. Let's work together on building better habits.";
+      capabilities = "**What I can do for you:**\n"
+          "- Create a budget plan that works for you\n"
+          "- Identify spending leaks & reduce unnecessary expenses\n"
+          "- Help build an emergency fund step by step\n"
+          "- Recommend safe investment options (RDs, liquid funds)\n"
+          "- Prioritize which debts to pay off first\n"
+          "- Give small, achievable weekly action items";
+    } else {
+      profileHint = "I'm here to help you improve your finances step by step. Let's start with quick wins today.";
+      capabilities = "**What I can do for you:**\n"
+          "- Stop the cash-flow drain — cut expenses safely\n"
+          "- Create a zero-based budget for next month\n"
+          "- Build your first emergency fund (even ₹500/week)\n"
+          "- Tackle high-interest debt with Avalanche method\n"
+          "- Improve financial discipline with daily habits\n"
+          "- Give one clear action to focus on each week";
+    }
+    
     final welcomeMessage = CFOMessage(
-      content: "Namaste! I'm KANTA, your AI financial advisor.\n\n"
-          "I can help you in:\n"
-          "English, Hindi, Telugu, Tamil, Malayalam, Kannada\n\n"
-          "Check all your bank balances\n"
-          "Track your transactions\n"
-          "Get personalized financial advice\n"
-          "Plan your savings & investments\n\n"
-          "Just ask in your preferred language!\n\n"
-          "⚠️ Disclaimer: Kantha provides AI-generated insights based on your financial data for informational and educational purposes only. These insights are not financial advice. Always conduct your own research or consult a qualified professional from our expert marketplace before making any financial decisions.",
+      content: "Namaste! I'm **KANTA**, your AI financial advisor.\n\n"
+          "$profileHint\n\n"
+          "I speak: English, Hindi, Telugu, Tamil, Malayalam, Kannada\n\n"
+          "$capabilities\n\n"
+          "Just ask me anything in your preferred language!\n\n"
+          "_Disclaimer: Kanta provides AI-generated insights for informational purposes only — not financial advice. "
+          "Consult a qualified professional before making financial decisions._",
       isUser: false,
     );
     state = state.copyWith(messages: [welcomeMessage]);
@@ -158,42 +209,82 @@ class CFOChatNotifier extends StateNotifier<CFOChatState> {
     );
 
     try {
-      final response = await _service.chat(message, sessionId: _sessionId);
-      
-      if (response != null) {
-        _sessionId = response['session_id'];
-        final aiMessage = CFOMessage(
-          content: response['message'] ?? 'Unable to generate response',
+      final stopwatch = Stopwatch()..start();
+
+      // Add a placeholder AI message that will be filled chunk-by-chunk
+      final aiMessage = CFOMessage(content: '', isUser: false);
+      state = state.copyWith(
+        messages: [...state.messages, aiMessage],
+      );
+
+      final buffer = StringBuffer();
+      await for (final chunk in streamChatResponse(
+        _service._dio,
+        path: '/api/v1/cfo/chat/stream',
+        data: {
+          'message': message,
+          if (_sessionId != null) 'session_id': _sessionId,
+          if (_healthScore > 0) 'health_score': _healthScore,
+          'health_label': _healthLabel,
+        },
+      )) {
+        buffer.write(chunk);
+        // Update the last message in place for progressive rendering
+        final updated = List<CFOMessage>.from(state.messages);
+        updated[updated.length - 1] = CFOMessage(
+          content: buffer.toString(),
+          isUser: false,
+        );
+        state = state.copyWith(messages: updated);
+      }
+
+      stopwatch.stop();
+      debugPrint('⏱️ CFO stream completed in ${stopwatch.elapsedMilliseconds}ms');
+
+      // Final state — mark loading done
+      final finalContent = buffer.toString();
+      if (finalContent.isEmpty) {
+        final updated = List<CFOMessage>.from(state.messages);
+        updated[updated.length - 1] = CFOMessage(
+          content: "Sorry, I couldn't process your request. Please try again.",
+          isUser: false,
+        );
+        state = state.copyWith(messages: updated, isLoading: false);
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (e) {
+      // Fallback: if streaming fails, try the blocking endpoint
+      try {
+        final response = await _service.chat(
+          message,
+          sessionId: _sessionId,
+          healthScore: _healthScore,
+          healthLabel: _healthLabel,
+        );
+        if (response != null) {
+          _sessionId = response['session_id'];
+          final updated = List<CFOMessage>.from(state.messages);
+          updated[updated.length - 1] = CFOMessage(
+            content: response['message'] ?? 'Unable to generate response',
+            isUser: false,
+          );
+          state = state.copyWith(messages: updated, isLoading: false);
+        } else {
+          state = state.copyWith(isLoading: false, error: e.toString());
+        }
+      } catch (fallbackError) {
+        final updated = List<CFOMessage>.from(state.messages);
+        updated[updated.length - 1] = CFOMessage(
+          content: "Error: ${fallbackError.toString()}",
           isUser: false,
         );
         state = state.copyWith(
-          messages: [...state.messages, aiMessage],
+          messages: updated,
           isLoading: false,
-        );
-      } else {
-        state = state.copyWith(
-          messages: [
-            ...state.messages,
-            CFOMessage(
-              content: "Sorry, I couldn't process your request. Please try again.",
-              isUser: false,
-            ),
-          ],
-          isLoading: false,
+          error: fallbackError.toString(),
         );
       }
-    } catch (e) {
-      state = state.copyWith(
-        messages: [
-          ...state.messages,
-          CFOMessage(
-            content: "Error: ${e.toString()}",
-            isUser: false,
-          ),
-        ],
-        isLoading: false,
-        error: e.toString(),
-      );
     }
   }
 
@@ -216,13 +307,15 @@ class CFOService {
   CFOService(this._dio);
 
   /// Send a chat message to CFO AI
-  Future<Map<String, dynamic>?> chat(String message, {String? sessionId}) async {
+  Future<Map<String, dynamic>?> chat(String message, {String? sessionId, int? healthScore, String? healthLabel}) async {
     try {
       final response = await _dio.post(
         '/api/v1/cfo/chat',
         data: {
           'message': message,
           if (sessionId != null) 'session_id': sessionId,
+          if (healthScore != null) 'health_score': healthScore,
+          if (healthLabel != null) 'health_label': healthLabel,
         },
         options: Options(extra: {'skipAuth': true}),
       );
@@ -313,6 +406,28 @@ class CFOService {
       );
     } catch (e) {
       // Silent fail for refresh
+    }
+  }
+
+  /// Convert text to speech via Sarvam AI (Indian male voice)
+  /// Returns base64-encoded WAV audio, or null on failure.
+  Future<String?> textToSpeech(String text, {String language = 'english'}) async {
+    try {
+      final response = await _dio.post(
+        '/api/v1/cfo/tts',
+        data: {
+          'text': text,
+          'language': language,
+        },
+        options: Options(extra: {'skipAuth': true}),
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        return response.data['data']['audio_base64'] as String?;
+      }
+      return null;
+    } catch (e) {
+      return null;  // Fallback to device TTS silently
     }
   }
 }
