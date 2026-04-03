@@ -1,6 +1,7 @@
 /// ESUN Payments Screen
 /// 
 /// Payment hub for UPI, bills, transfers and more.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -278,7 +279,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.surfaceVariant,
               shape: BoxShape.circle,
             ),

@@ -1,6 +1,7 @@
 /// ESUN Reminder Service
 ///
 /// Handles reminder scheduling for data linking via backend API.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

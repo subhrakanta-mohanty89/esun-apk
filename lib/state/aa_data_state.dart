@@ -1,6 +1,7 @@
 /// AA Data State
 /// 
 /// Manages Account Aggregator data from Finvu for display across the app.
+library;
 
 import 'dart:async';
 
@@ -835,12 +836,19 @@ class AADataNotifier extends StateNotifier<AADataState> {
   /// Track whether local balance changes exist that shouldn't be overwritten
   bool _hasLocalBalanceChanges = false;
   
+  /// Guard against concurrent fetchAllData() calls
+  bool _isFetching = false;
+  
   ApiService get _api => _ref.read(apiServiceProvider);
   
   /// Fetch all AA data from backend in two phases to avoid HTTP connection queuing.
   /// Phase 1 loads above-the-fold data (snapshot + bank accounts).
   /// Phase 2 loads the rest after phase 1 completes.
   Future<void> fetchAllData() async {
+    // Prevent duplicate concurrent calls
+    if (_isFetching) return;
+    _isFetching = true;
+    
     state = state.copyWith(isLoading: true, error: null);
     
     try {
@@ -907,6 +915,8 @@ class AADataNotifier extends StateNotifier<AADataState> {
         isLoading: false,
         error: e.toString(),
       );
+    } finally {
+      _isFetching = false;
     }
   }
   

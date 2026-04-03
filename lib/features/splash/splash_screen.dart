@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — splash
 /// Enhanced splash screen with elastic logo animation and tagline fade-in.
+library;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

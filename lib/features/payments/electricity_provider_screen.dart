@@ -2,6 +2,7 @@
 ///
 /// Provider selection screen for electricity bill payments with official logos,
 /// state-wise providers, saved connections, and bill history.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -214,10 +215,10 @@ class _ElectricityProviderScreenState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
+        builder: (context) => const BillPaymentScreen(
           billType: 'Electricity Bill',
           icon: Icons.bolt,
-          color: const Color(0xFFF59E0B),
+          color: Color(0xFFF59E0B),
         ),
       ),
     );
@@ -501,7 +502,7 @@ class _ElectricityProviderScreenState
       onTap: () => _navigateToPayment(provider.shortName),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           border:
               Border(bottom: BorderSide(color: ESUNColors.divider, width: 0.5)),
@@ -525,7 +526,7 @@ class _ElectricityProviderScreenState
                 ],
               ),
             ),
-            Icon(Icons.chevron_right,
+            const Icon(Icons.chevron_right,
                 color: ESUNColors.textTertiary, size: 20),
           ],
         ),

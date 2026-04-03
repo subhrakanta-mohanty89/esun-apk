@@ -1,6 +1,7 @@
 /// ESUN Secure Storage
 /// 
 /// Encrypted storage for sensitive data like tokens, credentials, and user preferences.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

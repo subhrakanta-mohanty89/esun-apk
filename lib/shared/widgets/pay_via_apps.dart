@@ -2,6 +2,7 @@
 ///
 /// Shows popular UPI / payment apps (PhonePe, Google Pay, Paytm, CRED, Amazon Pay)
 /// as alternate payment channels.
+library;
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';

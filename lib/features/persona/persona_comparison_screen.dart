@@ -2,6 +2,7 @@
 ///
 /// UI for comparing structured vs unstructured financial profiles.
 /// Shows health score, key ratios, and persona-specific insights.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,6 +1,7 @@
 /// Net Worth Screens
 /// 
 /// Displays user's net worth breakdown with data from Account Aggregator.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -633,7 +634,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     color: ESUNColors.success,
                     size: 24,
@@ -793,7 +794,7 @@ class _NetWorthScreenState extends ConsumerState<NetWorthScreen> {
                     drawVerticalLine: false,
                     horizontalInterval: 500000,
                     getDrawingHorizontalLine: (value) {
-                      return FlLine(
+                      return const FlLine(
                         color: ESUNColors.border,
                         strokeWidth: 1,
                       );
@@ -1018,7 +1019,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.trending_up,
               size: 64,
               color: ESUNColors.textTertiary,
@@ -1186,7 +1187,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
             const SizedBox(height: ESUNSpacing.sm),
             Row(
               children: [
-                Icon(Icons.account_balance, size: 12, color: ESUNColors.textTertiary),
+                const Icon(Icons.account_balance, size: 12, color: ESUNColors.textTertiary),
                 const SizedBox(width: 4),
                 Text(
                   inv.provider!,
@@ -1210,7 +1211,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.account_balance,
               size: 64,
               color: ESUNColors.textTertiary,
@@ -1305,7 +1306,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.savings,
               size: 64,
               color: ESUNColors.textTertiary,
@@ -1443,7 +1444,7 @@ class NetWorthDetailsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(ESUNSpacing.xxl),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.category,
                     size: 64,
                     color: ESUNColors.textTertiary,

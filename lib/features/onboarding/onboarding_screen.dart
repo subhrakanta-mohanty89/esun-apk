@@ -1,6 +1,7 @@
 /// ESUN Onboarding Screen
 /// 
 /// Introduces app features to new users.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -149,7 +150,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: _pages[currentIndex].gradient[0],
                       padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: ESUNRadius.lgRadius,
                       ),
                       elevation: 0,

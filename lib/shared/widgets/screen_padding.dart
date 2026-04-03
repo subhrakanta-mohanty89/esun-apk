@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — design system
 /// Consistent 20px horizontal screen padding wrapper.
+library;
+
 
 import 'package:flutter/material.dart';
 

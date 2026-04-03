@@ -1,6 +1,7 @@
 /// ESUN Reset Password Screen
 ///
 /// Allows users to enter OTP and new password to reset their password.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -160,7 +161,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: ESUNRadius.lgRadius,
           ),
           content: Column(
@@ -310,7 +311,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           style: ESUNTypography.headlineMedium.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             counterText: '',
                             filled: true,
                             fillColor: ESUNColors.neutral100,
@@ -320,7 +321,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: ESUNRadius.mdRadius,
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: ESUNColors.primary,
                                 width: 2,
                               ),
@@ -439,7 +440,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   // Password requirements
                   Container(
                     padding: const EdgeInsets.all(ESUNSpacing.md),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.neutral100,
                       borderRadius: ESUNRadius.mdRadius,
                     ),
@@ -485,7 +486,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.check_circle_outline,
             size: 14,
             color: ESUNColors.textSecondary,

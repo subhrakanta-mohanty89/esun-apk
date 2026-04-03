@@ -2,6 +2,7 @@
 /// 
 /// Unified state management for all transactions, payments, and balance updates.
 /// This creates a cohesive financial flow for the MVP demo.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/network/api_service.dart';

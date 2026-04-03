@@ -1,6 +1,7 @@
 /// ESUN Alerts Screen
 /// 
 /// Notifications and alerts center - derives from transaction history.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

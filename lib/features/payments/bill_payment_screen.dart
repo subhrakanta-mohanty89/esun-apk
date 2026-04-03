@@ -1,6 +1,7 @@
 /// ESUN Bill Payment Screen
 /// 
 /// Functional bill payment screen with static data and success animation.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

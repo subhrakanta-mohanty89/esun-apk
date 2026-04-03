@@ -2,6 +2,7 @@
 ///
 /// Main installation flow controller that manages the onboarding journey:
 /// Onboarding → Registration → Permissions → Data Linking.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

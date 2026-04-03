@@ -2,6 +2,7 @@
 ///
 /// A bottom sheet dialog for users to schedule a reminder
 /// when they choose to skip data linking.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,7 +78,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
               color: ESUNColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.notifications_active_outlined,
               size: 32,
               color: ESUNColors.primary,
@@ -171,7 +172,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
           // Skip without reminder
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
+            child: const Text(
               'Skip without reminder',
               style: TextStyle(
                 color: ESUNColors.textSecondary,
@@ -225,7 +226,7 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
                 ),
               ),
               if (isSelected)
-                Icon(
+                const Icon(
                   Icons.check_circle,
                   color: ESUNColors.primary,
                 ),
@@ -332,8 +333,8 @@ class _RemindMeLaterSheetState extends ConsumerState<_RemindMeLaterSheet> {
           Navigator.of(context).pop(true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Failed to set reminder. Try again.'),
+            const SnackBar(
+              content: Text('Failed to set reminder. Try again.'),
               backgroundColor: ESUNColors.error,
             ),
           );

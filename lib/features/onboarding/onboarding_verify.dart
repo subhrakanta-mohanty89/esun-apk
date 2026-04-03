@@ -20,12 +20,11 @@ class OnboardingVerifyScreen extends ConsumerStatefulWidget {
 
 class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen> {
   String _phoneOtp = '';
-  String _emailOtp = '';
   bool _isVerifying = false;
   bool _permissionsRequested = false;
 
   Future<void> _verify() async {
-    if (_phoneOtp.length != 6 || _emailOtp.length != 6) return;
+    if (_phoneOtp.length != 6) return;
 
     setState(() {
       _isVerifying = true;
@@ -91,9 +90,11 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verify your contact details'),
+        title: const Text('Verify your phone number'),
       ),
-      body: SafeArea(
+      body: Stack(
+        children: [
+        SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
@@ -114,7 +115,7 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
                           ),
                           const SizedBox(height: ESUNSpacing.xs),
                           Text(
-                            '${data.phone}  -  ${data.email}',
+                            data.phone,
                             style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -122,7 +123,7 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
                         ],
 
                         Text(
-                          'Mobile verification',
+                          'Enter the 6-digit OTP sent to your phone',
                           style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: ESUNSpacing.sm),
@@ -133,25 +134,7 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
                         ),
                         const SizedBox(height: ESUNSpacing.sm),
                         Text(
-                          'Code sent to your mobile number',
-                          style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary),
-                        ),
-
-                        SizedBox(height: isSmallScreen ? ESUNSpacing.lg : ESUNSpacing.xl),
-
-                        Text(
-                          'Email verification',
-                          style: ESUNTypography.titleSmall.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: ESUNSpacing.sm),
-                        FPOtpField(
-                          length: 6,
-                          onChanged: (value) => setState(() => _emailOtp = value),
-                          onCompleted: (value) => setState(() => _emailOtp = value),
-                        ),
-                        const SizedBox(height: ESUNSpacing.sm),
-                        Text(
-                          'Code sent to your email address',
+                          'Default OTP for demo: 123456',
                           style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary),
                         ),
 
@@ -162,7 +145,7 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
                           width: double.infinity,
                           child: FPButton(
                             label: 'Verify & Continue',
-                            onPressed: (_phoneOtp.length == 6 && _emailOtp.length == 6 && !_isVerifying)
+                            onPressed: (_phoneOtp.length == 6 && !_isVerifying)
                                 ? _verify
                                 : null,
                             isLoading: _isVerifying,
@@ -170,7 +153,7 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
                         ),
                         const SizedBox(height: ESUNSpacing.md),
                         Text(
-                          "Did not get a code? Check spam or request again after a minute.",
+                          "Default OTP is 123456 for this demo.",
                           style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary),
                         ),
                       ],
@@ -181,6 +164,16 @@ class _OnboardingVerifyScreenState extends ConsumerState<OnboardingVerifyScreen>
             );
           },
         ),
+      ),
+      // Full-screen loading overlay
+      if (_isVerifying)
+        Container(
+          color: Colors.black.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      ],
       ),
     );
   }

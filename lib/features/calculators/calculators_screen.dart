@@ -5,6 +5,7 @@
 /// - Retirement Calculator
 /// - Emergency Fund Calculator
 /// - SIP Calculator (bonus)
+library;
 
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -557,7 +558,7 @@ class _EMICalculatorSheetState extends State<EMICalculatorSheet> {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.border,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -662,8 +663,8 @@ class _EMICalculatorSheetState extends State<EMICalculatorSheet> {
                     // Monthly EMI
                     Container(
                       padding: const EdgeInsets.all(ESUNSpacing.lg),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
                           colors: [Color(0xFF2E4A9A), Color(0xFF223474)],
                         ),
                         borderRadius: ESUNRadius.lgRadius,
@@ -855,9 +856,9 @@ class _RetirementCalculatorSheetState extends State<RetirementCalculatorSheet> {
   int _retirementAge = 60;
   double _monthlyExpense = 50000;
   double _currentSavings = 500000;
-  double _expectedInflation = 6.0;
+  final double _expectedInflation = 6.0;
   double _expectedReturns = 12.0;
-  int _yearsAfterRetirement = 25;
+  final int _yearsAfterRetirement = 25;
   RetirementResult? _result;
 
   @override
@@ -897,7 +898,7 @@ class _RetirementCalculatorSheetState extends State<RetirementCalculatorSheet> {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.border,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -1032,8 +1033,8 @@ class _RetirementCalculatorSheetState extends State<RetirementCalculatorSheet> {
                   if (_result != null) ...[
                     Container(
                       padding: const EdgeInsets.all(ESUNSpacing.lg),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
                           colors: [Color(0xFF059669), Color(0xFF10B981)],
                         ),
                         borderRadius: ESUNRadius.lgRadius,
@@ -1229,7 +1230,7 @@ class _EmergencyFundCalculatorSheetState extends State<EmergencyFundCalculatorSh
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.border,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -1378,8 +1379,8 @@ class _EmergencyFundCalculatorSheetState extends State<EmergencyFundCalculatorSh
                   if (_result != null) ...[
                     Container(
                       padding: const EdgeInsets.all(ESUNSpacing.lg),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
                           colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
                         ),
                         borderRadius: ESUNRadius.lgRadius,
@@ -1617,7 +1618,7 @@ class _SIPCalculatorSheetState extends State<SIPCalculatorSheet> {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.border,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -1711,8 +1712,8 @@ class _SIPCalculatorSheetState extends State<SIPCalculatorSheet> {
                   // Future Value
                   Container(
                     padding: const EdgeInsets.all(ESUNSpacing.lg),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
                         colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
                       ),
                       borderRadius: ESUNRadius.lgRadius,

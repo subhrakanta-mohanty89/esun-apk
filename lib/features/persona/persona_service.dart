@@ -2,6 +2,7 @@
 /// 
 /// Service for calling the persona analysis API endpoints.
 /// Supports structured vs unstructured financial profile analysis.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';

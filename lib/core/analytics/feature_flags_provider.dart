@@ -2,6 +2,7 @@
 ///
 /// Manages feature flags state and caching for A/B testing and feature toggles.
 /// Automatically fetches flags on startup and caches them.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';

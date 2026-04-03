@@ -1,6 +1,7 @@
 /// ESUN AI Advisor Screen - KANTA
 /// 
 /// AI-powered financial advisor with chat interface.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -827,9 +828,9 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           const SizedBox(width: ESUNSpacing.sm),
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.surfaceVariant,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
                 bottomLeft: Radius.circular(4),
@@ -900,7 +901,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                       : 'Ask KANTA anything...',
                   filled: true,
                   fillColor: ESUNColors.surfaceVariant,
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: ESUNRadius.fullRadius,
                     borderSide: BorderSide.none,
                   ),

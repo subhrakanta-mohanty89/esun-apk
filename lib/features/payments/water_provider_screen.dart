@@ -2,6 +2,7 @@
 ///
 /// Provider selection for municipal water board bill payments with
 /// official logos, saved connections, and bill history.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -154,10 +155,10 @@ class _WaterProviderScreenState extends ConsumerState<WaterProviderScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
+        builder: (context) => const BillPaymentScreen(
           billType: 'Water Bill',
           icon: Icons.water_drop,
-          color: const Color(0xFF0288D1),
+          color: Color(0xFF0288D1),
         ),
       ),
     );

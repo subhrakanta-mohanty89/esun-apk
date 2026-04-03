@@ -1,6 +1,7 @@
 /// ESUN Home Screen
 /// 
 /// Main dashboard showing account overview, quick actions, and insights.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,6 @@ import '../../state/aa_data_state.dart';
 import '../../state/transaction_state.dart';
 import '../../core/analytics/analytics_service.dart';
 import '../payments/mobile_recharge_screen.dart';
-import '../../core/constants/brand_logos.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -114,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.lgRadius,
         ),
         title: Row(
@@ -192,7 +192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
               ref.read(authStateProvider.notifier).dismissLinkDataPopup();
             },
-            child: Text(
+            child: const Text(
               'Remind me later',
               style: TextStyle(color: ESUNColors.textSecondary),
             ),
@@ -334,7 +334,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Container(
                   width: 40, height: 4,
                   margin: const EdgeInsets.only(bottom: ESUNSpacing.xl),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.divider,
                     borderRadius: ESUNRadius.fullRadius,
                   ),
@@ -586,9 +586,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onPressed: () => context.push(AppRoutes.search),
         ),
         IconButton(
-          icon: Badge(
+          icon: const Badge(
             smallSize: 8,
-            child: const Icon(Icons.notifications_outlined),
+            child: Icon(Icons.notifications_outlined),
           ),
           onPressed: () => context.push(AppRoutes.alerts),
         ),
@@ -684,7 +684,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final monthSpending = ref.watch(monthSpendingProvider);
     
     // Calculate monthly income (credits) vs expenses
-    final monthIncome = 120000.0; // From salary etc.
+    const monthIncome = 120000.0; // From salary etc.
     
     // Format amounts for display
     String formatAmount(double amount) {
@@ -810,14 +810,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const Spacer(),
-          // Account Indicators
+          // Account Indicators — driven by actual bank accounts
           Row(
             children: [
-              _buildAccountDot('HDFC', BrandLogos.banks['hdfc']!),
-              const SizedBox(width: 8),
-              _buildAccountDot('ICICI', BrandLogos.banks['icici']!),
-              const SizedBox(width: 8),
-              _buildAccountDot('SBI', BrandLogos.banks['sbi']!),
+              ...aaData.bankAccounts.map((account) {
+                final logoUrl = account.effectiveLogoUrl;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildAccountDot(
+                    account.bankName,
+                    logoUrl ?? '',
+                  ),
+                );
+              }),
               const Spacer(),
               GestureDetector(
                 onTap: () => _showAccountsSheet(context),
@@ -831,7 +836,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '3 Accounts',
+                        '${aaData.bankAccounts.length} Account${aaData.bankAccounts.length == 1 ? '' : 's'}',
                         style: ESUNTypography.labelSmall.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
@@ -1278,8 +1283,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(ESUNSpacing.sm),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDCFCE7),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFDCFCE7),
                   borderRadius: ESUNRadius.smRadius,
                 ),
                 child: const Icon(
@@ -1490,7 +1495,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 label: const Text('Add Bank Account'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.lg),
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                     borderRadius: ESUNRadius.mdRadius,
                   ),
                 ),
@@ -1967,15 +1972,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   Container(
                     padding: ESUNSpacing.chipInsets,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.fullRadius,
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.filter_list, size: 16),
-                        const SizedBox(width: 4),
+                        Icon(Icons.filter_list, size: 16),
+                        SizedBox(width: 4),
                         Text('Filter', style: ESUNTypography.labelMedium),
                       ],
                     ),
@@ -2055,7 +2060,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     Text(category, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                     const SizedBox(width: 6),
-                    Text('•', style: TextStyle(color: ESUNColors.textTertiary)),
+                    const Text('•', style: TextStyle(color: ESUNColors.textTertiary)),
                     const SizedBox(width: 6),
                     Text(time, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary)),
                   ],
@@ -2184,8 +2189,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: () => context.push(AppRoutes.advisor),
         child: Container(
           padding: const EdgeInsets.all(ESUNSpacing.md),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [Color(0xFF2E4A9A), Color(0xFF4A62B8)],
             ),
             borderRadius: ESUNRadius.lgRadius,
@@ -2790,7 +2795,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   Container(
                     padding: ESUNSpacing.chipInsets,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.primary,
                       borderRadius: ESUNRadius.fullRadius,
                     ),
@@ -2908,7 +2913,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.receipt_long_outlined, size: 48, color: ESUNColors.textTertiary),
+                    const Icon(Icons.receipt_long_outlined, size: 48, color: ESUNColors.textTertiary),
                     const SizedBox(height: ESUNSpacing.sm),
                     Text(
                       'No transactions yet',
@@ -2966,9 +2971,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(ESUNSpacing.sm),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF2E4A9A), const Color(0xFF3B82F6)],
+                        colors: [Color(0xFF2E4A9A), Color(0xFF3B82F6)],
                       ),
                       borderRadius: ESUNRadius.smRadius,
                     ),
@@ -3209,11 +3214,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(3))),
                 const SizedBox(width: 4),
-                Text('Income', style: ESUNTypography.labelSmall),
+                const Text('Income', style: ESUNTypography.labelSmall),
                 const SizedBox(width: 16),
                 Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(3))),
                 const SizedBox(width: 4),
-                Text('Expense', style: ESUNTypography.labelSmall),
+                const Text('Expense', style: ESUNTypography.labelSmall),
               ],
             ),
             const SizedBox(height: ESUNSpacing.md),
@@ -3512,8 +3517,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: ESUNSpacing.md),
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.lg),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
                 colors: [ESUNColors.primary200, ESUNColors.secondaryLight],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

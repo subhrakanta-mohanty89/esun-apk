@@ -1,6 +1,7 @@
 /// ESUN Auth Screens
 /// 
 /// Login, OTP verification, and biometric unlock screens.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -173,21 +174,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       user: user,
       deviceId: deviceId,
     );
-    // GoRouter redirect handles navigation when authState changes
+    if (!mounted) return;
+    // Explicitly navigate after saving tokens
+    final authState = ref.read(authStateProvider);
+    if (!authState.aaConnected && !authState.isOnboarded) {
+      context.go(AppRoutes.installationDataLinking);
+    } else {
+      context.go(AppRoutes.payments);
+    }
   }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.xl),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: ESUNSpacing.xxxl),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.xl),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: ESUNSpacing.xxxl),
                 // Logo & Welcome — gradient background
                 Container(
                   width: 68,
@@ -227,7 +237,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: ESUNSpacing.xxl),
                 // Login Mode Toggle — pill style
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.surfaceVariant,
                     borderRadius: ESUNRadius.lgRadius,
                   ),
@@ -359,7 +369,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Divider with "or"
                 Row(
                   children: [
-                    Expanded(child: Divider(color: ESUNColors.divider)),
+                    const Expanded(child: Divider(color: ESUNColors.divider)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
                       child: Text(
@@ -369,7 +379,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: ESUNColors.divider)),
+                    const Expanded(child: Divider(color: ESUNColors.divider)),
                   ],
                 ),
                 const SizedBox(height: ESUNSpacing.lg),
@@ -380,7 +390,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: () => context.go(AppRoutes.onboarding),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: ESUNColors.primary.withOpacity(0.3)),
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: ESUNRadius.mdRadius,
                       ),
                     ),
@@ -428,6 +438,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+      // Full-screen loading overlay
+      if (_isLoading)
+        Container(
+          color: Colors.black.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
     );
   }
 }
@@ -499,7 +519,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     if (!mounted) return;
 
     if (ok) {
-      // Keep loading overlay; GoRouter redirect navigates automatically
+      // Explicitly navigate to clear the auth route stack.
+      // Don't rely solely on GoRouter redirect — it can race with microtask.
+      final authState = ref.read(authStateProvider);
+      if (!authState.aaConnected && !authState.isOnboarded) {
+        context.go(AppRoutes.installationDataLinking);
+      } else {
+        context.go(AppRoutes.payments);
+      }
       return;
     }
     setState(() => _isLoading = false);
@@ -556,7 +583,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: SafeArea(
+      body: Stack(
+        children: [
+        SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(ESUNSpacing.xl),
           child: Column(
@@ -636,9 +665,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   width: 1.85,
                                 ),
                               ),
-                              focusedBorder: OutlineInputBorder(
+                              focusedBorder: const OutlineInputBorder(
                                 borderRadius: ESUNRadius.mdRadius,
-                                borderSide: const BorderSide(
+                                borderSide: BorderSide(
                                   color: ESUNColors.primary,
                                   width: 2.2,
                                 ),
@@ -688,6 +717,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             ],
           ),
         ),
+      ),
+      // Full-screen loading overlay
+      if (_isLoading)
+        Container(
+          color: Colors.black.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      ],
       ),
     );
   }

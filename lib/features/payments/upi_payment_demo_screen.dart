@@ -2,6 +2,7 @@
 /// 
 /// Interactive demo screen for UPI payments.
 /// Shows balance, allows making demo payments that deduct from balance.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -162,7 +163,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.data_object, color: ESUNColors.primary),
+              const Icon(Icons.data_object, color: ESUNColors.primary),
               const SizedBox(width: ESUNSpacing.sm),
               Text(
                 'Setup Demo Data',
@@ -355,7 +356,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
                 color: ESUNColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.account_balance,
                 color: ESUNColors.primary,
                 size: 20,
@@ -430,7 +431,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
             ],
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Amount',
               prefixText: '₹ ',
               hintText: '0.00',
@@ -447,7 +448,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
             decoration: InputDecoration(
               labelText: 'Payee UPI ID',
               hintText: 'example@upi',
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
                 borderRadius: ESUNRadius.mdRadius,
               ),
               suffixIcon: _isVerifyingVpa
@@ -510,7 +511,7 @@ class _UPIPaymentDemoScreenState extends ConsumerState<UPIPaymentDemoScreen> {
           // Description Input
           TextField(
             controller: _descriptionController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Description (optional)',
               hintText: 'Payment for...',
               border: OutlineInputBorder(

@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — design system
 /// Outlined text field — 56px height, 12px radius, floating label.
+library;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

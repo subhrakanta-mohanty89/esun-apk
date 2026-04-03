@@ -1,6 +1,7 @@
 /// ESUN Mobile - Main Entry Point
 /// 
 /// A production-grade personal finance ecosystem.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

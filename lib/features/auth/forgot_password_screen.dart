@@ -1,6 +1,7 @@
 /// ESUN Forgot Password Screen
 ///
 /// Allows users to request password reset via OTP.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -101,7 +102,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 Container(
                   width: 72,
                   height: 72,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.primary100,
                     borderRadius: ESUNRadius.lgRadius,
                   ),

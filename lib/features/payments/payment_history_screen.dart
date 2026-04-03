@@ -1,6 +1,7 @@
 /// ESUN Payment History Screen
 ///
 /// Shows transaction history with static demo data and filtering options.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -759,7 +760,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Download Statement', style: ESUNTypography.titleLarge),
+            const Text('Download Statement', style: ESUNTypography.titleLarge),
             const SizedBox(height: 12),
             _buildDownloadOption('Last 30 Days', Icons.calendar_today),
             _buildDownloadOption('Last 3 Months', Icons.date_range),
@@ -795,7 +796,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Filter Transactions', style: ESUNTypography.titleLarge),
+            const Text('Filter Transactions', style: ESUNTypography.titleLarge),
             const SizedBox(height: 12),
             ListTile(
               leading: const Icon(Icons.calendar_today),

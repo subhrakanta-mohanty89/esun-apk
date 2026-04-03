@@ -2,6 +2,7 @@
 ///
 /// Provider selection for DTH recharge with official logos,
 /// saved connections, and plan selection.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -207,10 +208,10 @@ class _DthProviderScreenState extends ConsumerState<DthProviderScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
+        builder: (context) => const BillPaymentScreen(
           billType: 'DTH Recharge',
           icon: Icons.tv,
-          color: const Color(0xFF7C4DFF),
+          color: Color(0xFF7C4DFF),
         ),
       ),
     );

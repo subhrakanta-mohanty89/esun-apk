@@ -1,6 +1,7 @@
 /// ESUN Input Components
 /// 
 /// Reusable input fields and form components.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -340,7 +341,7 @@ class _FPOtpFieldState extends State<FPOtpField> {
     final screenWidth = MediaQuery.of(context).size.width;
     // Calculate responsive box width based on screen size
     // Total width = (boxWidth * length) + (spacing * (length - 1)) + padding
-    final horizontalPadding = ESUNSpacing.xl * 2; // 32 * 2 = 64
+    const horizontalPadding = ESUNSpacing.xl * 2; // 32 * 2 = 64
     final totalSpacing = ESUNSpacing.sm * (widget.length - 1);
     final availableWidth = screenWidth - horizontalPadding - totalSpacing;
     final boxWidth = (availableWidth / widget.length).clamp(40.0, 52.0);

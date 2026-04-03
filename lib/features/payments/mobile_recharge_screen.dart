@@ -2,6 +2,7 @@
 ///
 /// Full-featured mobile recharge screen with provider logos, saved numbers,
 /// recent recharges, and quick recharge plans — light theme design.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,10 +131,10 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
       color: const Color(0xFF00A651),
       logoUrl: _getTelecomLogo('bsnl'),
     ),
-    _TelecomProvider(
+    const _TelecomProvider(
       name: 'MTNL',
       shortName: 'MTNL',
-      color: const Color(0xFFFF6600),
+      color: Color(0xFFFF6600),
     ),
   ];
 
@@ -382,7 +383,7 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       right: BorderSide(color: ESUNColors.border),
                     ),
@@ -430,8 +431,8 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
                       // Contact picker placeholder
                     },
                     borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(ESUNSpacing.md),
+                    child: const Padding(
+                      padding: EdgeInsets.all(ESUNSpacing.md),
                       child: Icon(
                         Icons.contacts_rounded,
                         color: ESUNColors.primary,
@@ -482,7 +483,7 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
   Widget _buildSavedNumberCard(_SavedNumber number, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
           bottom: BorderSide(color: ESUNColors.divider, width: 0.5),
@@ -634,7 +635,7 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
               ),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right, size: 16, color: ESUNColors.primary),
+            const Icon(Icons.chevron_right, size: 16, color: ESUNColors.primary),
           ],
         ),
       ),
@@ -675,7 +676,7 @@ class _MobileRechargeScreenState extends ConsumerState<MobileRechargeScreen> {
   Widget _buildRechargeHistoryCard(_RechargeHistory item) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
           bottom: BorderSide(color: ESUNColors.divider, width: 0.5),

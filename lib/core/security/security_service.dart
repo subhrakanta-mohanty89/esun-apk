@@ -1,6 +1,7 @@
 /// ESUN Security Services
 /// 
 /// Biometric authentication, device binding, fraud detection, and security utilities.
+library;
 
 import 'dart:convert';
 import 'dart:math';

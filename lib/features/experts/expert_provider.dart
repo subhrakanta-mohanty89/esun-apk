@@ -1,6 +1,7 @@
 /// Expert Marketplace Providers
 ///
 /// Riverpod providers for expert search, filtering, and pagination.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

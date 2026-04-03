@@ -2,6 +2,7 @@
 ///
 /// Provides access to device contacts for payments and transfers.
 /// Handles contact fetching, searching, and caching.
+library;
 
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

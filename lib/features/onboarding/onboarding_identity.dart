@@ -137,7 +137,9 @@ class _OnboardingIdentityScreenState extends ConsumerState<OnboardingIdentityScr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+        SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(ESUNSpacing.xl),
           child: Form(
@@ -260,7 +262,7 @@ class _OnboardingIdentityScreenState extends ConsumerState<OnboardingIdentityScr
 
                 const SizedBox(height: ESUNSpacing.lg),
                 Text(
-                  'We’ll send separate codes to verify your mobile number and email.',
+                  'We\u2019ll send a code to verify your mobile number.',
                   style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textTertiary),
                 ),                const SizedBox(height: ESUNSpacing.xl),
                 Center(
@@ -272,6 +274,16 @@ class _OnboardingIdentityScreenState extends ConsumerState<OnboardingIdentityScr
             ),
           ),
         ),
+      ),
+      // Full-screen loading overlay
+      if (_isSubmitting)
+        Container(
+          color: Colors.black.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      ],
       ),
     );
   }

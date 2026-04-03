@@ -1,6 +1,7 @@
 /// Data Export Providers
 ///
 /// Riverpod providers for secure data export and advisor sharing.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

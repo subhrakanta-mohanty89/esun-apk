@@ -1,6 +1,7 @@
 /// ESUN Feature Introduction Screen
 ///
 /// Shows app features to new users after registration with swipeable pages.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

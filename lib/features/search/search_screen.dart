@@ -1,6 +1,7 @@
 /// ESUN Search Screen
 /// 
 /// Universal search for transactions, contacts, and features.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -212,7 +213,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final results = _getSearchResults(query);
     
     if (results.isEmpty) {
-      return FPEmptyState(
+      return const FPEmptyState(
         icon: Icons.search_off,
         title: 'No results found',
         description: 'Try searching for something else',

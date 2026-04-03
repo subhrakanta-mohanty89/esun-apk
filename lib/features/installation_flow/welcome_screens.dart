@@ -1,6 +1,7 @@
 /// ESUN Welcome Screens
 ///
 /// Swipeable onboarding screens introducing app features to new users.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

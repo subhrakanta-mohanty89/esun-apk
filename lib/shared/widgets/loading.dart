@@ -1,6 +1,7 @@
 /// ESUN Loading States
 /// 
 /// Skeleton loaders, shimmer effects, and loading indicators.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -183,9 +184,9 @@ class FPTransactionSkeleton extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return FPShimmer(
+    return const FPShimmer(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: ESUNSpacing.lg,
           vertical: ESUNSpacing.md,
         ),
@@ -196,8 +197,8 @@ class FPTransactionSkeleton extends StatelessWidget {
               height: 44,
               borderRadius: ESUNRadius.smRadius,
             ),
-            const SizedBox(width: ESUNSpacing.md),
-            const Expanded(
+            SizedBox(width: ESUNSpacing.md),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -207,8 +208,8 @@ class FPTransactionSkeleton extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: ESUNSpacing.md),
-            const FPSkeletonLine(width: 70, height: 16),
+            SizedBox(width: ESUNSpacing.md),
+            FPSkeletonLine(width: 70, height: 16),
           ],
         ),
       ),
@@ -225,7 +226,7 @@ class FPBalanceCardSkeleton extends StatelessWidget {
     return FPShimmer(
       child: Container(
         padding: const EdgeInsets.all(ESUNSpacing.xl),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: ESUNColors.surfaceVariant,
           borderRadius: ESUNRadius.cardRadius,
         ),
@@ -264,7 +265,7 @@ class FPStatsRowSkeleton extends StatelessWidget {
                 right: index < count - 1 ? ESUNSpacing.md : 0,
               ),
               padding: const EdgeInsets.all(ESUNSpacing.lg),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: ESUNColors.surfaceVariant,
                 borderRadius: ESUNRadius.cardRadius,
               ),
@@ -298,7 +299,7 @@ class FPChartSkeleton extends StatelessWidget {
     return FPShimmer(
       child: Container(
         height: height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: ESUNColors.surfaceVariant,
           borderRadius: ESUNRadius.cardRadius,
         ),

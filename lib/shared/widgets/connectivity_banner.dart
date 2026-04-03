@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — design system
 /// Non-dismissible connectivity banner shown at the top of the screen.
+library;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

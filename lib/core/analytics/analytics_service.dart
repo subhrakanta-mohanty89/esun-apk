@@ -2,6 +2,7 @@
 ///
 /// Centralized analytics logging for tracking user events and actions.
 /// Integrates with Firebase Analytics and backend API for dual tracking.
+library;
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

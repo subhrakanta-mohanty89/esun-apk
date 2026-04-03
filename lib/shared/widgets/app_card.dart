@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — design system
 /// Flat card with subtle border — 16px radius, 16px padding, no heavy shadow.
+library;
+
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';

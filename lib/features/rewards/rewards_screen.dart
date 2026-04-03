@@ -1,6 +1,7 @@
 /// ESUN Rewards Screen
 ///
 /// Professional rewards hub with gamification, cashback, gift cards, and more.
+library;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -28,11 +29,11 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
   // User rewards data - state managed for session
   int _coinBalance = 19546;
   int _cashbackBalance = 247;
-  int _scratchCards = 5;
+  final int _scratchCards = 5;
   int _currentStreak = 7;
   int _totalEarned = 45230;
-  int _level = 12;
-  double _levelProgress = 0.68;
+  final int _level = 12;
+  final double _levelProgress = 0.68;
   bool _dailyClaimed = false;
 
   @override
@@ -63,7 +64,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
 
   String _formatDuration(Duration d) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    return twoDigits(d.inHours) + ':' + twoDigits(d.inMinutes.remainder(60)) + ':' + twoDigits(d.inSeconds.remainder(60));
+    return '${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}';
   }
 
   @override
@@ -182,7 +183,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                             ),
                           ),
                           Text(
-                            (_levelProgress * 100).toInt().toString() + '%',
+                            '${(_levelProgress * 100).toInt()}%',
                             style: ESUNTypography.labelSmall.copyWith(
                               color: Colors.white70,
                             ),
@@ -375,7 +376,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                       const Icon(Icons.local_fire_department, color: Colors.orange, size: 14),
                       const SizedBox(width: 4),
                       Text(
-                        _currentStreak.toString() + ' days',
+                        '$_currentStreak days',
                         style: ESUNTypography.labelSmall.copyWith(
                           color: Colors.orange,
                           fontWeight: FontWeight.bold,
@@ -393,7 +394,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                 final isCompleted = index < _currentStreak;
                 final isToday = index == _currentStreak - 1;
                 return _buildStreakDay(
-                  'D' + (index + 1).toString(),
+                  'D${index + 1}',
                   ((index + 1) * 10).toString(),
                   isCompleted,
                   isToday,
@@ -600,7 +601,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
                         ),
                       ),
                       Text(
-                        card.discount.toString() + '% off',
+                        '${card.discount}% off',
                         style: ESUNTypography.labelSmall.copyWith(
                           color: const Color(0xFF059669),
                           fontWeight: FontWeight.bold,
@@ -719,7 +720,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
             const SizedBox(height: ESUNSpacing.sm),
             Row(
               children: [
-                _buildEarningStat('Total Earned', '\u20B9' + _totalEarned.toString(), const Color(0xFF059669)),
+                _buildEarningStat('Total Earned', '\u20B9$_totalEarned', const Color(0xFF059669)),
                 const SizedBox(width: ESUNSpacing.md),
                 _buildEarningStat('This Month', '\u20B94,520', ESUNColors.primary),
               ],
@@ -829,8 +830,8 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.md),
       child: Container(
         padding: const EdgeInsets.all(ESUNSpacing.md),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
             colors: [Color(0xFF2E4A9A), Color(0xFF223474)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -870,7 +871,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: ESUNRadius.smRadius,
               ),
@@ -1258,20 +1259,20 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen>
           children: [
             Text('Active Offers', style: ESUNTypography.titleLarge.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: ESUNSpacing.lg),
-            ListTile(
-              leading: const Icon(Icons.percent, color: Colors.green),
-              title: const Text('5% Cashback on Investments'),
-              subtitle: const Text('Min ₹5,000 investment'),
+            const ListTile(
+              leading: Icon(Icons.percent, color: Colors.green),
+              title: Text('5% Cashback on Investments'),
+              subtitle: Text('Min ₹5,000 investment'),
             ),
-            ListTile(
-              leading: const Icon(Icons.flash_on, color: Colors.orange),
-              title: const Text('2x Coins on Bill Payments'),
-              subtitle: const Text('Valid this week'),
+            const ListTile(
+              leading: Icon(Icons.flash_on, color: Colors.orange),
+              title: Text('2x Coins on Bill Payments'),
+              subtitle: Text('Valid this week'),
             ),
-            ListTile(
-              leading: const Icon(Icons.people, color: Colors.blue),
-              title: const Text('Refer & Earn ₹500'),
-              subtitle: const Text('Per successful referral'),
+            const ListTile(
+              leading: Icon(Icons.people, color: Colors.blue),
+              title: Text('Refer & Earn ₹500'),
+              subtitle: Text('Per successful referral'),
             ),
           ],
         ),

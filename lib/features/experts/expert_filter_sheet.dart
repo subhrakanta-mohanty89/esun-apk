@@ -2,6 +2,7 @@
 ///
 /// Bottom sheet for filtering experts by specialization, rating, price,
 /// availability, and location.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,7 +84,7 @@ class _ExpertFilterSheetState extends ConsumerState<ExpertFilterSheet> {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.divider,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -534,7 +535,7 @@ class _ExpertFilterSheetState extends ConsumerState<ExpertFilterSheet> {
                     },
                   )
                 : null,
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
               borderRadius: ESUNRadius.mdRadius,
             ),
           ),
@@ -681,7 +682,7 @@ class _ExpertFilterSheetState extends ConsumerState<ExpertFilterSheet> {
   }) {
     return Container(
       padding: const EdgeInsets.all(ESUNSpacing.md),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: ESUNColors.surfaceVariant,
         borderRadius: ESUNRadius.mdRadius,
       ),

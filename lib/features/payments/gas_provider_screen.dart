@@ -2,6 +2,7 @@
 ///
 /// Provider selection for LPG cylinder booking and piped gas payments
 /// with official logos for Bharat Gas, HP Gas, Indane, and piped gas providers.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -164,10 +165,10 @@ class _GasProviderScreenState extends ConsumerState<GasProviderScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
+        builder: (context) => const BillPaymentScreen(
           billType: 'Gas Cylinder',
           icon: Icons.local_gas_station,
-          color: const Color(0xFFEF6C00),
+          color: Color(0xFFEF6C00),
         ),
       ),
     );

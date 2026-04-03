@@ -2,6 +2,7 @@
 ///
 /// Documentaries, videos, courses and learning content
 /// related to finance, investment, and trading.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -301,11 +302,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.person_outline, size: 14, color: ESUNColors.textSecondary),
+                      const Icon(Icons.person_outline, size: 14, color: ESUNColors.textSecondary),
                       const SizedBox(width: 4),
                       Text(item.author, style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textSecondary)),
                       const SizedBox(width: 12),
-                      Icon(Icons.visibility_outlined, size: 14, color: ESUNColors.textSecondary),
+                      const Icon(Icons.visibility_outlined, size: 14, color: ESUNColors.textSecondary),
                       const SizedBox(width: 4),
                       Text(item.views, style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textSecondary)),
                       const Spacer(),
@@ -421,7 +422,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
       children: [
         Icon(icon, size: 12, color: ESUNColors.textSecondary),
         const SizedBox(width: 3),
-        Text(text, style: TextStyle(fontSize: 10, color: ESUNColors.textSecondary)),
+        Text(text, style: const TextStyle(fontSize: 10, color: ESUNColors.textSecondary)),
       ],
     );
   }
@@ -469,11 +470,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Text(article.readTime, style: TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
+                      Text(article.readTime, style: const TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
                       const SizedBox(width: 8),
-                      Text('·', style: TextStyle(color: ESUNColors.textSecondary)),
+                      const Text('·', style: TextStyle(color: ESUNColors.textSecondary)),
                       const SizedBox(width: 8),
-                      Text(article.date, style: TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
+                      Text(article.date, style: const TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
                     ],
                   ),
                 ],
@@ -560,11 +561,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
                     child: Container(
                       padding: ESUNSpacing.badgeInsets,
                       decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(6)),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.star_rounded, color: Colors.white, size: 12),
-                          const SizedBox(width: 2),
+                          Icon(Icons.star_rounded, color: Colors.white, size: 12),
+                          SizedBox(width: 2),
                           Text('Featured', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                         ],
                       ),
@@ -620,7 +621,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
       children: [
         Icon(icon, size: 14, color: ESUNColors.textSecondary),
         const SizedBox(width: 4),
-        Text(text, style: TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
+        Text(text, style: const TextStyle(fontSize: 11, color: ESUNColors.textSecondary)),
       ],
     );
   }
@@ -667,11 +668,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.person, size: 16, color: ESUNColors.textSecondary),
+                        const Icon(Icons.person, size: 16, color: ESUNColors.textSecondary),
                         const SizedBox(width: 4),
                         Text(item.author, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                         const SizedBox(width: 16),
-                        Icon(Icons.timer, size: 16, color: ESUNColors.textSecondary),
+                        const Icon(Icons.timer, size: 16, color: ESUNColors.textSecondary),
                         const SizedBox(width: 4),
                         Text(item.duration, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                       ],
@@ -842,7 +843,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
                       children: [
                         Text(article.readTime, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                         const SizedBox(width: 8),
-                        Text('·', style: TextStyle(color: ESUNColors.textSecondary)),
+                        const Text('·', style: TextStyle(color: ESUNColors.textSecondary)),
                         const SizedBox(width: 8),
                         Text(article.date, style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                       ],
@@ -862,7 +863,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
   // ─── Data ───
   List<_LearnItem> _getFilteredVideos() {
     final all = [
-      _LearnItem(
+      const _LearnItem(
         title: 'Mutual Funds for Beginners – Complete Guide',
         description: 'Learn how mutual funds work, types of funds (equity, debt, hybrid), SIPs, and how to choose the right fund for your goals.',
         author: 'CA Rachana Ranade',
@@ -870,11 +871,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Investing',
         views: '2.4M',
         rating: 5,
-        color: const Color(0xFF059669),
+        color: Color(0xFF059669),
         isFree: true,
         tags: ['Mutual Funds', 'SIP', 'Equity', 'Debt Funds'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Stock Market Basics – How to Start Trading',
         description: 'Understand the stock market from scratch: NSE, BSE, demat accounts, reading charts, placing orders, and risk management.',
         author: 'Pranjal Kamra',
@@ -882,11 +883,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Trading',
         views: '3.1M',
         rating: 5,
-        color: const Color(0xFF2563EB),
+        color: Color(0xFF2563EB),
         isFree: true,
         tags: ['Stocks', 'NSE', 'BSE', 'Trading'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Income Tax Planning – Save More Legally',
         description: 'Master Section 80C, 80D, HRA exemptions, NPS benefits, and advanced strategies to minimize your tax outgo.',
         author: 'Akshat Shrivastava',
@@ -894,11 +895,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Tax',
         views: '1.8M',
         rating: 4,
-        color: const Color(0xFFF59E0B),
+        color: Color(0xFFF59E0B),
         isFree: true,
         tags: ['Tax Saving', '80C', '80D', 'NPS'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'The 50/30/20 Budgeting Rule Explained',
         description: 'A simple and effective budgeting framework: 50% needs, 30% wants, 20% savings. Practical tips for Indian salaries.',
         author: 'Warikoo',
@@ -906,11 +907,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Budgeting',
         views: '5.2M',
         rating: 5,
-        color: const Color(0xFF8B5CF6),
+        color: Color(0xFF8B5CF6),
         isFree: true,
         tags: ['Budgeting', 'Saving', 'Money Management'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Understanding Health & Term Insurance',
         description: 'Why you need adequate health and term insurance, how to calculate cover, and common mistakes to avoid.',
         author: 'Labour Law Advisor',
@@ -918,11 +919,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Insurance',
         views: '1.2M',
         rating: 4,
-        color: const Color(0xFFEF4444),
+        color: Color(0xFFEF4444),
         isFree: true,
         tags: ['Health Insurance', 'Term Insurance', 'Cover'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Options Trading Masterclass',
         description: 'Deep dive into call & put options, option Greeks, spreads, straddles, and real-world strategies with risk management.',
         author: 'Power of Stocks',
@@ -930,11 +931,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Trading',
         views: '890K',
         rating: 4,
-        color: const Color(0xFF0891B2),
+        color: Color(0xFF0891B2),
         isFree: false,
         tags: ['Options', 'Greeks', 'Strategies', 'Risk'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Real Estate Investing in India 2026',
         description: 'Should you buy or rent? REITs vs physical property. Tax implications, rental yields, and market outlook.',
         author: 'Shankar Nath',
@@ -942,11 +943,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Investing',
         views: '670K',
         rating: 4,
-        color: const Color(0xFF7C3AED),
+        color: Color(0xFF7C3AED),
         isFree: true,
         tags: ['Real Estate', 'REITs', 'Property', 'Rent vs Buy'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Cryptocurrency Basics for Indians',
         description: 'Bitcoin, Ethereum, blockchain technology explained. Tax on crypto in India, exchanges, and safe investing practices.',
         author: 'Pushkar Raj Thakur',
@@ -954,7 +955,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Crypto',
         views: '2.1M',
         rating: 4,
-        color: const Color(0xFFEC4899),
+        color: Color(0xFFEC4899),
         isFree: true,
         tags: ['Bitcoin', 'Ethereum', 'Blockchain', 'Crypto Tax'],
       ),
@@ -965,55 +966,55 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
 
   List<_CourseItem> _getCourses() {
     return [
-      _CourseItem(
+      const _CourseItem(
         title: 'Personal Finance 101',
         subtitle: 'Build a solid foundation in managing your money — from budgeting and saving to investing and planning for retirement.',
         icon: Icons.account_balance_wallet_outlined,
-        color: const Color(0xFF2E4A9A),
+        color: Color(0xFF2E4A9A),
         lessons: 8,
         duration: '2h 30m',
         level: 'Beginner',
         progress: 0.25,
         lessonTitles: ['Why Personal Finance Matters', 'Tracking Income & Expenses', 'Building an Emergency Fund', 'Understanding Debt', 'Introduction to Investing', 'Tax Saving Basics', 'Setting Financial Goals', 'Creating Your Plan'],
       ),
-      _CourseItem(
+      const _CourseItem(
         title: 'Stock Market Investing',
         subtitle: 'Learn to analyze stocks, read financial statements, understand valuations, and build a long-term equity portfolio.',
         icon: Icons.trending_up_rounded,
-        color: const Color(0xFF059669),
+        color: Color(0xFF059669),
         lessons: 12,
         duration: '4h 15m',
         level: 'Intermediate',
         progress: 0.0,
         lessonTitles: ['How Stock Markets Work', 'Reading Financial Statements', 'Fundamental Analysis', 'Technical Analysis Basics', 'Valuation Methods', 'Building a Portfolio', 'Sector Analysis', 'Risk Management', 'Dividend Investing', 'Growth vs Value', 'When to Buy & Sell', 'Portfolio Review'],
       ),
-      _CourseItem(
+      const _CourseItem(
         title: 'Mutual Fund Mastery',
         subtitle: 'From choosing the right fund to SIP strategies, learn everything about mutual fund investing in India.',
         icon: Icons.pie_chart_outline_rounded,
-        color: const Color(0xFFF59E0B),
+        color: Color(0xFFF59E0B),
         lessons: 6,
         duration: '1h 45m',
         level: 'Beginner',
         progress: 0.5,
         lessonTitles: ['What Are Mutual Funds', 'Types of Mutual Funds', 'SIP vs Lumpsum', 'How to Choose a Fund', 'Tax on Mutual Funds', 'Building Your MF Portfolio'],
       ),
-      _CourseItem(
+      const _CourseItem(
         title: 'Trading Strategies',
         subtitle: 'Master intraday, swing trading, and positional trading with chart patterns, indicators, and risk management.',
         icon: Icons.candlestick_chart_outlined,
-        color: const Color(0xFFEF4444),
+        color: Color(0xFFEF4444),
         lessons: 15,
         duration: '6h 00m',
         level: 'Advanced',
         progress: 0.0,
         lessonTitles: ['Introduction to Trading', 'Candlestick Patterns', 'Support & Resistance', 'Moving Averages', 'RSI & MACD', 'Volume Analysis', 'Intraday Strategies', 'Swing Trading', 'Options Basics', 'Option Strategies', 'Risk Management', 'Position Sizing', 'Trading Psychology', 'Building a Trading Plan', 'Backtesting'],
       ),
-      _CourseItem(
+      const _CourseItem(
         title: 'Tax Planning & Filing',
         subtitle: 'Optimize your taxes legally using all available deductions, exemptions, and investment strategies.',
         icon: Icons.receipt_long_outlined,
-        color: const Color(0xFF8B5CF6),
+        color: Color(0xFF8B5CF6),
         lessons: 7,
         duration: '2h 00m',
         level: 'Intermediate',
@@ -1025,7 +1026,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
 
   List<_ArticleItem> _getArticles() {
     return [
-      _ArticleItem(
+      const _ArticleItem(
         title: 'Emergency Fund: How Much Do You Really Need?',
         preview: 'Most experts recommend 6 months of expenses, but the right amount depends on your job stability, dependents, and lifestyle...',
         content: 'An emergency fund is the foundation of your financial plan. It\'s money set aside for unexpected expenses — job loss, medical emergencies, or urgent repairs.\n\nHow much should you save?\n\nThe standard recommendation is 3-6 months of monthly expenses. However, consider these factors:\n\n• Single income household: Aim for 6-9 months\n• Dual income, no dependents: 3-4 months may suffice\n• Freelancers or variable income: 9-12 months is safer\n• High-risk industry: Consider up to 12 months\n\nWhere to keep your emergency fund:\n\n1. Savings account (instant access)\n2. Liquid mutual funds (slightly better returns)\n3. Short-term FDs (with premature withdrawal)\n\nNever invest your emergency fund in stocks, mutual funds with lock-in, or illiquid assets. The purpose is quick access, not high returns.\n\nStart small — even ₹5,000/month adds up. Set up an auto-transfer on salary day so you pay yourself first.',
@@ -1033,9 +1034,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         readTime: '5 min read',
         date: 'Mar 18, 2026',
         icon: Icons.savings_outlined,
-        color: const Color(0xFF059669),
+        color: Color(0xFF059669),
       ),
-      _ArticleItem(
+      const _ArticleItem(
         title: 'ELSS vs PPF vs NPS: Which is Best for Tax Saving?',
         preview: 'Compare the top Section 80C instruments on returns, lock-in, liquidity, and tax treatment...',
         content: 'When it comes to tax saving under Section 80C (up to ₹1.5 lakh), you have several options. Let\'s compare the top three:\n\nELSS (Equity Linked Savings Scheme)\n• Lock-in: 3 years (shortest)\n• Expected returns: 12-15% CAGR\n• Tax on returns: 10% LTCG above ₹1 lakh\n• Suitable for: Moderate to high risk takers\n\nPPF (Public Provident Fund)\n• Lock-in: 15 years\n• Returns: 7.1% (government fixed)\n• Tax on returns: Exempt (EEE status)\n• Suitable for: Conservative investors\n\nNPS (National Pension System)\n• Lock-in: Till age 60\n• Expected returns: 9-12%\n• Additional deduction: ₹50,000 under 80CCD(1B)\n• Tax on returns: Partially taxable\n• Suitable for: Long-term retirement planning\n\nVerdict: For maximum tax saving with flexibility, ELSS is best. For guaranteed safety, PPF. For additional deduction, add NPS to your portfolio.',
@@ -1043,9 +1044,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         readTime: '7 min read',
         date: 'Mar 15, 2026',
         icon: Icons.compare_arrows_outlined,
-        color: const Color(0xFFF59E0B),
+        color: Color(0xFFF59E0B),
       ),
-      _ArticleItem(
+      const _ArticleItem(
         title: 'Reading a Company Balance Sheet in 10 Minutes',
         preview: 'A practical guide to quickly analyze a company\'s financial health using just the balance sheet...',
         content: 'Before investing in any stock, you must understand its balance sheet. Here\'s how to read one in 10 minutes:\n\n1. Total Assets: What the company owns\n   - Current Assets (cash, receivables, inventory)\n   - Non-current Assets (property, equipment, goodwill)\n\n2. Total Liabilities: What the company owes\n   - Current Liabilities (payables, short-term debt)\n   - Non-current Liabilities (long-term debt, bonds)\n\n3. Shareholders\' Equity: Net worth = Assets - Liabilities\n\nKey Ratios to Check:\n• Debt-to-Equity: Below 1 is generally good\n• Current Ratio: Above 1.5 shows good liquidity\n• Return on Equity (ROE): Above 15% is attractive\n\nRed flags:\n- Increasing debt year-over-year\n- Declining cash reserves\n- Growing receivables (customers not paying)\n- Inventory pile-up\n\nAlways compare ratios with industry peers, not in isolation.',
@@ -1053,9 +1054,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         readTime: '8 min read',
         date: 'Mar 12, 2026',
         icon: Icons.analytics_outlined,
-        color: const Color(0xFF2563EB),
+        color: Color(0xFF2563EB),
       ),
-      _ArticleItem(
+      const _ArticleItem(
         title: 'What is SIP and Why Should You Start One Today',
         preview: 'Systematic Investment Plans automate your investing journey and help build wealth through rupee cost averaging...',
         content: 'A Systematic Investment Plan (SIP) is the easiest way to start investing. You invest a fixed amount regularly (monthly/weekly) into a mutual fund.\n\nWhy SIP works:\n\n1. Rupee Cost Averaging: You buy more units when prices are low and fewer when high, averaging out your cost.\n\n2. Power of Compounding: ₹5,000/month at 12% for 20 years = ₹49.9 lakhs (invested only ₹12 lakhs)\n\n3. Discipline: Auto-debit means you invest consistently without emotional decisions.\n\n4. Start Small: Begin with just ₹500/month.\n\nHow to choose a SIP:\n• For 3-5 years: Debt or hybrid funds\n• For 5-10 years: Large-cap or flexi-cap funds\n• For 10+ years: Mid-cap or small-cap funds\n\nTop tip: Increase your SIP by 10% every year (step-up SIP) to accelerate wealth building.',
@@ -1063,9 +1064,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         readTime: '4 min read',
         date: 'Mar 10, 2026',
         icon: Icons.auto_graph_outlined,
-        color: const Color(0xFF7C3AED),
+        color: Color(0xFF7C3AED),
       ),
-      _ArticleItem(
+      const _ArticleItem(
         title: 'Health Insurance: 5 Mistakes People Make',
         preview: 'Don\'t fall into these common traps when buying health insurance for your family...',
         content: 'Health insurance is not optional — it\'s essential. But many people make these mistakes:\n\n1. Insufficient Cover\nDon\'t buy just ₹3-5 lakhs. With medical inflation at 14%, get at least ₹10-20 lakhs. Use a base plan + super top-up combo.\n\n2. Waiting Till You\'re Older\nBuy early! Premiums are 2-3x higher after 40. Pre-existing diseases have waiting periods.\n\n3. Relying Only on Employer Cover\nCorporate insurance ends when you leave. Get your own policy alongside.\n\n4. Ignoring Sub-limits\nSome policies have room rent caps (1-2% of sum insured). Read the fine print.\n\n5. Not Considering Family Floater\nA family floater plan is cheaper than individual plans for each family member. But ensure the total sum insured is adequate.\n\nBonus Tip: Always add a critical illness rider for diseases like cancer, heart attack, and stroke.',
@@ -1073,14 +1074,14 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         readTime: '6 min read',
         date: 'Mar 8, 2026',
         icon: Icons.health_and_safety_outlined,
-        color: const Color(0xFFEF4444),
+        color: Color(0xFFEF4444),
       ),
     ];
   }
 
   List<_LearnItem> _getDocumentaries() {
     final all = [
-      _LearnItem(
+      const _LearnItem(
         title: 'The Big Short – How the 2008 Crash Happened',
         description: 'Explore the story of how a few wall street outsiders predicted and profited from the subprime mortgage crisis, revealing the corruption and greed that led to the global financial meltdown.',
         author: 'Financial Times',
@@ -1088,11 +1089,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Investing',
         views: '12M',
         rating: 5,
-        color: const Color(0xFF1E3A5F),
+        color: Color(0xFF1E3A5F),
         isFree: true,
         tags: ['2008 Crisis', 'Wall Street', 'Subprime', 'Financial History'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Inside the Mind of Warren Buffett',
         description: 'A deep dive into the investment philosophy, strategies, and life lessons of the Oracle of Omaha. Learn value investing, patience, and the art of compound growth.',
         author: 'HBO Documentary',
@@ -1100,11 +1101,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Investing',
         views: '8.5M',
         rating: 5,
-        color: const Color(0xFF059669),
+        color: Color(0xFF059669),
         isFree: true,
         tags: ['Warren Buffett', 'Value Investing', 'Berkshire', 'Compounding'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Scam 1992 – Harshad Mehta & The Indian Stock Market',
         description: 'The incredible true story of Harshad Mehta who manipulated the Indian stock market in 1992 using bank receipts and stamping paper frauds. A lesson in market manipulation.',
         author: 'SonyLIV',
@@ -1112,11 +1113,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Trading',
         views: '15M',
         rating: 5,
-        color: const Color(0xFFC2410C),
+        color: Color(0xFFC2410C),
         isFree: false,
         tags: ['Harshad Mehta', 'BSE', 'Market Manipulation', 'Indian Markets'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Money Explained – How Banking Really Works',
         description: 'From fractional reserve banking to central bank policies, understand how money is created, managed, and how it affects your daily life and investments.',
         author: 'Netflix',
@@ -1124,11 +1125,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Budgeting',
         views: '4.2M',
         rating: 4,
-        color: const Color(0xFF7C3AED),
+        color: Color(0xFF7C3AED),
         isFree: false,
         tags: ['Banking', 'Money Creation', 'RBI', 'Interest Rates'],
       ),
-      _LearnItem(
+      const _LearnItem(
         title: 'Crypto Revolution – The Future of Money?',
         description: 'Is cryptocurrency the next evolution of money? Explore Bitcoin\'s creation, blockchain technology, DeFi, and what it means for traditional finance in India.',
         author: 'Vice Documentary',
@@ -1136,7 +1137,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> with SingleTickerProv
         category: 'Crypto',
         views: '6.8M',
         rating: 4,
-        color: const Color(0xFFEC4899),
+        color: Color(0xFFEC4899),
         isFree: true,
         tags: ['Bitcoin', 'Blockchain', 'DeFi', 'Future of Money'],
       ),

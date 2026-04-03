@@ -1,6 +1,7 @@
 /// ESUN Main Shell
 /// 
 /// Bottom navigation shell that wraps the main screens.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -138,7 +139,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.lgRadius,
         ),
         title: Row(
@@ -182,7 +183,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(
+            child: const Text(
               'Cancel',
               style: TextStyle(color: ESUNColors.textSecondary),
             ),
@@ -195,7 +196,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
             style: ElevatedButton.styleFrom(
               backgroundColor: ESUNColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: ESUNRadius.smRadius,
               ),
             ),
@@ -219,16 +220,16 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: isDark ? ESUNColors.darkSurface : Colors.white,
-          border: Border(
+          border: const Border(
             top: BorderSide(
-              color: const Color(0xFFF1F5F9),
+              color: Color(0xFFF1F5F9),
               width: 1,
             ),
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: ESUNSpacing.sm,
               right: ESUNSpacing.sm,
               top: ESUNSpacing.sm,

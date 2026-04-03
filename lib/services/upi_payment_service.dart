@@ -1,6 +1,7 @@
 /// ESUN UPI Payment Service
 /// 
 /// Handles UPI payment operations including demo/mock payments.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/network/api_service.dart';

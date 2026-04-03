@@ -5,6 +5,7 @@
 /// 2. Trigger background API refresh
 /// 3. Update UI when fresh data arrives
 /// 4. On error, keep showing cached data (graceful degradation)
+library;
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';

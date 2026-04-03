@@ -2,6 +2,7 @@
 ///
 /// Dashboard badge widget that shows linking status and prompts
 /// users to complete data linking or re-link on errors.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

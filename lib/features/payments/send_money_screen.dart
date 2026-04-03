@@ -1,6 +1,7 @@
 /// ESUN Send Money Screen
 /// 
 /// Functional UPI/Bank transfer screen with static data and success animation.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -569,7 +570,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     autofocus: true,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w700,
                       color: ESUNColors.textPrimary,

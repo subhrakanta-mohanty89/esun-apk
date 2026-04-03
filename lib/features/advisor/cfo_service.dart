@@ -1,6 +1,7 @@
 /// CFO Advisor Service
 /// 
 /// Service for calling the CFO AI chatbot API endpoints.
+library;
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';

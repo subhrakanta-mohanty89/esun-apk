@@ -1,6 +1,7 @@
 /// ESUN App State
 /// 
 /// Global application state providers using Riverpod.
+library;
 
 import 'dart:async';
 import 'dart:convert';
@@ -338,7 +339,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         final success = body['success'] == true;
         
         if (!success) {
-          return _TokenValidationResult(
+          return const _TokenValidationResult(
             isValid: false,
             error: 'Server returned unsuccessful response',
           );
@@ -368,7 +369,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       }
     } catch (e) {
       // Network/connection error — NOT an auth error
-      return _TokenValidationResult(
+      return const _TokenValidationResult(
         isValid: false,
         isAuthError: false,
         error: 'Connection error.',

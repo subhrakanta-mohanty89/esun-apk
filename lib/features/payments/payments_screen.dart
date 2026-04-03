@@ -1,6 +1,7 @@
 /// ESUN Pay Screen - Production Level
 /// 
 /// Inspired by Google Pay and PhonePe with modern UX patterns
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -185,7 +186,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -248,27 +249,68 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
+                      color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF121212), width: 1.5),
+                      border: Border.all(color: const Color(0xFFF5F6FA), width: 1.5),
                     ),
-                    child: const Icon(Icons.qr_code, size: 12, color: Colors.white),
+                    child: const Icon(Icons.qr_code, size: 12, color: ESUNColors.primary),
                   ),
                 ),
               ],
             ),
           ),
-          // Help Icon
-          GestureDetector(
-            onTap: () => _showHelpSheet(context),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white24, width: 1.5),
+          // Right side: Rewards + Help
+          Row(
+            children: [
+              // Rewards button
+              GestureDetector(
+                onTap: () => context.push(AppRoutes.rewards),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [ESUNColors.primary, ESUNColors.primaryLight],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ESUNColors.primary.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.card_giftcard_rounded, color: Colors.amber, size: 16),
+                      SizedBox(width: 5),
+                      Text(
+                        'Rewards',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              child: const Icon(Icons.help_outline, color: Colors.white, size: 20),
-            ),
+              const SizedBox(width: 10),
+              // Help Icon
+              GestureDetector(
+                onTap: () => _showHelpSheet(context),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.2), width: 1.5),
+                  ),
+                  child: const Icon(Icons.help_outline, color: ESUNColors.primary, size: 20),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -280,89 +322,51 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
       onTap: () => _showBalanceSheet(context),
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2D1B69),
-              Color(0xFF462B8F),
-              Color(0xFF5B3BA5),
-            ],
-          ),
           borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          children: [
-            // Top text
-            Text(
-              'Add up to ₹2 Lakh, scan any QR code',
-              style: ESUNTypography.bodySmall.copyWith(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Unlock Wallet benefits',
-              style: ESUNTypography.headlineSmall.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Top up CTA
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Top up now',
-                  style: ESUNTypography.bodyMedium.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Wallet banner illustration image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/wallet_banner.png',
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  // Fallback if image not found
-                  return SizedBox(
-                    height: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.qr_code_scanner, color: Colors.white.withOpacity(0.7), size: 40),
-                        const SizedBox(width: 20),
-                        Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.5), size: 24),
-                        const SizedBox(width: 20),
-                        Icon(Icons.account_balance_wallet, color: Colors.white.withOpacity(0.7), size: 40),
-                      ],
-                    ),
-                  );
-                },
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: ESUNColors.primary.withValues(alpha: 0.15),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/images/payment-hero.png',
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback navy gradient if image not found
+              return Container(
+                height: 180,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ESUNColors.primary,
+                      ESUNColors.primaryLight,
+                      ESUNColors.primary400,
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.account_balance_wallet, color: Colors.white.withValues(alpha: 0.7), size: 48),
+                      const SizedBox(height: 8),
+                      const Text('Payments', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -380,7 +384,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Text(
                 'Money Transfers',
                 style: ESUNTypography.titleSmall.copyWith(
-                  color: Colors.white,
+                  color: ESUNColors.textPrimary,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -389,9 +393,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3D2A15),
+                  color: ESUNColors.primary900,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFF7B5C2E), width: 0.5),
+                  border: Border.all(color: ESUNColors.primary700, width: 0.5),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -399,16 +403,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     Container(
                       padding: const EdgeInsets.all(2),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
+                        color: ESUNColors.accent,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.currency_rupee, color: Colors.white, size: 12),
                     ),
                     const SizedBox(width: 6),
-                    const Text(
+                    Text(
                       'Refer → ₹200',
                       style: TextStyle(
-                        color: Color(0xFFE8B04A),
+                        color: ESUNColors.secondaryLight,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -426,25 +430,25 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               _buildTransferAction(
                 Icons.phone_android,
                 'To Mobile\nNumber',
-                const Color(0xFF7C4DFF),
+                ESUNColors.primary,
                 () => _showPayToPhone(context),
               ),
               _buildTransferAction(
                 Icons.account_balance,
                 'To Bank &\nSelf A/c',
-                const Color(0xFF7C4DFF),
+                ESUNColors.primary,
                 () => _showBankTransferSheet(context),
               ),
               _buildTransferAction(
                 Icons.download_rounded,
                 'Receive\nMoney',
-                const Color(0xFF7C4DFF),
+                ESUNColors.primary,
                 () => showQrBottomSheet(context, name: _name, upiId: _upiId, bankLabel: _bankLabel),
               ),
               _buildTransferAction(
                 Icons.currency_rupee,
                 'Check\nBalance',
-                const Color(0xFF7C4DFF),
+                ESUNColors.primary,
                 () => _showBalanceSheet(context),
               ),
             ],
@@ -479,7 +483,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white70,
+              color: ESUNColors.textSecondary,
               fontSize: 11,
               height: 1.3,
             ),
@@ -611,9 +615,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -634,7 +645,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     const Expanded(
                       child: Text(
                         'Save VISA Card to pay faster',
-                        style: TextStyle(color: Colors.white70, fontSize: 11),
+                        style: TextStyle(color: ESUNColors.textSecondary, fontSize: 11),
                       ),
                     ),
                   ],
@@ -654,9 +665,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -664,16 +682,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade700,
+                        color: Colors.grey.shade200,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.monetization_on, color: Colors.grey, size: 18),
+                      child: Icon(Icons.monetization_on, color: Colors.grey.shade500, size: 18),
                     ),
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
                         'Start saving in pure Silver',
-                        style: TextStyle(color: Colors.white70, fontSize: 11),
+                        style: TextStyle(color: ESUNColors.textSecondary, fontSize: 11),
                       ),
                     ),
                   ],
@@ -688,10 +706,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   
   Widget _buildRechargeBillsSection(BuildContext context) {
     final items = [
-      _BillItem(Icons.phone_android, 'Mobile\nRecharge', const Color(0xFF7C4DFF), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileRechargeScreen()))),
-      _BillItem(Icons.credit_card, 'Credit Card\nBill', const Color(0xFF42A5F5), () => _showCreditCardPayment(context)),
-      _BillItem(Icons.lightbulb_outline, 'Electricity\nBill', const Color(0xFFFFC107), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectricityProviderScreen()))),
-      _BillItem(Icons.calendar_today, 'Loan\nRepayment', const Color(0xFF8D6E63), () => _showBillPayment(context, 'Loan Repayment', Icons.calendar_today, const Color(0xFF8D6E63))),
+      _BillItem(Icons.phone_android, 'Mobile\nRecharge', ESUNColors.primary, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileRechargeScreen()))),
+      _BillItem(Icons.credit_card, 'Credit Card\nBill', ESUNColors.secondary, () => _showCreditCardPayment(context)),
+      _BillItem(Icons.lightbulb_outline, 'Electricity\nBill', ESUNColors.warning, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectricityProviderScreen()))),
+      _BillItem(Icons.calendar_today, 'Loan\nRepayment', ESUNColors.primaryLight, () => _showBillPayment(context, 'Loan Repayment', Icons.calendar_today, ESUNColors.primaryLight)),
     ];
     
     return Container(
@@ -702,7 +720,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           Text(
             'Recharge & Bills',
             style: ESUNTypography.titleSmall.copyWith(
-              color: Colors.white,
+              color: ESUNColors.textPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -723,16 +741,23 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
                         const Expanded(
                           child: Text(
                             'Buy Jio SIM:Home Delivered',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: TextStyle(color: ESUNColors.textSecondary, fontSize: 12),
                           ),
                         ),
                         Container(
@@ -758,19 +783,26 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'More',
-                          style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                          style: TextStyle(color: ESUNColors.textSecondary, fontSize: 13),
                         ),
-                        const SizedBox(width: 4),
-                        Icon(Icons.arrow_forward, color: Colors.grey.shade400, size: 16),
+                        SizedBox(width: 4),
+                        Icon(Icons.arrow_forward, color: ESUNColors.textSecondary, size: 16),
                       ],
                     ),
                   ),
@@ -794,9 +826,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white10),
+                border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Icon(item.icon, color: item.color, size: 26),
             ),
@@ -804,7 +843,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
             Text(
               item.label,
               style: const TextStyle(
-                color: Colors.white60,
+                color: ESUNColors.textSecondary,
                 fontSize: 10.5,
                 height: 1.3,
               ),
@@ -819,10 +858,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
   
   Widget _buildLoansSection(BuildContext context) {
     final loanItems = [
-      {'icon': Icons.person, 'label': 'Personal\nLoan', 'color': const Color(0xFFFF7043)},
-      {'icon': Icons.bar_chart, 'label': 'Mutual\nFunds', 'color': const Color(0xFF66BB6A)},
-      {'icon': Icons.card_giftcard, 'label': 'Gold\nLoan', 'color': const Color(0xFFFFC107)},
-      {'icon': Icons.speed, 'label': 'Credit\nScore', 'color': const Color(0xFFEF5350)},
+      {'icon': Icons.person, 'label': 'Personal\nLoan', 'color': ESUNColors.primary},
+      {'icon': Icons.bar_chart, 'label': 'Mutual\nFunds', 'color': ESUNColors.accent},
+      {'icon': Icons.card_giftcard, 'label': 'Gold\nLoan', 'color': ESUNColors.warning},
+      {'icon': Icons.speed, 'label': 'Credit\nScore', 'color': ESUNColors.error},
     ];
     
     return Container(
@@ -833,7 +872,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           Text(
             'Loans',
             style: ESUNTypography.titleSmall.copyWith(
-              color: Colors.white,
+              color: ESUNColors.textPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -856,9 +895,16 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.white10),
+                          border: Border.all(color: ESUNColors.primary.withValues(alpha: 0.1)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Icon(item['icon'] as IconData, color: item['color'] as Color, size: 26),
                       ),
@@ -866,7 +912,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                       Text(
                         item['label'] as String,
                         style: const TextStyle(
-                          color: Colors.white60,
+                          color: ESUNColors.textSecondary,
                           fontSize: 10.5,
                           height: 1.3,
                         ),
@@ -897,18 +943,25 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF2D1B69),
-            Color(0xFF462B8F),
+            ESUNColors.primary,
+            ESUNColors.primaryLight,
           ],
         ),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: ESUNColors.primary.withValues(alpha: 0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.local_offer, color: Colors.white, size: 24),
@@ -928,7 +981,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 Text(
                   'On your first bill payment',
                   style: ESUNTypography.labelSmall.copyWith(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -943,7 +996,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
             child: Text(
               'Claim',
               style: ESUNTypography.labelSmall.copyWith(
-                color: const Color(0xFF462B8F),
+                color: ESUNColors.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -984,10 +1037,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
     Color getIconColor(TransactionType type, bool isDebit) {
       if (!isDebit) return ESUNColors.success;
       switch (type) {
-        case TransactionType.billPayment: return const Color(0xFF7C4DFF);
-        case TransactionType.upiTransfer: return const Color(0xFF7C4DFF);
-        case TransactionType.bankTransfer: return const Color(0xFF7C4DFF);
-        case TransactionType.recharge: return const Color(0xFF7C4DFF);
+        case TransactionType.billPayment: return ESUNColors.primary;
+        case TransactionType.upiTransfer: return ESUNColors.primary;
+        case TransactionType.bankTransfer: return ESUNColors.primary;
+        case TransactionType.recharge: return ESUNColors.primary;
         case TransactionType.income: return ESUNColors.success;
         case TransactionType.refund: return ESUNColors.success;
       }
@@ -997,8 +1050,15 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1009,7 +1069,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               Text(
                 'Transaction History',
                 style: ESUNTypography.titleSmall.copyWith(
-                  color: Colors.white,
+                  color: ESUNColors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -1018,7 +1078,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                 child: Text(
                   'See All',
                   style: ESUNTypography.labelSmall.copyWith(
-                    color: const Color(0xFF7C4DFF),
+                    color: ESUNColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1032,9 +1092,9 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade600),
+                    Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
                     const SizedBox(height: 8),
-                    Text('No transactions yet', style: ESUNTypography.bodyMedium.copyWith(color: Colors.white38)),
+                    Text('No transactions yet', style: ESUNTypography.bodyMedium.copyWith(color: const Color(0xFF718096))),
                   ],
                 ),
               ),
@@ -1051,7 +1111,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                     Container(
                       padding: const EdgeInsets.all(ESUNSpacing.md),
                       decoration: BoxDecoration(
-                        color: iconColor.withOpacity(0.15),
+                        color: iconColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(getIcon(tx.type), color: iconColor, size: 20),
@@ -1061,8 +1121,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(tx.title, style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500, color: Colors.white)),
-                          Text('$category • ${getTimeAgo(tx.timestamp)}', style: ESUNTypography.labelSmall.copyWith(color: Colors.white38)),
+                          Text(tx.title, style: ESUNTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500, color: ESUNColors.primary)),
+                          Text('$category • ${getTimeAgo(tx.timestamp)}', style: ESUNTypography.labelSmall.copyWith(color: const Color(0xFF718096))),
                         ],
                       ),
                     ),
@@ -1752,7 +1812,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> with SingleTick
               child: const Icon(Icons.mic, size: 48, color: ESUNColors.primary),
             ),
             const SizedBox(height: 12),
-            Text('Listening...', style: ESUNTypography.titleMedium),
+            const Text('Listening...', style: ESUNTypography.titleMedium),
             const SizedBox(height: 8),
             Text('Say a name or UPI ID', style: ESUNTypography.bodyMedium.copyWith(color: Colors.grey)),
             const SizedBox(height: 12),

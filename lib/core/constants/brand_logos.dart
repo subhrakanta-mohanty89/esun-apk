@@ -2,6 +2,7 @@
 /// 
 /// All official logo URLs for banks, companies, and brands used across the app.
 /// Using reliable CDN sources for consistent logo loading.
+library;
 
 class BrandLogos {
   BrandLogos._();

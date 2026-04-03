@@ -2,6 +2,7 @@
 /// 
 /// AI-powered financial advisor that analyzes your bank statement
 /// and provides data-driven advice based on 12 financial rules.
+library;
 
 import 'dart:convert';
 import 'dart:typed_data';
@@ -44,7 +45,7 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
   
   // Sarvam AI TTS (Indian male voice — primary)
   final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _useSarvam = true; // Try Sarvam first, fall back to device TTS
+  final bool _useSarvam = true; // Try Sarvam first, fall back to device TTS
   
   // Language selection
   String _selectedLanguage = 'English';
@@ -225,10 +226,12 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
     }
 
     _tts.setCompletionHandler(() {
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _isSpeaking = false;
         _speakingMessageId = null;
       });
+      }
     });
   }
   
@@ -795,7 +798,7 @@ class _CFOAdvisorScreenState extends ConsumerState<CFOAdvisorScreen> {
                         AnimatedRotation(
                           turns: _suggestionsExpanded ? 0.5 : 0.0,
                           duration: const Duration(milliseconds: 200),
-                          child: Icon(
+                          child: const Icon(
                             Icons.expand_more,
                             size: 18,
                             color: ESUNColors.textSecondary,

@@ -1,6 +1,7 @@
 /// ESUN Network Layer
 /// 
 /// Dio-based HTTP client with interceptors, retry logic, and certificate pinning.
+library;
 
 import 'dart:async';
 import 'dart:io';

@@ -1,6 +1,7 @@
 /// ESUN Router Configuration
 /// 
 /// GoRouter setup with nested navigation and guards.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,18 @@ import '../features/payments/qr_scanner_screen.dart';
 import '../features/payments/payment_history_screen.dart';
 import '../features/invest/invest_screen.dart';
 import '../features/discover/discover_screen.dart';
+import '../features/discover/cards_screen.dart';
+import '../features/discover/loans_screen.dart';
+import '../features/discover/insurance_screen.dart';
+import '../features/discover/gold_screen.dart';
+import '../features/discover/fd_rd_screen.dart';
+import '../features/discover/crypto_screen.dart';
+import '../features/discover/real_estate_screen.dart';
+import '../features/discover/more_categories_screen.dart';
+import '../features/discover/mutual_funds_screen.dart';
+import '../features/discover/stocks_screen.dart';
+import '../features/discover/fixed_deposits_screen.dart';
+import '../features/discover/digital_gold_screen.dart';
 import '../features/experts/experts_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/alerts/alerts_screen.dart';
@@ -362,9 +375,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'mutual-funds',
-                builder: (context, state) => const Scaffold(
-                  body: Center(child: Text('Mutual Funds')),
-                ),
+                builder: (context, state) => const MutualFundsScreen(),
               ),
               GoRoute(
                 path: 'mutual-funds/:id',
@@ -377,15 +388,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'stocks',
-                builder: (context, state) => const Scaffold(
-                  body: Center(child: Text('Stocks')),
-                ),
+                builder: (context, state) => const StocksScreen(),
               ),
               GoRoute(
                 path: 'gold',
-                builder: (context, state) => const Scaffold(
-                  body: Center(child: Text('Digital Gold')),
-                ),
+                builder: (context, state) => const DigitalGoldScreen(),
               ),
             ],
           ),
@@ -401,9 +408,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':category',
                 builder: (context, state) {
                   final category = state.pathParameters['category']!;
-                  return Scaffold(
-                    body: Center(child: Text('Category: $category')),
-                  );
+                  return switch (category) {
+                    'cards' => const CardsScreen(),
+                    'loans' => const LoansScreen(),
+                    'insurance' => const InsuranceScreen(),
+                    'gold' => const GoldScreen(),
+                    'fd/rd' => const FdRdScreen(),
+                    'crypto' => const CryptoScreen(),
+                    'real estate' => const RealEstateScreen(),
+                    'more' => const MoreCategoriesScreen(),
+                    _ => Scaffold(body: Center(child: Text('Category: $category'))),
+                  };
                 },
               ),
               GoRoute(

@@ -2,6 +2,7 @@
 /// 
 /// Type scale based on Material Design 3 with custom refinements
 /// for optimal readability in financial applications.
+library;
 
 import 'package:flutter/material.dart';
 import 'design_tokens.dart';

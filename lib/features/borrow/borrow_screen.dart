@@ -1,6 +1,7 @@
 /// ESUN Borrow Hub Screen
 /// 
 /// Loan products, credit options, and AI-powered loan assistant.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,12 +127,12 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   fontWeight: FontWeight.bold,
                   color: ESUNColors.primary,
                 ),
-                border: OutlineInputBorder(
+                border: const OutlineInputBorder(
                   borderRadius: ESUNRadius.mdRadius,
                 ),
-                focusedBorder: OutlineInputBorder(
+                focusedBorder: const OutlineInputBorder(
                   borderRadius: ESUNRadius.mdRadius,
-                  borderSide: const BorderSide(color: ESUNColors.primary, width: 2),
+                  borderSide: BorderSide(color: ESUNColors.primary, width: 2),
                 ),
               ),
             ),
@@ -389,7 +390,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   runSpacing: 6,
                   children: rec.features.map((f) => Container(
                     padding: ESUNSpacing.badgeInsets,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.fullRadius,
                     ),
@@ -525,7 +526,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
           Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.primary,
               shape: BoxShape.circle,
             ),
@@ -1105,18 +1106,18 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.check_circle, color: ESUNColors.success),
-            const SizedBox(width: 8),
-            const Text('Apply for Loan'),
+            Icon(Icons.check_circle, color: ESUNColors.success),
+            SizedBox(width: 8),
+            Text('Apply for Loan'),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('You\'re applying for:'),
+            const Text('You\'re applying for:'),
             const SizedBox(height: 8),
             Text(
               '${rec.bankName} - ${rec.loanType}',
@@ -1429,7 +1430,7 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
                   padding: const EdgeInsets.all(ESUNSpacing.xl),
                   child: Column(
                     children: [
-                      Icon(Icons.check_circle_outline, size: 48, color: ESUNColors.success),
+                      const Icon(Icons.check_circle_outline, size: 48, color: ESUNColors.success),
                       const SizedBox(height: ESUNSpacing.md),
                       Text(
                         'No Active Loans',
@@ -1672,8 +1673,8 @@ class _BorrowScreenState extends ConsumerState<BorrowScreen> {
           const SizedBox(height: ESUNSpacing.md),
           Container(
             padding: const EdgeInsets.all(ESUNSpacing.lg),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
                 colors: [ESUNColors.primary300, ESUNColors.primary500],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

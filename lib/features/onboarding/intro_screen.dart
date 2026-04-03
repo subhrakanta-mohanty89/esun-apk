@@ -1,6 +1,8 @@
 // Part of eSun Flutter App — onboarding
 /// Three-page onboarding intro shown on first install.
 /// Writes 'onboarding_complete' to Hive, then navigates to /onboarding/details.
+library;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

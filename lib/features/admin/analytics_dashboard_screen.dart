@@ -2,6 +2,7 @@
 ///
 /// Admin screen for viewing analytics KPIs, conversion funnels,
 /// error metrics, and managing alerts.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

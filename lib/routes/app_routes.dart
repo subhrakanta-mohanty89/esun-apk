@@ -1,6 +1,7 @@
 /// ESUN Navigation Routes
 /// 
 /// Route definitions and path constants.
+library;
 
 abstract class AppRoutes {
   // Root

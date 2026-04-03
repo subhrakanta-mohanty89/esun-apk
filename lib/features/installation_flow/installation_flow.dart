@@ -1,6 +1,7 @@
 /// ESUN Installation Flow
 ///
 /// Export barrel for installation flow screens.
+library;
 
 export 'installation_flow_screen.dart';
 export 'welcome_screens.dart';

@@ -2,6 +2,7 @@
 ///
 /// Multi-step flow for connecting user's financial accounts via
 /// RBI's Account Aggregator framework.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -478,7 +479,7 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                         child: Column(
                           children: [
                             // Illustration placeholder
-                            Container(
+                            SizedBox(
                               height: 120,
                               child: Stack(
                                 alignment: Alignment.center,
@@ -495,7 +496,7 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.person_outline, color: ESUNColors.primary, size: 24),
+                                        const Icon(Icons.person_outline, color: ESUNColors.primary, size: 24),
                                         const SizedBox(height: ESUNSpacing.sm),
                                         Container(
                                           width: 50,
@@ -518,7 +519,7 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                                     ),
                                   ),
                                   // Person illustration
-                                  Positioned(
+                                  const Positioned(
                                     right: 60,
                                     bottom: 0,
                                     child: Icon(
@@ -528,7 +529,7 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                                     ),
                                   ),
                                   // Arrow indicators
-                                  Positioned(
+                                  const Positioned(
                                     left: 60,
                                     top: 20,
                                     child: Icon(
@@ -574,11 +575,11 @@ class _AAVerifyPanScreenState extends ConsumerState<AAVerifyPanScreen> {
                                 hintText: 'ABCDE1234F',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: ESUNColors.border),
+                                  borderSide: const BorderSide(color: ESUNColors.border),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: ESUNColors.primary, width: 2),
+                                  borderSide: const BorderSide(color: ESUNColors.primary, width: 2),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
@@ -827,7 +828,7 @@ class _OtpBottomSheetState extends ConsumerState<_OtpBottomSheet> {
                             ),
                           ),
                           const Spacer(),
-                          Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
+                          const Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
                         ],
                       ),
                       const SizedBox(height: ESUNSpacing.lg),
@@ -954,7 +955,7 @@ class _OtpBottomSheetState extends ConsumerState<_OtpBottomSheet> {
                       // Timer and Resend
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
+                          const Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
                           const SizedBox(width: ESUNSpacing.xs),
                           Text(
                             _formattedTime,
@@ -1039,7 +1040,7 @@ class _OtpBottomSheetState extends ConsumerState<_OtpBottomSheet> {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: ESUNSpacing.md),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.primary,
                     borderRadius: ESUNRadius.mdRadius,
                   ),
@@ -1270,7 +1271,7 @@ class AAActivateTrackerScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        Icon(Icons.open_in_new, size: 18, color: ESUNColors.textSecondary),
+                        const Icon(Icons.open_in_new, size: 18, color: ESUNColors.textSecondary),
                       ],
                     ),
                     
@@ -1673,15 +1674,15 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
 
   // Insurance providers list with logo URLs
   final List<Map<String, dynamic>> _insuranceProviders = [
-    {'name': 'HDFC Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfclife.com&size=128'},
-    {'name': 'HDFC Ergo', 'icon': Icons.shield, 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128'},
-    {'name': 'TATA AIA Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF001F5C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tataaia.com&size=128'},
-    {'name': 'ACKO Life Insurance Limited', 'icon': Icons.shield, 'color': Color(0xFF6B46C1), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://acko.com&size=128'},
-    {'name': 'LIC of India', 'icon': Icons.shield, 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128'},
-    {'name': 'ICICI Prudential', 'icon': Icons.shield, 'color': Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iciciprulife.com&size=128'},
-    {'name': 'SBI Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbilife.co.in&size=128'},
-    {'name': 'Max Life Insurance', 'icon': Icons.shield, 'color': Color(0xFF0066CC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128'},
-    {'name': 'National Insurance Company', 'icon': Icons.shield, 'color': Color(0xFFED1C24), 'comingSoon': true},
+    {'name': 'HDFC Life Insurance', 'icon': Icons.shield, 'color': const Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfclife.com&size=128'},
+    {'name': 'HDFC Ergo', 'icon': Icons.shield, 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcergo.com&size=128'},
+    {'name': 'TATA AIA Life Insurance', 'icon': Icons.shield, 'color': const Color(0xFF001F5C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tataaia.com&size=128'},
+    {'name': 'ACKO Life Insurance Limited', 'icon': Icons.shield, 'color': const Color(0xFF6B46C1), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://acko.com&size=128'},
+    {'name': 'LIC of India', 'icon': Icons.shield, 'color': const Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://licindia.in&size=128'},
+    {'name': 'ICICI Prudential', 'icon': Icons.shield, 'color': const Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iciciprulife.com&size=128'},
+    {'name': 'SBI Life Insurance', 'icon': Icons.shield, 'color': const Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://sbilife.co.in&size=128'},
+    {'name': 'Max Life Insurance', 'icon': Icons.shield, 'color': const Color(0xFF0066CC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://maxlifeinsurance.com&size=128'},
+    {'name': 'National Insurance Company', 'icon': Icons.shield, 'color': const Color(0xFFED1C24), 'comingSoon': true},
   ];
   final Set<String> _selectedInsuranceProviders = {};
 
@@ -1694,49 +1695,49 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
   // Comprehensive Indian Banks list with logo URLs
   final List<Map<String, dynamic>> _banks = [
     // Public Sector Banks
-    {'name': 'State Bank of India', 'color': Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128'},
-    {'name': 'Punjab National Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pnbindia.in&size=128'},
-    {'name': 'Bank of Baroda', 'color': Color(0xFFF15A22), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofbaroda.in&size=128'},
-    {'name': 'Canara Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://canarabank.com&size=128'},
-    {'name': 'Union Bank of India', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://unionbankofindia.co.in&size=128'},
-    {'name': 'Bank of India', 'color': Color(0xFFFF6600), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofindia.co.in&size=128'},
-    {'name': 'Indian Bank', 'color': Color(0xFF1B3A6D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indianbank.in&size=128'},
-    {'name': 'Central Bank of India', 'color': Color(0xFF0055A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://centralbank.net.in&size=128'},
-    {'name': 'Indian Overseas Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iob.in&size=128'},
-    {'name': 'UCO Bank', 'color': Color(0xFF000066), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ucobank.com&size=128'},
-    {'name': 'Bank of Maharashtra', 'color': Color(0xFF003D7C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofmaharashtra.in&size=128'},
-    {'name': 'Punjab & Sind Bank', 'color': Color(0xFF1E4D8C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://psbindia.com&size=128'},
+    {'name': 'State Bank of India', 'color': const Color(0xFF22409A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://onlinesbi.sbi&size=128'},
+    {'name': 'Punjab National Bank', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pnbindia.in&size=128'},
+    {'name': 'Bank of Baroda', 'color': const Color(0xFFF15A22), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofbaroda.in&size=128'},
+    {'name': 'Canara Bank', 'color': const Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://canarabank.com&size=128'},
+    {'name': 'Union Bank of India', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://unionbankofindia.co.in&size=128'},
+    {'name': 'Bank of India', 'color': const Color(0xFFFF6600), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofindia.co.in&size=128'},
+    {'name': 'Indian Bank', 'color': const Color(0xFF1B3A6D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indianbank.in&size=128'},
+    {'name': 'Central Bank of India', 'color': const Color(0xFF0055A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://centralbank.net.in&size=128'},
+    {'name': 'Indian Overseas Bank', 'color': const Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://iob.in&size=128'},
+    {'name': 'UCO Bank', 'color': const Color(0xFF000066), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ucobank.com&size=128'},
+    {'name': 'Bank of Maharashtra', 'color': const Color(0xFF003D7C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bankofmaharashtra.in&size=128'},
+    {'name': 'Punjab & Sind Bank', 'color': const Color(0xFF1E4D8C), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://psbindia.com&size=128'},
     
     // Private Sector Banks
-    {'name': 'HDFC Bank', 'color': Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128'},
-    {'name': 'ICICI Bank', 'color': Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128'},
-    {'name': 'Axis Bank', 'color': Color(0xFF97144D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128'},
-    {'name': 'Kotak Mahindra Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128'},
-    {'name': 'IndusInd Bank', 'color': Color(0xFF6D1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indusind.com&size=128'},
-    {'name': 'Yes Bank', 'color': Color(0xFF0033A0), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://yesbank.co.in&size=128'},
-    {'name': 'IDFC First Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://idfcfirstbank.com&size=128'},
-    {'name': 'Federal Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://federalbank.co.in&size=128'},
-    {'name': 'South Indian Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://southindianbank.com&size=128'},
-    {'name': 'Karnataka Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://karnatakabank.com&size=128'},
-    {'name': 'Karur Vysya Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kvb.in&size=128'},
-    {'name': 'Bandhan Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bandhanbank.com&size=128'},
-    {'name': 'RBL Bank', 'color': Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://rblbank.com&size=128'},
-    {'name': 'City Union Bank', 'color': Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cityunionbank.com&size=128'},
-    {'name': 'Tamilnad Mercantile Bank', 'color': Color(0xFF0052A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tmb.in&size=128'},
-    {'name': 'DCB Bank', 'color': Color(0xFF6B1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dcbbank.com&size=128'},
-    {'name': 'Dhanlaxmi Bank', 'color': Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dhanlaxmibank.com&size=128'},
+    {'name': 'HDFC Bank', 'color': const Color(0xFF004C8F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hdfcbank.com&size=128'},
+    {'name': 'ICICI Bank', 'color': const Color(0xFFB02A30), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://icicibank.com&size=128'},
+    {'name': 'Axis Bank', 'color': const Color(0xFF97144D), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://axisbank.com&size=128'},
+    {'name': 'Kotak Mahindra Bank', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kotak.com&size=128'},
+    {'name': 'IndusInd Bank', 'color': const Color(0xFF6D1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://indusind.com&size=128'},
+    {'name': 'Yes Bank', 'color': const Color(0xFF0033A0), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://yesbank.co.in&size=128'},
+    {'name': 'IDFC First Bank', 'color': const Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://idfcfirstbank.com&size=128'},
+    {'name': 'Federal Bank', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://federalbank.co.in&size=128'},
+    {'name': 'South Indian Bank', 'color': const Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://southindianbank.com&size=128'},
+    {'name': 'Karnataka Bank', 'color': const Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://karnatakabank.com&size=128'},
+    {'name': 'Karur Vysya Bank', 'color': const Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kvb.in&size=128'},
+    {'name': 'Bandhan Bank', 'color': const Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://bandhanbank.com&size=128'},
+    {'name': 'RBL Bank', 'color': const Color(0xFF0066B3), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://rblbank.com&size=128'},
+    {'name': 'City Union Bank', 'color': const Color(0xFF0072BC), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cityunionbank.com&size=128'},
+    {'name': 'Tamilnad Mercantile Bank', 'color': const Color(0xFF0052A5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tmb.in&size=128'},
+    {'name': 'DCB Bank', 'color': const Color(0xFF6B1F7A), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dcbbank.com&size=128'},
+    {'name': 'Dhanlaxmi Bank', 'color': const Color(0xFFE31837), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dhanlaxmibank.com&size=128'},
     
     // Small Finance Banks
-    {'name': 'AU Small Finance Bank', 'color': Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://aubank.in&size=128'},
-    {'name': 'Equitas Small Finance Bank', 'color': Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://equitasbank.com&size=128'},
-    {'name': 'Ujjivan Small Finance Bank', 'color': Color(0xFF009639), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ujjivansfb.in&size=128'},
+    {'name': 'AU Small Finance Bank', 'color': const Color(0xFFE84E0F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://aubank.in&size=128'},
+    {'name': 'Equitas Small Finance Bank', 'color': const Color(0xFF003399), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://equitasbank.com&size=128'},
+    {'name': 'Ujjivan Small Finance Bank', 'color': const Color(0xFF009639), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ujjivansfb.in&size=128'},
     
     // Payments Banks
-    {'name': 'Paytm Payments Bank', 'color': Color(0xFF00B9F5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128'},
-    {'name': 'Airtel Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128'},
-    {'name': 'India Post Payments Bank', 'color': Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ippbonline.com&size=128'},
-    {'name': 'Fino Payments Bank', 'color': Color(0xFF1E3A5F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://finobank.com&size=128'},
-    {'name': 'Jio Payments Bank', 'color': Color(0xFF0A3D92), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jio.com&size=128'},
+    {'name': 'Paytm Payments Bank', 'color': const Color(0xFF00B9F5), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://paytm.com&size=128'},
+    {'name': 'Airtel Payments Bank', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://airtel.in&size=128'},
+    {'name': 'India Post Payments Bank', 'color': const Color(0xFFED1C24), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ippbonline.com&size=128'},
+    {'name': 'Fino Payments Bank', 'color': const Color(0xFF1E3A5F), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://finobank.com&size=128'},
+    {'name': 'Jio Payments Bank', 'color': const Color(0xFF0A3D92), 'logoUrl': 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jio.com&size=128'},
   ];
   final Set<String> _selectedBanks = {};
 
@@ -1960,7 +1961,7 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
           
           // Tab Bar
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: ESUNColors.border)),
             ),
             child: TabBar(
@@ -2111,11 +2112,11 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
               border: Border.all(color: ESUNColors.border),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
+            child: const Row(
               children: [
                 Text('See what you will share', style: ESUNTypography.bodyMedium),
-                const Spacer(),
-                const Icon(Icons.keyboard_arrow_down, color: ESUNColors.textSecondary),
+                Spacer(),
+                Icon(Icons.keyboard_arrow_down, color: ESUNColors.textSecondary),
               ],
             ),
           ),
@@ -2457,7 +2458,7 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
               Text('Missing any accounts?', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
               TextButton.icon(
                 onPressed: () => _showAddMoreBottomSheet(forTab: ShareAccountTab.bankAccounts),
-                icon: Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
+                icon: const Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
                 label: Text('Add More', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.primary, fontWeight: FontWeight.w600)),
               ),
             ],
@@ -2666,7 +2667,7 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
               Text('Missing any accounts?', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
               TextButton.icon(
                 onPressed: () => _showAddMoreBottomSheet(forTab: ShareAccountTab.deposits),
-                icon: Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
+                icon: const Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
                 label: Text('Add More', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.primary, fontWeight: FontWeight.w600)),
               ),
             ],
@@ -2731,11 +2732,11 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
                     suffixIcon: const Icon(Icons.mic, color: ESUNColors.textSecondary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: ESUNColors.border),
+                      borderSide: const BorderSide(color: ESUNColors.border),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: ESUNColors.border),
+                      borderSide: const BorderSide(color: ESUNColors.border),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
@@ -2828,7 +2829,7 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
                         ),
                         TextButton.icon(
                           onPressed: () {},
-                          icon: Icon(Icons.notifications_outlined, size: 16, color: ESUNColors.primary),
+                          icon: const Icon(Icons.notifications_outlined, size: 16, color: ESUNColors.primary),
                           label: Text('Notify Me', style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.primary)),
                         ),
                       ],
@@ -2876,9 +2877,9 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
         Container(
           margin: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg),
           padding: const EdgeInsets.all(ESUNSpacing.lg),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1B5E20),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1B5E20),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -3107,7 +3108,7 @@ class _AASelectBanksScreenState extends ConsumerState<AASelectBanksScreen>
               Text('Missing any accounts?', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.textSecondary)),
               TextButton.icon(
                 onPressed: () => _showAddMoreBottomSheet(forTab: ShareAccountTab.insurance),
-                icon: Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
+                icon: const Icon(Icons.add_circle_outline, size: 18, color: ESUNColors.primary),
                 label: Text('Add More', style: ESUNTypography.bodyMedium.copyWith(color: ESUNColors.primary, fontWeight: FontWeight.w600)),
               ),
             ],
@@ -3294,7 +3295,7 @@ class _AddMoreProvidersSheetState extends State<_AddMoreProvidersSheet> {
                             style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.textSecondary),
                           ),
                         )
-                      : Icon(Icons.arrow_forward_ios, size: 16, color: ESUNColors.textSecondary),
+                      : const Icon(Icons.arrow_forward_ios, size: 16, color: ESUNColors.textSecondary),
                 );
               },
             ),
@@ -3460,7 +3461,7 @@ class _LinkAccountOtpBottomSheetState extends State<_LinkAccountOtpBottomSheet> 
                           Text('OTP sent to ', style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                           Text('+91 80361 73887', style: ESUNTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
                           const Spacer(),
-                          Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
+                          const Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
                         ],
                       ),
                       const SizedBox(height: ESUNSpacing.lg),
@@ -3582,7 +3583,7 @@ class _LinkAccountOtpBottomSheetState extends State<_LinkAccountOtpBottomSheet> 
                       // Timer and Resend
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
+                          const Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
                           const SizedBox(width: ESUNSpacing.xs),
                           Text(_formattedTime, style: ESUNTypography.bodyMedium),
                           const Spacer(),
@@ -3874,7 +3875,7 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
                           Text('OTP sent to ', style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                           Text('+91 80361 73887', style: ESUNTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
                           const Spacer(),
-                          Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
+                          const Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
                         ],
                       ),
                       const SizedBox(height: ESUNSpacing.lg),
@@ -3996,7 +3997,7 @@ class _BankOtpBottomSheetState extends State<_BankOtpBottomSheet> {
                       // Timer and Resend
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
+                          const Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
                           const SizedBox(width: ESUNSpacing.xs),
                           Text(_formattedTime, style: ESUNTypography.bodyMedium),
                           const Spacer(),
@@ -4126,7 +4127,7 @@ class AADiscoverAccountsScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          _AAProgressBar(currentStep: 1),
+          const _AAProgressBar(currentStep: 1),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(ESUNSpacing.lg),
@@ -4288,7 +4289,7 @@ class _AAReviewConsentScreenState extends ConsumerState<AAReviewConsentScreen> {
       ),
       body: Column(
         children: [
-          _AAProgressBar(currentStep: 2),
+          const _AAProgressBar(currentStep: 2),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(ESUNSpacing.lg),
@@ -4354,19 +4355,19 @@ class _AAReviewConsentScreenState extends ConsumerState<AAReviewConsentScreen> {
                   const SizedBox(height: ESUNSpacing.lg),
 
                   // Consent details
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Purpose',
                       value: 'Financial wellness education + affordability insights'),
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Data Types', value: 'Balances + Transactions'),
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Time Range', value: 'Last 12 months'),
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Frequency',
                       value: 'One-time with periodic refresh'),
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Duration', value: '90 days (renewable)'),
-                  _ConsentDetailTile(
+                  const _ConsentDetailTile(
                       title: 'Revocation', value: 'Anytime from Settings'),
 
                   const SizedBox(height: ESUNSpacing.xl),
@@ -4388,7 +4389,7 @@ class _AAReviewConsentScreenState extends ConsumerState<AAReviewConsentScreen> {
                               setState(() => _consentChecked = v ?? false),
                         ),
                         const SizedBox(width: ESUNSpacing.sm),
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'I consent to share this data for the stated purpose. I understand I can revoke this consent anytime.',
                             style: ESUNTypography.bodySmall,
@@ -4502,7 +4503,7 @@ class _AAConnectingScreenState extends ConsumerState<AAConnectingScreen>
       ),
       body: Column(
         children: [
-          _AAProgressBar(currentStep: 3),
+          const _AAProgressBar(currentStep: 3),
           Expanded(
             child: Center(
               child: Column(
@@ -4748,21 +4749,21 @@ class _AAFinalStepConsentScreenState
                   ),
                   const SizedBox(height: 8),
                   RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
+                    text: const TextSpan(
+                      style: TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
                       ),
                       children: [
-                        const TextSpan(text: 'Consent to share your ('),
-                        const TextSpan(
+                        TextSpan(text: 'Consent to share your ('),
+                        TextSpan(
                           text: 'yourphone@Finvu',
                           style: TextStyle(
                             color: Color(0xFF009688),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const TextSpan(text: ') accounts with <FIU name>'),
+                        TextSpan(text: ') accounts with <FIU name>'),
                       ],
                     ),
                   ),
@@ -4789,10 +4790,10 @@ class _AAFinalStepConsentScreenState
                           },
                           child: Row(
                             children: [
-                              Text(
+                              const Text(
                                 'View Details',
                                 style: TextStyle(
-                                  color: const Color(0xFF009688),
+                                  color: Color(0xFF009688),
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
                                 ),
@@ -5571,7 +5572,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
+          const Row(
             children: [
               Text(
                 'Top up now',
@@ -5595,14 +5596,14 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
               color: const Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Row(
+            child: const Row(
               children: [
                 Icon(
                   Icons.people,
-                  color: const Color(0xFF2E7D32),
+                  color: Color(0xFF2E7D32),
                   size: 14,
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     '20,000+ users have topped up their investments after a salary hike in the past 3 months.',
@@ -5670,7 +5671,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
+          const Row(
             children: [
               Text(
                 'View Details',
@@ -5896,7 +5897,7 @@ class AAFinancialHealthDashboardScreen extends ConsumerWidget {
           Center(
             child: TextButton(
               onPressed: () {},
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
@@ -6415,8 +6416,8 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
       description: 'Access your data once a day',
       dateRange: '29 Aug 2024 to 30 Sep 2025',
       accounts: [
-        {'name': 'HDFC Bank', 'number': '2785', 'color': Color(0xFF004C8F)},
-        {'name': 'Axis Bank', 'number': '0245', 'color': Color(0xFF97144D)},
+        {'name': 'HDFC Bank', 'number': '2785', 'color': const Color(0xFF004C8F)},
+        {'name': 'Axis Bank', 'number': '0245', 'color': const Color(0xFF97144D)},
       ],
       issuedVia: 'FINVU',
       expiresInDays: 2,
@@ -6428,8 +6429,8 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
       description: 'Access your data once a day',
       dateRange: '29 Aug 2024 to 30 Sep 2025',
       accounts: [
-        {'name': 'HDFC Bank', 'number': '2785', 'color': Color(0xFF004C8F)},
-        {'name': 'Axis Bank', 'number': '0245', 'color': Color(0xFF97144D)},
+        {'name': 'HDFC Bank', 'number': '2785', 'color': const Color(0xFF004C8F)},
+        {'name': 'Axis Bank', 'number': '0245', 'color': const Color(0xFF97144D)},
       ],
       issuedVia: 'anumati',
       expiresInDays: 2,
@@ -6538,7 +6539,7 @@ class _AAMyConsentsScreenState extends ConsumerState<AAMyConsentsScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(Icons.info_outline, size: 16, color: ESUNColors.primary),
+                  const Icon(Icons.info_outline, size: 16, color: ESUNColors.primary),
                 ],
               ),
             ),
@@ -7058,7 +7059,7 @@ class _RevokeConsentBottomSheetState extends State<_RevokeConsentBottomSheet> {
                           Text('OTP sent to ', style: ESUNTypography.bodySmall.copyWith(color: ESUNColors.textSecondary)),
                           Text('+91 80361 73887', style: ESUNTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
                           const Spacer(),
-                          Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
+                          const Icon(Icons.edit_outlined, size: 18, color: ESUNColors.textSecondary),
                         ],
                       ),
                       const SizedBox(height: ESUNSpacing.lg),
@@ -7109,7 +7110,7 @@ class _RevokeConsentBottomSheetState extends State<_RevokeConsentBottomSheet> {
                       // Timer and Resend
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
+                          const Icon(Icons.access_time, size: 18, color: ESUNColors.primary),
                           const SizedBox(width: ESUNSpacing.xs),
                           Text(_formattedTime, style: ESUNTypography.bodyMedium),
                           const Spacer(),
@@ -7499,8 +7500,8 @@ class _AARevokeConsentsScreenState extends ConsumerState<AARevokeConsentsScreen>
       'purpose': 'To offer you suitable loan options, you are sharing your banking data with Banking Solutions Pvt. Ltd.',
       'frequency': 'Access once, every month for 1 year (ending 12 Aug 2025)',
       'accounts': [
-        {'bank': 'Axis Bank', 'number': '6576', 'color': Color(0xFF97144D)},
-        {'bank': 'HDFC Bank', 'number': '0245', 'color': Color(0xFF004C8F)},
+        {'bank': 'Axis Bank', 'number': '6576', 'color': const Color(0xFF97144D)},
+        {'bank': 'HDFC Bank', 'number': '0245', 'color': const Color(0xFF004C8F)},
       ],
       'isSelected': true,
     },
@@ -7510,8 +7511,8 @@ class _AARevokeConsentsScreenState extends ConsumerState<AARevokeConsentsScreen>
       'purpose': 'Profile your portfolio on your account and help you wealth creation',
       'frequency': 'Access once, every month for 1 year (ending 12 Aug 2025)',
       'accounts': [
-        {'bank': 'CDSL', 'number': '4566', 'color': Color(0xFF1B5E20)},
-        {'bank': 'NSDL', 'number': '0896', 'color': Color(0xFFFF6F00)},
+        {'bank': 'CDSL', 'number': '4566', 'color': const Color(0xFF1B5E20)},
+        {'bank': 'NSDL', 'number': '0896', 'color': const Color(0xFFFF6F00)},
       ],
     },
   ];
@@ -7718,7 +7719,7 @@ class _AARevokeConsentsScreenState extends ConsumerState<AARevokeConsentsScreen>
                               Navigator.pop(context);
                               context.push('/aa/select-banks');
                             },
-                            icon: Icon(Icons.add_circle_outline, size: 16, color: ESUNColors.primary),
+                            icon: const Icon(Icons.add_circle_outline, size: 16, color: ESUNColors.primary),
                             label: Text('Add More', style: ESUNTypography.labelSmall.copyWith(color: ESUNColors.primary)),
                           ),
                         ],
@@ -7854,12 +7855,12 @@ class _ConsentDetailsBottomSheet extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: ESUNColors.primary),
+                      side: const BorderSide(color: ESUNColors.primary),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: Text('Close'),
+                    child: const Text('Close'),
                   ),
                 ),
               ],
@@ -8452,7 +8453,7 @@ class AAFailureScreen extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline,
                           color: ESUNColors.textSecondary,
                           size: 20,

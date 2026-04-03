@@ -2,6 +2,7 @@
 /// 
 /// Connect with financial advisors and experts.
 /// Features search, filters, and location-based discovery.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,7 +142,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
                   tooltip: 'Find nearby experts',
                   onPressed: _showLocationSearch,
                 ),
-          border: OutlineInputBorder(
+          border: const OutlineInputBorder(
             borderRadius: ESUNRadius.lgRadius,
             borderSide: BorderSide.none,
           ),
@@ -399,7 +400,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
         children: [
           const Icon(Icons.error_outline, size: 64, color: ESUNColors.error),
           const SizedBox(height: ESUNSpacing.lg),
-          Text(
+          const Text(
             'Something went wrong',
             style: ESUNTypography.titleMedium,
           ),
@@ -428,7 +429,7 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
         children: [
           const Icon(Icons.search_off, size: 64, color: ESUNColors.textTertiary),
           const SizedBox(height: ESUNSpacing.lg),
-          Text(
+          const Text(
             'No experts found',
             style: ESUNTypography.titleMedium,
           ),
@@ -719,8 +720,8 @@ class _ExpertsScreenState extends ConsumerState<ExpertsScreen> {
       padding: const EdgeInsets.all(ESUNSpacing.lg),
       child: Container(
         padding: const EdgeInsets.all(ESUNSpacing.lg),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
@@ -1388,7 +1389,7 @@ void _showChatBookingFlow(BuildContext context, _Expert expert) {
               ),
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Type your message...',
@@ -1398,7 +1399,7 @@ void _showChatBookingFlow(BuildContext context, _Expert expert) {
                         ),
                         filled: true,
                         fillColor: ESUNColors.surfaceVariant,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                     ),
                   ),
@@ -1596,7 +1597,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                   // What to bring section
                   Container(
                     padding: const EdgeInsets.all(ESUNSpacing.md),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.mdRadius,
                     ),
@@ -1620,7 +1621,7 @@ void _showWalkInBookingSheet(BuildContext context, _Expert expert) {
                   const SizedBox(height: ESUNSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(ESUNSpacing.md),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.surfaceVariant,
                       borderRadius: ESUNRadius.mdRadius,
                     ),
@@ -1843,7 +1844,7 @@ void _showDateTimeBookingSheet(BuildContext context, _Expert expert, String type
                       const SizedBox(height: ESUNSpacing.sm),
                       Container(
                         padding: const EdgeInsets.all(ESUNSpacing.md),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: ESUNColors.surfaceVariant,
                           borderRadius: ESUNRadius.mdRadius,
                         ),
@@ -1914,7 +1915,7 @@ void _showPreJoinDialog(BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: ESUNRadius.lgRadius),
+            shape: const RoundedRectangleBorder(borderRadius: ESUNRadius.lgRadius),
             title: const Text('Prepare to join'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1941,7 +1942,7 @@ void _showPreJoinDialog(BuildContext context) {
                       label: Text(speakerOn ? 'Speaker' : 'Earpiece'),
                       selected: speakerOn,
                       onSelected: (_) => setState(() => speakerOn = !speakerOn),
-                      avatar: Icon(Icons.volume_up, size: 18),
+                      avatar: const Icon(Icons.volume_up, size: 18),
                     ),
                   ],
                 ),
@@ -2012,12 +2013,12 @@ void _showCallUi(BuildContext context, {required bool micOn, required bool camOn
                     children: [
                       Container(
                         padding: const EdgeInsets.all(ESUNSpacing.md),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.black54,
                           borderRadius: ESUNRadius.mdRadius,
                         ),
-                        child: Row(
-                          children: const [
+                        child: const Row(
+                          children: [
                             Icon(Icons.timer, color: Colors.white70, size: 16),
                             SizedBox(width: 6),
                             Text('00:24', style: TextStyle(color: Colors.white70)),
@@ -2164,9 +2165,9 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
           const SizedBox(height: ESUNSpacing.lg),
           TextField(
             controller: _controller,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter city name...',
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: ESUNRadius.mdRadius,
               ),
@@ -2257,7 +2258,7 @@ class _ExpertDetailSheet extends StatelessWidget {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.divider,
               borderRadius: ESUNRadius.fullRadius,
             ),
@@ -2321,7 +2322,7 @@ class _ExpertDetailSheet extends StatelessWidget {
                 // Stats Row
                 Container(
                   padding: const EdgeInsets.all(ESUNSpacing.md),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.surfaceVariant,
                     borderRadius: ESUNRadius.mdRadius,
                   ),

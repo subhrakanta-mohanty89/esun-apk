@@ -2,6 +2,7 @@
 ///
 /// Explains the purpose of data linking (AA & Credit Bureau) with consent screens.
 /// Provides clear CTAs: "Link Data Now" and "Do it later — go to Dashboard".
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -112,7 +113,7 @@ class _DataLinkingScreenState extends ConsumerState<DataLinkingScreen> {
   }
 
   Widget _buildProgressIndicator() {
-    final steps = DataLinkingStep.values;
+    const steps = DataLinkingStep.values;
     final currentIndex = steps.indexOf(_currentStep);
 
     return Padding(
@@ -280,28 +281,28 @@ class _IntroStep extends StatelessWidget {
           const SizedBox(height: ESUNSpacing.xxl),
 
           // Benefits
-          _BenefitCard(
+          const _BenefitCard(
             icon: Icons.psychology_rounded,
             title: 'AI-Powered Insights',
             description:
                 'KANTA analyzes your spending patterns and gives personalized advice.',
-            gradient: [const Color(0xFF4A62B8), const Color(0xFF2E4A9A)],
+            gradient: [Color(0xFF4A62B8), Color(0xFF2E4A9A)],
           ),
           const SizedBox(height: ESUNSpacing.md),
-          _BenefitCard(
+          const _BenefitCard(
             icon: Icons.account_balance_rounded,
             title: 'All Accounts in One Place',
             description:
                 'View balances from all your banks in a single dashboard.',
-            gradient: [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+            gradient: [Color(0xFF11998E), Color(0xFF38EF7D)],
           ),
           const SizedBox(height: ESUNSpacing.md),
-          _BenefitCard(
+          const _BenefitCard(
             icon: Icons.trending_up_rounded,
             title: 'Credit Score Monitoring',
             description:
                 'Track your credit score and get tips to improve it.',
-            gradient: [const Color(0xFFFC466B), const Color(0xFF3F5EFB)],
+            gradient: [Color(0xFFFC466B), Color(0xFF3F5EFB)],
           ),
           const SizedBox(height: ESUNSpacing.xxl),
 
@@ -519,9 +520,9 @@ class _AAConsentStep extends StatelessWidget {
           const SizedBox(height: ESUNSpacing.lg),
 
           // What we access
-          _ConsentSection(
+          const _ConsentSection(
             title: 'What data will be accessed',
-            items: const [
+            items: [
               'Bank account statements (last 12 months)',
               'Account balances and transaction history',
               'Deposit and investment account details',
@@ -532,9 +533,9 @@ class _AAConsentStep extends StatelessWidget {
           const SizedBox(height: ESUNSpacing.md),
 
           // Security
-          _ConsentSection(
+          const _ConsentSection(
             title: 'How your data is protected',
-            items: const [
+            items: [
               'End-to-end encryption',
               'No data stored without your consent',
               'Revoke access anytime from settings',
@@ -657,7 +658,7 @@ class _CreditBureauConsentStep extends StatelessWidget {
                   color: ESUNColors.warning.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.credit_score_rounded,
                   color: ESUNColors.warning,
                   size: 28,
@@ -706,9 +707,9 @@ class _CreditBureauConsentStep extends StatelessWidget {
           const SizedBox(height: ESUNSpacing.lg),
 
           // What we access
-          _ConsentSection(
+          const _ConsentSection(
             title: 'What data will be accessed',
-            items: const [
+            items: [
               'Your credit score and history',
               'Active loans and credit cards',
               'Payment history and defaults',
@@ -720,9 +721,9 @@ class _CreditBureauConsentStep extends StatelessWidget {
           const SizedBox(height: ESUNSpacing.md),
 
           // Benefits
-          _ConsentSection(
+          const _ConsentSection(
             title: 'Benefits',
-            items: const [
+            items: [
               'Free monthly credit score updates',
               'Personalized loan recommendations',
               'Tips to improve your score',
@@ -745,7 +746,7 @@ class _CreditBureauConsentStep extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline_rounded,
                   size: 18,
                   color: ESUNColors.info,
@@ -1137,7 +1138,7 @@ class _SummaryCard extends StatelessWidget {
               size: 24,
             )
           else
-            Icon(
+            const Icon(
               Icons.remove_circle_outline_rounded,
               color: ESUNColors.textTertiary,
               size: 24,

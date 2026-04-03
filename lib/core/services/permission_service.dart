@@ -2,6 +2,7 @@
 ///
 /// Handles app permissions for contacts, camera, microphone, and media.
 /// Auto-requests essential permissions on app startup.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';

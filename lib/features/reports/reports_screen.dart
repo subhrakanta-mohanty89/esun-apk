@@ -1,6 +1,7 @@
 /// ESUN Reports Screen
 /// 
 /// Financial reports and analytics.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,7 +138,7 @@ class ReportsScreen extends ConsumerWidget {
   Widget _buildPeriodSelector() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: ESUNColors.surfaceVariant,
         borderRadius: ESUNRadius.fullRadius,
       ),

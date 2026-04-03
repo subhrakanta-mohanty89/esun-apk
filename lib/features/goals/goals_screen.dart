@@ -1,6 +1,7 @@
 /// ESUN Goals Screen
 /// 
 /// Financial goal tracking and management.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -483,7 +484,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: ESUNSpacing.md),
-              Text('Choose Icon', style: ESUNTypography.bodyMedium),
+              const Text('Choose Icon', style: ESUNTypography.bodyMedium),
               const SizedBox(height: ESUNSpacing.sm),
               Wrap(
                 spacing: 8,

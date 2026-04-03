@@ -2,6 +2,7 @@
 ///
 /// Provider selection for broadband/fiber internet bill payments with
 /// official logos, saved connections, and plan details.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -146,10 +147,10 @@ class _BroadbandProviderScreenState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
+        builder: (context) => const BillPaymentScreen(
           billType: 'Broadband Bill',
           icon: Icons.wifi,
-          color: const Color(0xFF00897B),
+          color: Color(0xFF00897B),
         ),
       ),
     );
@@ -274,7 +275,7 @@ class _BroadbandProviderScreenState
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        Icon(Icons.speed, size: 14, color: ESUNColors.textTertiary),
+                        const Icon(Icons.speed, size: 14, color: ESUNColors.textTertiary),
                         const SizedBox(width: 4),
                         Text(conn.plan,
                             style: ESUNTypography.bodySmall

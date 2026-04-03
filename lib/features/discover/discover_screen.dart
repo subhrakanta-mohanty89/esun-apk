@@ -1,6 +1,7 @@
 /// ESUN Discover Screen
 /// 
 /// Explore financial products, offers, and features.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -180,7 +181,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   Widget _buildProductCard(_ProductItem product) {
     return GestureDetector(
-      onTap: () => _showProductDetail(product.name, product.subtitle, product.color, product.icon),
+      onTap: () => _navigateToProduct(product.name),
       child: Container(
         padding: const EdgeInsets.all(ESUNSpacing.md),
         decoration: BoxDecoration(
@@ -205,7 +206,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 if (product.isPopular)
                   Container(
                     padding: ESUNSpacing.tagInsets,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.green,
                       borderRadius: ESUNRadius.fullRadius,
                     ),
@@ -796,8 +797,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       padding: const EdgeInsets.symmetric(horizontal: ESUNSpacing.lg, vertical: ESUNSpacing.md),
       child: Container(
         height: 180,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [Color(0xFF2E4A9A), Color(0xFF1C2961)],
@@ -2103,7 +2104,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
             Container(
               padding: const EdgeInsets.all(ESUNSpacing.md),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: ESUNRadius.mdRadius,
               ),
@@ -2113,6 +2114,25 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         ),
       ),
     );
+  }
+
+  void _navigateToProduct(String name) {
+    switch (name) {
+      case 'Mutual Funds':
+        context.push(AppRoutes.mutualFunds);
+      case 'Stocks & ETFs':
+        context.push(AppRoutes.stocks);
+      case 'Fixed Deposits':
+        context.push(AppRoutes.discoverCategoryPath('fd/rd'));
+      case 'Digital Gold':
+        context.push(AppRoutes.digitalGold);
+      case 'Bonds':
+        context.push(AppRoutes.discoverCategoryPath('more'));
+      case 'NPS':
+        context.push(AppRoutes.discoverCategoryPath('more'));
+      default:
+        context.push(AppRoutes.invest);
+    }
   }
   
   void _showProductDetail(String title, String description, Color color, IconData icon) {

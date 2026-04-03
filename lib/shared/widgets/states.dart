@@ -1,6 +1,7 @@
 /// ESUN State Widgets
 /// 
 /// Empty states, error states, and placeholder components.
+library;
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';
@@ -160,7 +161,7 @@ class FPErrorState extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.errorSurface,
               shape: BoxShape.circle,
             ),
@@ -376,7 +377,7 @@ class FPMaintenanceState extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: ESUNColors.warningSurface,
               shape: BoxShape.circle,
             ),
@@ -387,7 +388,7 @@ class FPMaintenanceState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: ESUNSpacing.xxl),
-          Text(
+          const Text(
             'Under Maintenance',
             style: ESUNTypography.titleLarge,
             textAlign: TextAlign.center,
@@ -407,7 +408,7 @@ class FPMaintenanceState extends StatelessWidget {
                 horizontal: ESUNSpacing.lg,
                 vertical: ESUNSpacing.sm,
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: ESUNColors.warningSurface,
                 borderRadius: ESUNRadius.smRadius,
               ),

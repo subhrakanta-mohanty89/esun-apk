@@ -1,6 +1,7 @@
 /// ESUN Wealth Manager Screen
 /// 
 /// Wealth management hub for stocks, mutual funds, FDs, and more.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -468,7 +469,7 @@ class InvestScreen extends ConsumerWidget {
                     show: true,
                     drawVerticalLine: false,
                     horizontalInterval: 5,
-                    getDrawingHorizontalLine: (value) => FlLine(
+                    getDrawingHorizontalLine: (value) => const FlLine(
                       color: ESUNColors.border,
                       strokeWidth: 1,
                     ),
@@ -553,7 +554,7 @@ class InvestScreen extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Container(
                     padding: ESUNSpacing.tagInsets,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ESUNColors.success,
                       borderRadius: ESUNRadius.fullRadius,
                     ),
@@ -1706,7 +1707,7 @@ class InvestScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => context.push(AppRoutes.mutualFunds),
-                child: Text('View All', style: TextStyle(color: ESUNColors.primary)),
+                child: const Text('View All', style: TextStyle(color: ESUNColors.primary)),
               ),
             ],
           ),
@@ -1967,7 +1968,7 @@ class InvestScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => context.push(AppRoutes.mutualFunds),
-                child: Text('More', style: TextStyle(color: ESUNColors.primary)),
+                child: const Text('More', style: TextStyle(color: ESUNColors.primary)),
               ),
             ],
           ),
@@ -2122,7 +2123,7 @@ class InvestScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(fund.returns, style: TextStyle(color: ESUNColors.success, fontWeight: FontWeight.w600)),
+                            Text(fund.returns, style: const TextStyle(color: ESUNColors.success, fontWeight: FontWeight.w600)),
                             Text(fund.rating, style: TextStyle(color: Colors.amber.shade700, fontSize: 12)),
                           ],
                         ),
@@ -2222,7 +2223,7 @@ class InvestScreen extends ConsumerWidget {
                           ),
                           title: Text(fund.name, style: const TextStyle(fontWeight: FontWeight.w500)),
                           subtitle: Text(fund.category),
-                          trailing: Text(fund.returns, style: TextStyle(color: ESUNColors.success, fontWeight: FontWeight.w600)),
+                          trailing: Text(fund.returns, style: const TextStyle(color: ESUNColors.success, fontWeight: FontWeight.w600)),
                         );
                       },
                     ),
@@ -2445,7 +2446,7 @@ class _PortfolioSliderWidgetState extends ConsumerState<_PortfolioSliderWidget> 
     final totalReturns = totalPortfolio - totalInvested;
     final totalReturnsPerc = totalInvested > 0 ? (totalReturns / totalInvested) * 100 : 12.5;
     final dayPL = totalPortfolio * 0.003; // Mock day P&L
-    final dayPLPerc = 0.28;
+    const dayPLPerc = 0.28;
     
     String formatAmount(double amount) {
       if (amount >= 10000000) {
@@ -2804,7 +2805,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
                       color: ESUNColors.primary.withOpacity(0.1),
                       borderRadius: ESUNRadius.smRadius,
                     ),
-                    child: Icon(Icons.pie_chart_rounded, color: ESUNColors.primary, size: 20),
+                    child: const Icon(Icons.pie_chart_rounded, color: ESUNColors.primary, size: 20),
                   ),
                   const SizedBox(width: ESUNSpacing.sm),
                   Text(
@@ -2824,7 +2825,7 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.trending_up, color: ESUNColors.success, size: 14),
+                    const Icon(Icons.trending_up, color: ESUNColors.success, size: 14),
                     const SizedBox(width: 4),
                     Text(
                       '+${snapshot.netWorthChange.toStringAsFixed(1)}% YTD',
@@ -2908,11 +2909,11 @@ class _NetWorthBreakdownSection extends ConsumerWidget {
             color: ESUNColors.cardBackground,
             borderRadius: ESUNRadius.mdRadius,
             border: Border.all(color: ESUNColors.border),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: ESUNColors.cardShadow,
                 blurRadius: 8,
-                offset: const Offset(0, 2),
+                offset: Offset(0, 2),
               ),
             ],
           ),

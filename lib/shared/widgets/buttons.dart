@@ -1,6 +1,7 @@
 /// ESUN Buttons
 /// 
 /// Reusable button components following the design system.
+library;
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';
@@ -161,8 +162,8 @@ class FPButton extends StatelessWidget {
       minimumSize: WidgetStatePropertyAll(_getMinSize()),
       padding: WidgetStatePropertyAll(_getPadding()),
       textStyle: WidgetStatePropertyAll(_getTextStyle()),
-      backgroundColor: WidgetStatePropertyAll(ESUNColors.error),
-      foregroundColor: WidgetStatePropertyAll(ESUNColors.onError),
+      backgroundColor: const WidgetStatePropertyAll(ESUNColors.error),
+      foregroundColor: const WidgetStatePropertyAll(ESUNColors.onError),
     );
   }
   

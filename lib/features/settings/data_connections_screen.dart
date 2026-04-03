@@ -2,6 +2,7 @@
 ///
 /// Manage Account Aggregator and Credit Bureau connections.
 /// Shows connection status and provides actions to link/re-link/disconnect.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -596,7 +597,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
               const SizedBox(height: ESUNSpacing.sm),
               Row(
                 children: [
-                  Icon(Icons.sync, size: 14, color: ESUNColors.textTertiary),
+                  const Icon(Icons.sync, size: 14, color: ESUNColors.textTertiary),
                   const SizedBox(width: 4),
                   Text(
                     'Last synced: ${_formatDate(connection.lastSyncAt!)}',
@@ -613,7 +614,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
               const SizedBox(height: ESUNSpacing.sm),
               Container(
                 padding: const EdgeInsets.all(ESUNSpacing.sm),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: ESUNColors.errorSurface,
                   borderRadius: ESUNRadius.smRadius,
                 ),
@@ -912,7 +913,7 @@ class _DataConnectionsScreenState extends ConsumerState<DataConnectionsScreen> {
         children: [
           const Icon(Icons.error_outline, size: 48, color: ESUNColors.error),
           const SizedBox(height: ESUNSpacing.md),
-          Text('Failed to load connections', style: ESUNTypography.titleMedium),
+          const Text('Failed to load connections', style: ESUNTypography.titleMedium),
           const SizedBox(height: ESUNSpacing.sm),
           TextButton(
             onPressed: () => ref.refresh(dataConnectionsProvider),

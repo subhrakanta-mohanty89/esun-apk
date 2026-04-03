@@ -1,5 +1,7 @@
 // Part of eSun Flutter App — design system
 /// Primary and secondary buttons with gradient, loading state, and press animation.
+library;
+
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';

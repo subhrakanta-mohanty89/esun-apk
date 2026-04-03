@@ -2,6 +2,7 @@
 ///
 /// Scans UPI QR codes and processes payment details.
 /// Uses mobile_scanner package for camera-based QR scanning.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -234,7 +235,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
             const SizedBox(height: 16),
             const Icon(Icons.qr_code_2, size: 48, color: ESUNColors.primary),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'QR Code Scanned',
               style: ESUNTypography.headlineSmall,
             ),
@@ -606,7 +607,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
           right: 8,
           bottom: 8,
         ),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -643,7 +644,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen>
           right: 32,
           top: 20,
         ),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
@@ -757,7 +758,7 @@ class _PaymentConfirmationSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
+          const Text(
             'QR Code Scanned',
             style: ESUNTypography.headlineSmall,
           ),

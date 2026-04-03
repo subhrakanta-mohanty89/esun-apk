@@ -46,7 +46,7 @@ Future<void> showQrBottomSheet(
                 Container(
                   width: 40,
                   height: 4,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: ESUNColors.divider,
                     borderRadius: ESUNRadius.fullRadius,
                   ),
@@ -117,10 +117,10 @@ Future<void> showQrBottomSheet(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(ESUNSpacing.lg),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: ESUNRadius.mdRadius,
-                          boxShadow: const [
+                          boxShadow: [
                             BoxShadow(
                               color: Color(0x12000000),
                               blurRadius: 12,

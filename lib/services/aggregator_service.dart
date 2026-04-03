@@ -6,6 +6,7 @@
 /// - Data fetching
 /// - Account summaries
 /// - Transaction insights
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/network/api_service.dart';

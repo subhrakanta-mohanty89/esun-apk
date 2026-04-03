@@ -1,6 +1,7 @@
 /// ESUN Cards
 /// 
 /// Reusable card components following the design system.
+library;
 
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';

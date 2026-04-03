@@ -1,6 +1,7 @@
 /// ESUN Theme System
 /// 
 /// Complete Material 3 theme implementation with light and dark modes.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,8 +68,8 @@ class ESUNTheme {
       tertiaryContainer: ESUNColors.accent.withOpacity(0.3),
       onTertiaryContainer: ESUNColors.accentLight,
       error: ESUNColors.errorLight,
-      onError: Color(0xFF601410),
-      errorContainer: Color(0xFF8C1D18),
+      onError: const Color(0xFF601410),
+      errorContainer: const Color(0xFF8C1D18),
       onErrorContainer: ESUNColors.errorLight,
       surface: ESUNColors.darkSurface,
       onSurface: ESUNColors.darkTextPrimary,
@@ -208,7 +209,7 @@ class ESUNTheme {
           elevation: 0,
           padding: ESUNSpacing.buttonInsets,
           minimumSize: const Size(88, ESUNTouchTarget.minimum),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: ESUNRadius.buttonRadius,
           ),
           backgroundColor: colorScheme.primary,
@@ -224,7 +225,7 @@ class ESUNTheme {
         style: FilledButton.styleFrom(
           padding: ESUNSpacing.buttonInsets,
           minimumSize: const Size(88, ESUNTouchTarget.minimum),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: ESUNRadius.buttonRadius,
           ),
           textStyle: ESUNTypography.button,
@@ -236,7 +237,7 @@ class ESUNTheme {
         style: OutlinedButton.styleFrom(
           padding: ESUNSpacing.buttonInsets,
           minimumSize: const Size(88, ESUNTouchTarget.minimum),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: ESUNRadius.buttonRadius,
           ),
           side: BorderSide(
@@ -253,7 +254,7 @@ class ESUNTheme {
         style: TextButton.styleFrom(
           padding: ESUNSpacing.buttonInsets,
           minimumSize: const Size(88, ESUNTouchTarget.minimum),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: ESUNRadius.buttonRadius,
           ),
           foregroundColor: colorScheme.primary,
@@ -278,7 +279,7 @@ class ESUNTheme {
         foregroundColor: colorScheme.onPrimary,
         elevation: 4,
         highlightElevation: 8,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.lgRadius,
         ),
       ),
@@ -293,11 +294,11 @@ class ESUNTheme {
           horizontal: ESUNSpacing.lg,
           vertical: ESUNSpacing.md,
         ),
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: ESUNRadius.inputRadius,
           borderSide: BorderSide.none,
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
           borderRadius: ESUNRadius.inputRadius,
           borderSide: BorderSide.none,
         ),
@@ -345,7 +346,7 @@ class ESUNTheme {
           horizontal: ESUNSpacing.sm,
           vertical: ESUNSpacing.xs,
         ),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.chipRadius,
         ),
         side: BorderSide.none,
@@ -358,7 +359,7 @@ class ESUNTheme {
             : ESUNColors.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 24,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.xlRadius,
         ),
         titleTextStyle: textTheme.headlineSmall,
@@ -372,7 +373,7 @@ class ESUNTheme {
             : ESUNColors.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 8,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.sheetRadius,
         ),
         dragHandleColor: isDark 
@@ -392,7 +393,7 @@ class ESUNTheme {
               ? ESUNColors.textPrimary 
               : ESUNColors.textInverse,
         ),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.smRadius,
         ),
         behavior: SnackBarBehavior.floating,
@@ -434,7 +435,7 @@ class ESUNTheme {
           vertical: ESUNSpacing.xs,
         ),
         minVerticalPadding: ESUNSpacing.sm,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: ESUNRadius.smRadius,
         ),
         titleTextStyle: textTheme.bodyLarge,
